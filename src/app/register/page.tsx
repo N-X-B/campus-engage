@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -22,6 +23,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      if (isDemoMode) {
+        await demoAuth.register(email, name);
+        window.location.href = '/onboarding';
+        return;
+      }
+
       // 1. Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -57,6 +64,7 @@ export default function RegisterPage() {
           </Link>
           <h1 className="text-2xl font-semibold text-slate-900 mt-4">Create an account</h1>
           <p className="text-sm text-slate-500 mt-2">Join your campus network</p>
+          {isDemoMode && <p className="text-xs text-orange-500 mt-2 font-bold">DEMO MODE ACTIVE</p>}
         </div>
 
         {error && (

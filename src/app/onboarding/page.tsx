@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
+import { isDemoMode, demoDb } from '@/lib/demo-backend';
 
 export default function OnboardingPage() {
   const { user, loading: authLoading } = useAuth();
@@ -56,6 +57,13 @@ export default function OnboardingPage() {
 
     setSaving(true);
     try {
+      if (isDemoMode) {
+        // Just use blob URLs for demo mode
+        await demoDb.updateProfile(user.uid, { year, branch, bio, photos: previews.filter(p => p !== null) });
+        router.push('/feed');
+        return;
+      }
+
       // 1. Upload photos to Firebase Storage
       const photoUrls: string[] = [];
       for (let i = 0; i < validFiles.length; i++) {

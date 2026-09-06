@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { isDemoMode, demoAuth } from '@/lib/demo-backend';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -20,11 +22,16 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      if (isDemoMode) {
+        await demoAuth.signIn(email);
+        window.location.href = '/feed'; // force reload to update context
+        return;
+      }
+      
       await signInWithEmailAndPassword(auth, email, password);
-      // Redirect to feed/dashboard (we'll just use root for now or a feed page)
       router.push('/feed');
     } catch (err: any) {
-      setError('Invalid email or password.');
+      setError(err.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
@@ -39,6 +46,7 @@ export default function LoginPage() {
           </Link>
           <h1 className="text-2xl font-semibold text-slate-900 mt-4">Welcome back</h1>
           <p className="text-sm text-slate-500 mt-2">Sign in to your account to continue</p>
+          {isDemoMode && <p className="text-xs text-orange-500 mt-2 font-bold">DEMO MODE ACTIVE</p>}
         </div>
 
         {error && (
@@ -76,16 +84,6 @@ export default function LoginPage() {
               placeholder="••••••••"
               className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-colors"
             />
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="rounded border-slate-300 text-slate-900 focus:ring-slate-900" />
-              <span className="text-slate-600">Remember me</span>
-            </label>
-            <Link href="#" className="text-slate-900 font-medium hover:underline">
-              Forgot password?
-            </Link>
           </div>
 
           <Button type="submit" disabled={loading} className="w-full bg-slate-900 text-white hover:bg-slate-800 h-12 rounded-lg mt-6">
