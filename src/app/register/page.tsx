@@ -1,21 +1,24 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
+import { motion } from 'framer-motion';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const referralId = searchParams.get('ref');
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,112 +28,134 @@ export default function RegisterPage() {
     try {
       if (isDemoMode) {
         await demoAuth.register(email, name);
+        // We skip referral logic in demo mode for simplicity, as it relies on real backend coordination
         window.location.href = '/onboarding';
         return;
       }
 
-      // 1. Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. Update display name
       await updateProfile(user, { displayName: name });
 
-      // 3. Create user document in Firestore
       await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
         name,
         email,
         createdAt: new Date().toISOString(),
-        onboarded: false,
+        onboardingComplete: false,
         referralCount: 0,
+        referredBy: referralId || null
       });
 
-      // 4. Redirect to onboarding
+      // If they were referred, update the referrer's count
+      if (referralId) {
+        try {
+          const referrerRef = doc(db, 'users', referralId);
+          await updateDoc(referrerRef, {
+            referralCount: increment(1)
+          });
+        } catch (err) {
+          console.error("Failed to update referral count", err);
+        }
+      }
+
       router.push('/onboarding');
     } catch (err: any) {
-      setError(err.message || 'Failed to create account.');
-    } finally {
+      setError(err.message || 'Failed to create account');
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-slate-50 items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-xl font-bold tracking-tight text-slate-900 mb-2 inline-block">
-            CampusEngage.
-          </Link>
-          <h1 className="text-2xl font-semibold text-slate-900 mt-4">Create an account</h1>
-          <p className="text-sm text-slate-500 mt-2">Join your campus network</p>
-          {isDemoMode && <p className="text-xs text-orange-500 mt-2 font-bold">DEMO MODE ACTIVE</p>}
-        </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
-            {error}
-          </div>
+    <div className="w-full max-w-md mx-auto p-8 bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl relative z-10">
+      <div className="text-center mb-8">
+        <Link href="/" className="text-2xl font-black tracking-tight text-white mb-2 inline-block">
+          CampusEngage.
+        </Link>
+        <h1 className="text-2xl font-bold text-white mt-4">Initialize Profile</h1>
+        <p className="text-zinc-400 mt-2">Create an account to join the network.</p>
+        {referralId && (
+           <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+             <p className="text-indigo-400 text-sm font-bold">🎉 You were invited by a friend!</p>
+           </div>
         )}
+      </div>
 
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="name">
-              Full Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-colors"
-            />
-          </div>
+      {error && (
+        <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-sm font-medium">
+          {error}
+        </div>
+      )}
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="email">
-              University Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@university.edu"
-              className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-colors"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-colors"
-            />
-          </div>
+      <form onSubmit={handleRegister} className="space-y-5">
+        <div>
+          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">Full Name</label>
+          <input
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            placeholder="e.g. John Doe"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">University Email</label>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            placeholder="student@university.edu"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">Password</label>
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            placeholder="••••••••"
+          />
+        </div>
+        
+        <Button 
+          type="submit" 
+          disabled={loading}
+          className="w-full bg-white text-black hover:bg-zinc-200 py-6 text-lg font-bold rounded-xl mt-4"
+        >
+          {loading ? 'Creating Account...' : 'Continue to Vibe Check →'}
+        </Button>
+      </form>
 
-          <Button type="submit" disabled={loading} className="w-full bg-slate-900 text-white hover:bg-slate-800 h-12 rounded-lg mt-6">
-            {loading ? 'Creating...' : 'Continue to Profile Setup'}
-          </Button>
-        </form>
-
-        <div className="mt-8 text-center text-sm text-slate-500">
-          Already have an account?{' '}
-          <Link href="/login" className="text-slate-900 font-medium hover:underline">
+      <div className="mt-8 text-center">
+        <p className="text-zinc-500 text-sm">
+          Already on the network?{' '}
+          <Link href="/login" className="text-white font-bold hover:underline">
             Sign in
           </Link>
-        </div>
+        </p>
       </div>
+    </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans selection:bg-white/20">
+      
+      {/* Background Orbs */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
+         <motion.div animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] bg-indigo-600/20 rounded-full blur-[120px]" />
+         <motion.div animate={{ rotate: -360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} className="absolute -bottom-1/4 -left-1/4 w-[800px] h-[800px] bg-rose-600/10 rounded-full blur-[120px]" />
+      </div>
+
+      <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+        <RegisterForm />
+      </Suspense>
     </div>
   );
 }

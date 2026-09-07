@@ -215,10 +215,10 @@ export default function FeedPage() {
             {profiles.map((p, index) => (
               <motion.div 
                 key={p.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 100, filter: "blur(40px) brightness(2)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px) brightness(1)" }}
                 viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                 className="relative bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/5] flex flex-col group"
               >
                 {/* Background Image */}

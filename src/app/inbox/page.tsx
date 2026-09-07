@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { Navigation } from '@/components/Navigation';
+import { motion } from 'framer-motion';
 
 export default function InboxPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [conversations, setConversations] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -23,66 +25,71 @@ export default function InboxPage() {
 
     if (isDemoMode) {
       setConversations(demoDb.getConversations());
+      demoDb.getProfiles().then(setAllUsers);
       return;
     }
 
-    // In a real app, this would be an onSnapshot listener on the 'conversations' collection
-    // where participants array contains user.uid
-    // For MVP, we will show demo conversations if no real data is set up yet
     setConversations([]);
   }, [user]);
 
-  if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 md:pb-0">
+    <div className="min-h-screen bg-black pb-24 md:pb-0 font-sans selection:bg-white/20">
       <Navigation />
       
-      <main className="max-w-3xl mx-auto p-6 mt-4">
-        <div className="flex justify-between items-end mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Inbox</h1>
-            <p className="text-slate-500 mt-1">Your matches and conversations.</p>
-          </div>
-          {isDemoMode && <span className="text-xs bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-bold">DEMO MODE</span>}
+      <main className="max-w-3xl mx-auto p-4 sm:p-6 mt-4">
+        <div className="mb-10">
+          <h1 className="text-4xl font-black text-white tracking-tight">Messages</h1>
+          <p className="text-zinc-500 mt-2 text-lg">Your campus connections.</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          {conversations.length === 0 ? (
-            <div className="text-center py-16 text-slate-500">
-              No conversations yet. Go to the feed and send an icebreaker!
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {conversations.map((conv) => (
-                <Link key={conv.id} href={`/chat/${conv.id}`} className="block hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center p-4 sm:p-5 gap-4">
-                    <div className="relative">
-                      <img src={conv.otherUserPhoto} alt={conv.otherUserName} className="w-14 h-14 rounded-full object-cover border border-slate-200" />
-                      {conv.unread && (
-                        <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-blue-500 border-2 border-white rounded-full"></span>
+        {conversations.length === 0 ? (
+          <div className="text-center py-32 bg-zinc-950 rounded-[2rem] border border-white/5">
+            <div className="text-6xl mb-4 opacity-50 grayscale">🧊</div>
+            <h3 className="text-2xl font-bold text-white mb-2">It's quiet here...</h3>
+            <p className="text-zinc-500 mb-8">Go to Discover and break the ice with someone.</p>
+            <Link href="/feed" className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-zinc-200 transition">
+              Discover Matches
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {conversations.map((conv, i) => {
+              const otherUser = allUsers.find(u => u.id === conv.id.replace('conv-', ''));
+              
+              return (
+                <Link href={`/chat/${conv.id}`} key={conv.id}>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-center p-4 bg-zinc-900/50 hover:bg-zinc-800/80 backdrop-blur-md rounded-3xl border border-white/5 transition-colors group cursor-none md:cursor-auto"
+                  >
+                    <div className="w-16 h-16 rounded-full overflow-hidden bg-zinc-800 mr-5 flex-shrink-0 border border-white/10 relative">
+                      {otherUser?.photos?.[0] ? (
+                        <img src={otherUser.photos[0]} alt="Avatar" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl">👤</div>
                       )}
+                      {!conv.read && <div className="absolute top-0 right-0 w-4 h-4 bg-rose-500 rounded-full border-2 border-black" />}
                     </div>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-1">
-                        <h3 className={`text-base truncate ${conv.unread ? 'font-bold text-slate-900' : 'font-semibold text-slate-700'}`}>
-                          {conv.otherUserName}
-                        </h3>
-                        <span className="text-xs text-slate-400 whitespace-nowrap ml-2">
-                          {new Date(conv.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                        <h3 className="text-xl font-bold text-white truncate">{otherUser?.name || 'Campus Match'}</h3>
+                        <span className="text-xs font-bold text-zinc-600 uppercase tracking-wider ml-2">{new Date(conv.lastUpdated).toLocaleDateString()}</span>
                       </div>
-                      <p className={`text-sm truncate ${conv.unread ? 'font-medium text-slate-800' : 'text-slate-500'}`}>
-                        {conv.lastMessageText}
+                      <p className={`text-sm truncate ${conv.read ? 'text-zinc-500' : 'text-white font-bold'}`}>
+                        {conv.lastMessage || "Start the conversation..."}
                       </p>
                     </div>
-                  </div>
+                  </motion.div>
                 </Link>
-              ))}
-            </div>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );

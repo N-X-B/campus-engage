@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import Link from 'next/link';
 
-export default function PrivateChatPage() {
+export default function ChatRoom({ params }: { params: { id: string } }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const params = useParams();
-  const conversationId = params.id as string;
-  
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -23,87 +20,102 @@ export default function PrivateChatPage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (!user || !conversationId) return;
-    
+    if (!user) return;
     if (isDemoMode) {
-      setMessages(demoDb.getMessages(conversationId));
+      setMessages(demoDb.getMessages(params.id));
       const interval = setInterval(() => {
-        setMessages(demoDb.getMessages(conversationId));
+        setMessages(demoDb.getMessages(params.id));
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [user, conversationId]);
+  }, [user, params.id]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = async (e: React.FormEvent) => {
+  const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user || !conversationId) return;
+    if (!newMessage.trim() || !user) return;
 
-    try {
-      if (isDemoMode) {
-        demoDb.sendMessage(conversationId, newMessage, user.uid, user.displayName || 'Unknown');
-        setNewMessage('');
-        return;
-      }
-      // Firebase real-time send logic goes here for production
-    } catch (err) {
-      console.error("Error sending message:", err);
+    if (isDemoMode) {
+      demoDb.sendMessage(params.id, newMessage.trim(), user.uid, user.displayName || 'Me');
+      setNewMessage('');
+      setMessages(demoDb.getMessages(params.id));
+      return;
     }
   };
 
-  if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50">
-      <header className="w-full px-6 py-4 bg-white border-b border-slate-100 flex items-center shrink-0 sticky top-0 z-10">
-        <Link href="/inbox" className="p-2 -ml-2 text-slate-400 hover:text-slate-600 transition-colors">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+    <div className="flex flex-col h-[100dvh] bg-black font-sans selection:bg-white/20">
+      <header className="bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 p-4 sticky top-0 z-10 flex items-center">
+        <Link href="/inbox" className="mr-4 text-zinc-400 hover:text-white transition w-10 h-10 flex items-center justify-center bg-zinc-900 rounded-full border border-white/5">
+          ←
         </Link>
-        <div className="ml-2 flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-200 rounded-full overflow-hidden border border-slate-200">
-             {/* For demo, using a static image based on ID. In prod, fetch user data */}
-             <img src={conversationId === 'conv-2' ? "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80" : "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80"} alt="Avatar" className="w-full h-full object-cover" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-slate-900">{conversationId === 'conv-2' ? 'Mike Chen' : 'Sarah Jenkins'}</h2>
-            <p className="text-xs text-slate-500">Active now</p>
-          </div>
+        <div className="flex items-center">
+           <div className="w-10 h-10 bg-zinc-800 rounded-full mr-3 border border-white/10 overflow-hidden flex-shrink-0">
+             <div className="w-full h-full flex items-center justify-center grayscale text-xl">👤</div>
+           </div>
+           <div>
+             <h2 className="text-lg font-bold text-white leading-tight">Match Chat</h2>
+             <span className="text-[10px] text-emerald-500 font-bold tracking-widest uppercase">Online</span>
+           </div>
         </div>
       </header>
-      
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 w-full flex flex-col gap-4">
-        {messages.length === 0 ? (
-          <div className="text-center text-slate-500 mt-10">Say hi to start the conversation!</div>
-        ) : (
-          messages.map((msg, i) => (
-            <div key={msg.id || i} className={`flex flex-col max-w-[80%] ${msg.senderId === user?.uid ? 'self-end items-end' : 'self-start items-start'}`}>
-              <div className={`px-4 py-3 rounded-2xl text-[15px] leading-relaxed shadow-sm ${msg.senderId === user?.uid ? 'bg-slate-900 text-white rounded-br-sm' : 'bg-white border border-slate-200 text-slate-900 rounded-bl-sm'}`}>
-                {msg.text}
+
+      <main className="flex-1 overflow-y-auto p-4 space-y-6">
+        {messages.length === 0 && (
+           <div className="flex flex-col items-center justify-center h-full opacity-40">
+             <span className="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🧊</span>
+             <p className="text-zinc-500 font-medium">Icebreaker sent. Awaiting response.</p>
+           </div>
+        )}
+        
+        {messages.map((msg, idx) => {
+          const isMe = msg.senderId === user?.uid;
+          const showAvatar = !isMe && (idx === 0 || messages[idx - 1].senderId !== msg.senderId);
+          
+          return (
+            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} items-end group`}>
+              {!isMe && (
+                <div className="w-8 h-8 rounded-full bg-zinc-800 mr-2 flex-shrink-0 border border-white/5 overflow-hidden">
+                  {showAvatar ? <div className="w-full h-full flex items-center justify-center text-xs grayscale">👤</div> : null}
+                </div>
+              )}
+              
+              <div className={`max-w-[75%] px-5 py-3.5 rounded-[1.5rem] ${
+                isMe 
+                  ? 'bg-white text-black rounded-br-sm shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
+                  : 'bg-zinc-900 border border-white/5 text-white rounded-bl-sm shadow-xl'
+              }`}>
+                <p className="text-[15px] leading-relaxed font-medium">{msg.text}</p>
+                <div className={`text-[9px] mt-1.5 font-bold tracking-widest uppercase opacity-50`}>
+                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
               </div>
             </div>
-          ))
-        )}
+          );
+        })}
         <div ref={messagesEndRef} />
       </main>
 
-      <footer className="p-4 bg-white border-t border-slate-100 shrink-0 pb-safe">
-        <form onSubmit={sendMessage} className="max-w-4xl mx-auto flex gap-2">
+      <footer className="p-4 bg-zinc-950/80 backdrop-blur-xl border-t border-white/5">
+        <form onSubmit={sendMessage} className="flex gap-3 max-w-3xl mx-auto">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 px-4 py-3 rounded-full border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 bg-slate-50 transition-colors"
+            placeholder="Type a message..."
+            className="flex-1 rounded-full px-6 py-4 bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all shadow-inner"
           />
-          <button type="submit" disabled={!newMessage.trim()} className="bg-slate-900 text-white p-3 rounded-full hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+          <button
+            type="submit"
+            disabled={!newMessage.trim()}
+            className="bg-white text-black px-8 py-4 rounded-full font-bold disabled:opacity-50 hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95"
+          >
+            Send
           </button>
         </form>
       </footer>

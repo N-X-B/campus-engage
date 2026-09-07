@@ -15,35 +15,48 @@ export function Navigation() {
   ];
 
   return (
-    <header className="w-full px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center sticky top-0 z-50">
-      <Link href="/feed" className="text-xl font-bold tracking-tight text-slate-900">
-        CampusEngage.
-      </Link>
-      
-      <nav className="hidden md:flex items-center gap-6">
-        {navItems.map((item) => (
-          <Link 
-            key={item.path} 
-            href={item.path}
-            className={`text-sm font-medium transition-colors ${pathname === item.path ? 'text-slate-900 border-b-2 border-slate-900 pb-1' : 'text-slate-500 hover:text-slate-900'}`}
-          >
-            {item.name}
-          </Link>
-        ))}
-      </nav>
+    <>
+      {/* Desktop Header */}
+      <header className="w-full px-6 py-5 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center sticky top-0 z-50">
+        <Link href="/feed" className="text-xl font-bold tracking-tight text-white hover:scale-105 transition-transform">
+          CampusEngage.
+        </Link>
+        
+        <nav className="hidden md:flex items-center gap-8">
+          {navItems.map((item) => (
+            <Link 
+              key={item.path} 
+              href={item.path}
+              className={`text-sm font-bold tracking-widest uppercase transition-all ${
+                pathname === item.path 
+                  ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' 
+                  : 'text-zinc-500 hover:text-white'
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+      </header>
 
-      {/* Mobile Tab Bar (Fixed at bottom for small screens) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex justify-around p-4 z-50 pb-safe">
+      {/* Mobile Bottom Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-950/90 backdrop-blur-2xl border-t border-white/5 flex justify-around p-5 z-50 pb-safe">
         {navItems.map((item) => (
           <Link 
             key={item.path} 
             href={item.path}
-            className={`text-sm font-medium ${pathname === item.path ? 'text-slate-900' : 'text-slate-400'}`}
+            className={`text-[10px] font-bold tracking-widest uppercase transition-all flex flex-col items-center gap-1 ${
+              pathname === item.path 
+                ? 'text-white' 
+                : 'text-zinc-600'
+            }`}
           >
+            {/* Visual Dot indicator for active tab */}
+            <div className={`w-1 h-1 rounded-full ${pathname === item.path ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,1)]' : 'bg-transparent'}`} />
             {item.name}
           </Link>
         ))}
       </div>
-    </header>
+    </>
   );
 }
