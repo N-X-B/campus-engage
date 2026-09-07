@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
@@ -96,14 +96,14 @@ export default function OnboardingWizard() {
         photoUrls.push(url);
       }
 
-      await updateDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, 'users', user.uid), {
         year,
         branch,
         bio,
         answers,
         photos: photoUrls,
         onboarded: true,
-      });
+      }, { merge: true });
 
       setOnboardingSuccess(true);
       setTimeout(() => {
