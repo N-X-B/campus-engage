@@ -36,8 +36,8 @@ export async function generateAndSaveEmbedding(uid: string, answers: any) {
     const embedding = response.data[0].embedding;
     
     // Save to Pinecone
-    const index = pinecone.index(PINECONE_INDEX_NAME);
-    await index.upsert([{
+    const index = pinecone.index(PINECONE_INDEX_NAME) as any;
+    await index.upsert([ {
       id: uid,
       values: embedding,
       metadata: {
@@ -55,7 +55,7 @@ export async function generateAndSaveEmbedding(uid: string, answers: any) {
 export async function getTopMatches(uid: string, limit: number = 20) {
   try {
     const pinecone = getPinecone();
-    const index = pinecone.index(PINECONE_INDEX_NAME);
+    const index = pinecone.index(PINECONE_INDEX_NAME) as any;
     
     // 1. Fetch the current user's embedding to use as the query vector
     const userRecord = await index.fetch([uid]);
@@ -77,11 +77,23 @@ export async function getTopMatches(uid: string, limit: number = 20) {
     // 3. Filter out the current user and map to IDs
     const matchedUids = queryResponse.matches
       ?.filter((match: any) => match.id !== uid)
-      .map(match => ({ id: match.id, score: match.score || 0 })) || [];
+      .map((match: any) => ({ id: match.id, score: match.score || 0 })) || [];
       
     return { success: true, matches: matchedUids };
   } catch (error: any) {
     console.error("Match Query Error:", error);
     return { success: false, error: error.message, matches: [] };
+  }
+}
+
+export async function deleteUserEmbedding(uid: string) {
+  try {
+    const pinecone = getPinecone();
+    const index = pinecone.index(PINECONE_INDEX_NAME) as any;
+    await index.deleteOne(uid);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Delete Embedding Error:", error);
+    return { success: false, error: error.message };
   }
 }

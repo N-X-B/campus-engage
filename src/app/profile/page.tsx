@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { auth } from '@/lib/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut, deleteUser } from 'firebase/auth';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
@@ -27,6 +30,43 @@ export default function ProfilePage() {
     await signOut(auth);
     router.push('/');
   };
+
+  const handleDeleteAccount = async () => {
+    if (isDemoMode) {
+      alert("Cannot delete accounts in Demo Mode.");
+      return;
+    }
+    
+    const confirmDelete = window.confirm(
+      "Are you absolutely sure you want to permanently delete your account?\n\nThis will instantly erase your profile, photos, matches, and all data from our servers. This action cannot be undone."
+    );
+    
+    if (!confirmDelete) return;
+
+    try {
+      // 1. Delete from AI Vector Database (Fire and forget)
+      deleteUserEmbedding(user.uid).catch(e => console.error(e));
+      
+      // 2. Delete the profile document from Firestore (this also deletes the base64 photos stored inside it)
+      await deleteDoc(doc(db, "users", user.uid));
+      
+      // 3. Delete the user from Firebase Authentication
+      if (auth.currentUser) {
+        await deleteUser(auth.currentUser);
+      }
+      
+      alert("Your account and all associated data have been permanently erased.");
+      window.location.href = '/';
+    } catch (error: any) {
+      console.error("Error deleting account:", error);
+      if (error.code === 'auth/requires-recent-login') {
+        alert("For security reasons, you need to log out and log back in before deleting your account.");
+      } else {
+        alert("An error occurred while deleting your account: " + error.message);
+      }
+    }
+  };
+
 
   const copyInviteLink = () => {
     const link = `https://campusengage.vercel.app/register?ref=${user.uid}`;
