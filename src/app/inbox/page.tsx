@@ -7,6 +7,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { Navigation } from '@/components/Navigation';
 import { motion } from 'framer-motion';
+import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function InboxPage() {
   const { user, loading } = useAuth();
@@ -29,7 +31,33 @@ export default function InboxPage() {
       return;
     }
 
-    setConversations([]);
+    // Load all users to get names/photos for the inbox
+    getDocs(collection(db, 'users')).then(snapshot => {
+      const users: any[] = [];
+      snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+      setAllUsers(users);
+    });
+
+    // Listen to real conversations
+    const q = query(collection(db, 'conversations'), where('participants', 'array-contains', user.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+       const convos: any[] = [];
+       snapshot.forEach(d => {
+          const data = d.data();
+          const otherUserId = data.participants?.find((id: string) => id !== user.uid);
+          convos.push({
+             id: d.id,
+             otherUserId,
+             lastMessage: data.lastMessage,
+             lastUpdated: data.lastUpdated,
+             read: true
+          });
+       });
+       convos.sort((a, b) => b.lastUpdated - a.lastUpdated);
+       setConversations(convos);
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
   if (loading) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
@@ -56,7 +84,7 @@ export default function InboxPage() {
         ) : (
           <div className="space-y-4">
             {conversations.map((conv, i) => {
-              const otherUser = allUsers.find(u => u.id === conv.id.replace('conv-', ''));
+              const otherUser = allUsers.find(u => u.id === (isDemoMode ? conv.id.replace('conv-', '') : conv.otherUserId));
               
               return (
                 <Link href={`/chat/${conv.id}`} key={conv.id}>
@@ -78,7 +106,9 @@ export default function InboxPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-1">
                         <h3 className="text-xl font-bold text-white truncate">{otherUser?.name || 'Campus Match'}</h3>
-                        <span className="text-xs font-bold text-zinc-600 uppercase tracking-wider ml-2">{new Date(conv.lastUpdated).toLocaleDateString()}</span>
+                        <span className="text-xs font-bold text-zinc-600 uppercase tracking-wider ml-2">
+                          {new Date(conv.lastUpdated).toLocaleDateString()}
+                        </span>
                       </div>
                       <p className={`text-sm truncate ${conv.read ? 'text-zinc-500' : 'text-white font-bold'}`}>
                         {conv.lastMessage || "Start the conversation..."}

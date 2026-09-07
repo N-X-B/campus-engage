@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import Link from 'next/link';
+import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function ChatRoom({ params }: { params: { id: string } }) {
   const { user, loading } = useAuth();
@@ -28,13 +30,22 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
       }, 1000);
       return () => clearInterval(interval);
     }
+    
+    // Production: Listen to real messages
+    const q = query(collection(db, `conversations/${params.id}/messages`), orderBy('timestamp', 'asc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+       const msgs: any[] = [];
+       snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+       setMessages(msgs);
+    });
+    return () => unsubscribe();
   }, [user, params.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = (e: React.FormEvent) => {
+  const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
 
@@ -43,6 +54,27 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
       setNewMessage('');
       setMessages(demoDb.getMessages(params.id));
       return;
+    }
+    
+    // Production: Send real message
+    const msgText = newMessage.trim();
+    setNewMessage(''); // optimistic clear
+    
+    try {
+      const msgRef = collection(db, `conversations/${params.id}/messages`);
+      await addDoc(msgRef, {
+         text: msgText,
+         senderId: user.uid,
+         senderName: user.displayName || 'Anonymous',
+         timestamp: Date.now()
+      });
+
+      await updateDoc(doc(db, 'conversations', params.id), {
+         lastMessage: msgText,
+         lastUpdated: Date.now()
+      });
+    } catch(err) {
+      console.error(err);
     }
   };
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, setDoc, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
@@ -46,7 +46,7 @@ export default function FeedPage() {
         if (isDemoMode) {
           fetchedProfiles = await demoDb.getProfiles();
         } else {
-          const q = query(collection(db, "users"), where("uid", "!=", user.uid));
+          const q = collection(db, "users");
           const querySnapshot = await getDocs(q);
           querySnapshot.forEach((doc) => {
             fetchedProfiles.push({ id: doc.id, ...doc.data() });
@@ -54,7 +54,7 @@ export default function FeedPage() {
         }
         
         const scoredProfiles = fetchedProfiles
-          .filter(p => p.onboarded)
+          .filter(p => p.onboarded && p.id !== user.uid)
           .map(p => ({
             ...p,
             matchScore: calculateMatchScore(user, p)
@@ -86,8 +86,28 @@ export default function FeedPage() {
       return;
     }
     try {
-       router.push(`/chat/${selectedUser.id}`);
-    } catch(e) {}
+      
+      const convId = [user.uid, selectedUser.id].sort().join('_');
+      
+      // Initialize conversation document
+      await setDoc(doc(db, 'conversations', convId), {
+         participants: [user.uid, selectedUser.id],
+         lastMessage: selectedPrompt,
+         lastUpdated: Date.now()
+      }, { merge: true });
+
+      // Add the message
+      await addDoc(collection(db, `conversations/${convId}/messages`), {
+         text: selectedPrompt,
+         senderId: user.uid,
+         senderName: user.displayName || 'Anonymous',
+         timestamp: Date.now()
+      });
+
+      router.push(`/chat/${convId}`);
+    } catch(e) {
+      console.error(e);
+    }
   };
 
   const getMatchColor = (score: number) => {
