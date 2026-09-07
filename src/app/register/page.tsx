@@ -8,6 +8,7 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { motion } from 'framer-motion';
 
 function RegisterForm() {
