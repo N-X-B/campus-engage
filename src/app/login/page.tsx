@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -32,10 +33,18 @@ export default function LoginPage() {
         return;
       }
       
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+      const userData = userDoc.data();
+      
       setLoginState('success');
       setTimeout(() => {
-        router.push('/feed');
+        if (userData && userData.onboarded) {
+          router.push('/feed');
+        } else {
+          router.push('/onboarding');
+        }
       }, 1200);
     } catch (err: any) {
       setError(err.message || 'Invalid email or password.');
