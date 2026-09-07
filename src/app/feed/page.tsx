@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { calculateMatchScore } from '@/lib/matchAlgorithm';
+import { getTopMatches } from '@/app/actions/matchmaking';
 import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -53,13 +54,41 @@ export default function FeedPage() {
           });
         }
         
-        const scoredProfiles = fetchedProfiles
-          .filter(p => p.onboarded && p.id !== user.uid)
-          .map(p => ({
-            ...p,
-            matchScore: calculateMatchScore(user, p)
-          }))
-          .sort((a, b) => b.matchScore - a.matchScore); 
+        
+        let scoredProfiles = [];
+        
+        // Try AI Vector Database Matchmaking first
+        if (!isDemoMode && user) {
+          try {
+            const aiMatches = await getTopMatches(user.uid, 50);
+            if (aiMatches.success && aiMatches.matches.length > 0) {
+              const aiScoreMap = new Map();
+              aiMatches.matches.forEach((m: any) => aiScoreMap.set(m.id, m.score));
+              
+              scoredProfiles = fetchedProfiles
+                .filter(p => p.onboarded && p.id !== user.uid && aiScoreMap.has(p.id))
+                .map(p => ({
+                  ...p,
+                  // Scale Pinecone cosine similarity (usually 0 to 1, sometimes 0 to 100) to our 1-100 scale
+                  matchScore: Math.round(aiScoreMap.get(p.id) * 100)
+                }))
+                .sort((a, b) => b.matchScore - a.matchScore);
+            }
+          } catch (e) {
+            console.error("AI Matchmaking skipped/failed (using fallback):", e);
+          }
+        }
+        
+        // Fallback to basic string-matching algorithm if AI is missing keys or fails
+        if (scoredProfiles.length === 0) {
+          scoredProfiles = fetchedProfiles
+            .filter(p => p.onboarded && p.id !== user.uid)
+            .map(p => ({
+              ...p,
+              matchScore: calculateMatchScore(user, p)
+            }))
+            .sort((a, b) => b.matchScore - a.matchScore);
+        }
 
         setProfiles(scoredProfiles);
       } catch (err) {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
+import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
@@ -137,6 +138,7 @@ export default function OnboardingWizard() {
         photoUrls.push(url);
       }
 
+      
       // Race database save against a 10-second timeout
       await Promise.race([
         setDoc(doc(db, 'users', user.uid), {
@@ -149,7 +151,10 @@ export default function OnboardingWizard() {
         }, { merge: true }),
         timeoutPromise(10000, "Database save timed out! Please double check that your Vercel Environment Variables have no typos.")
       ]);
-
+      
+      // Fire-and-forget: Generate AI Embedding for the user's vibe check answers
+      // We don't await this blocking the UI, but it saves to Pinecone in the background.
+      generateAndSaveEmbedding(user.uid, answers).catch(e => console.error("Embedding generation skipped (missing keys?):", e));
 
       setOnboardingSuccess(true);
       setTimeout(() => {
