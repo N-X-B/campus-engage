@@ -70,10 +70,10 @@ function RegisterForm() {
   return (
     <div className="w-full max-w-md mx-auto p-8 bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl relative z-10">
       <div className="text-center mb-8">
-        <Link href="/" className="text-2xl font-black tracking-tight text-white mb-2 inline-block">
+        <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 mb-2 inline-block">
           CampusEngage.
         </Link>
-        <h1 className="text-2xl font-bold text-white mt-4">Initialize Profile</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mt-4">Initialize Profile</h1>
         <p className="text-zinc-400 mt-2">Create an account to join the network.</p>
         {referralId && (
            <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
@@ -96,7 +96,7 @@ function RegisterForm() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
             placeholder="e.g. John Doe"
           />
         </div>
@@ -107,7 +107,7 @@ function RegisterForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
             placeholder="student@university.edu"
           />
         </div>
@@ -118,7 +118,7 @@ function RegisterForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
             placeholder="••••••••"
           />
         </div>
@@ -135,7 +135,7 @@ function RegisterForm() {
       <div className="mt-8 text-center">
         <p className="text-zinc-500 text-sm">
           Already on the network?{' '}
-          <Link href="/login" className="text-white font-bold hover:underline">
+          <Link href="/login" className="text-slate-900 font-bold hover:underline">
             Sign in
           </Link>
         </p>
@@ -154,7 +154,7 @@ export default function RegisterPage() {
          <motion.div animate={{ rotate: -360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} className="absolute -bottom-1/4 -left-1/4 w-[800px] h-[800px] bg-rose-600/10 rounded-full blur-[120px]" />
       </div>
 
-      <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+      <Suspense fallback={<div className="text-slate-900 text-center">Loading...</div>}>
         <RegisterForm />
       </Suspense>
     </div>
