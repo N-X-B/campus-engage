@@ -86,24 +86,39 @@ export default function OnboardingWizard() {
         return;
       }
 
+      
+      const timeoutPromise = (ms: number, msg: string) => new Promise((_, reject) => setTimeout(() => reject(new Error(msg)), ms));
+
       const validFiles = files.filter(f => f !== null) as File[];
       const photoUrls: string[] = [];
+      
       for (let i = 0; i < validFiles.length; i++) {
         const file = validFiles[i];
         const storageRef = ref(storage, `users/${user.uid}/photo_${i}_${Date.now()}`);
-        await uploadBytes(storageRef, file);
+        
+        // Race upload against a 15-second timeout (usually hangs if CORS is missing)
+        await Promise.race([
+          uploadBytes(storageRef, file),
+          timeoutPromise(15000, "Photo upload timed out! Your Google Cloud Storage bucket might be missing CORS configuration. Try skipping photos for now.")
+        ]);
+        
         const url = await getDownloadURL(storageRef);
         photoUrls.push(url);
       }
 
-      await setDoc(doc(db, 'users', user.uid), {
-        year,
-        branch,
-        bio,
-        answers,
-        photos: photoUrls,
-        onboarded: true,
-      }, { merge: true });
+      // Race database save against a 10-second timeout
+      await Promise.race([
+        setDoc(doc(db, 'users', user.uid), {
+          year,
+          branch,
+          bio,
+          answers,
+          photos: photoUrls,
+          onboarded: true
+        }, { merge: true }),
+        timeoutPromise(10000, "Database save timed out! Please double check that your Vercel Environment Variables have no typos.")
+      ]);
+
 
       setOnboardingSuccess(true);
       setTimeout(() => {
