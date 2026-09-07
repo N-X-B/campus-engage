@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -18,9 +18,19 @@ let db: any;
 let storage: any;
 
 try {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  const apps = getApps();
+  if (!apps.length) {
+    app = initializeApp(firebaseConfig);
+    // Force Long Polling to completely bypass WebSocket/Firewall network drops
+    db = initializeFirestore(app, {
+      experimentalForceLongPolling: true
+    });
+  } else {
+    app = getApp();
+    db = getFirestore(app);
+  }
+  
   auth = getAuth(app);
-  db = getFirestore(app);
   storage = getStorage(app);
 } catch (e) {
   console.warn("Firebase initialization failed.", e);
