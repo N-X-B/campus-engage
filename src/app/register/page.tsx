@@ -74,7 +74,7 @@ function RegisterForm() {
           CampusEngage.
         </Link>
         <h1 className="text-2xl font-bold text-slate-900 mt-4">Initialize Profile</h1>
-        <p className="text-zinc-400 mt-2">Create an account to join the network.</p>
+        <p className="text-slate-500 mt-2">Create an account to join the network.</p>
         {referralId && (
            <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
              <p className="text-indigo-400 text-sm font-bold">🎉 You were invited by a friend!</p>
@@ -90,35 +90,35 @@ function RegisterForm() {
 
       <form onSubmit={handleRegister} className="space-y-5">
         <div>
-          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">Full Name</label>
+          <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
             placeholder="e.g. John Doe"
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">University Email</label>
+          <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">University Email</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
             placeholder="student@university.edu"
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">Password</label>
+          <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Password</label>
           <input
             type="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
             placeholder="••••••••"
           />
         </div>
@@ -126,7 +126,7 @@ function RegisterForm() {
         <Button 
           type="submit" 
           disabled={loading}
-          className="w-full bg-white text-black hover:bg-zinc-200 py-6 text-lg font-bold rounded-xl mt-4"
+          className="w-full bg-slate-900 text-white hover:bg-slate-800 py-6 text-lg font-bold rounded-xl mt-4"
         >
           {loading ? 'Creating Account...' : 'Continue to Vibe Check →'}
         </Button>
@@ -146,7 +146,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans selection:bg-white/20">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans selection:bg-white/20">
       
       {/* Background Orbs */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
