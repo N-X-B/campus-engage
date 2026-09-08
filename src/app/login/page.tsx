@@ -41,21 +41,24 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
       let userData = null;
+      let dbFailed = false;
       try {
         const userDoc = (await Promise.race([ getDoc(doc(db, 'users', userCredential.user.uid)), timeoutPromise(1500, 'timeout') ])) as any;
         userData = userDoc.data();
       } catch (dbErr) {
-        console.warn("[LOGIN] Failed to get user document. Network blocked? Proceeding to onboarding as fallback.", dbErr);
+        console.warn("[LOGIN] Failed to get user document. Network blocked? Proceeding to feed as fallback.", dbErr);
+        dbFailed = true;
       }
       
       setLoginState('success');
       setTimeout(() => {
-        if (userData && userData.onboarded) {
+        // If DB fails, assume they are returning user to avoid forcing onboarding loop
+        if (dbFailed || (userData && userData.onboarded)) {
           window.location.href = '/feed';
         } else {
           window.location.href = '/onboarding';
         }
-      }, 1200);
+      }, 500);
     } catch (err: any) {
       setError(err.message || 'Invalid email or password.');
       setLoginState('idle');
