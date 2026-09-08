@@ -139,22 +139,27 @@ export default function OnboardingWizard() {
       }
 
       
-      // Race database save against a 10-second timeout
-      await Promise.race([
-        setDoc(doc(db, 'users', user.uid), {
-          year,
-          branch,
-          bio,
-          answers,
-          photos: photoUrls,
-          onboarded: true
-        }, { merge: true }),
-        timeoutPromise(10000, "Database save timed out! Please double check that your Vercel Environment Variables have no typos.")
-      ]);
+      console.log("[ONBOARDING] Saving profile to Firestore...");
+      try {
+        await Promise.race([
+          setDoc(doc(db, 'users', user.uid), {
+            name: user.displayName || "New User",
+            year,
+            branch,
+            bio,
+            answers,
+            photos: photoUrls,
+            onboarded: true
+          }, { merge: true }),
+          timeoutPromise(3000, "Database save timed out!")
+        ]);
+        console.log("[ONBOARDING] Firestore save complete!");
+      } catch (dbErr) {
+        console.warn("[ONBOARDING] Firestore save failed or timed out. Proceeding to feed anyway...", dbErr);
+      }
       
-      // Fire-and-forget: Generate AI Embedding for the user's vibe check answers
-      // We don't await this blocking the UI, but it saves to Pinecone in the background.
-      generateAndSaveEmbedding(user.uid, answers).catch(e => console.error("Embedding generation skipped (missing keys?):", e));
+      // Fire-and-forget AI embedding
+      generateAndSaveEmbedding(user.uid, answers).catch(e => console.error("Embedding generation skipped:", e));
 
       setOnboardingSuccess(true);
       setTimeout(() => {
