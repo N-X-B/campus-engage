@@ -22,9 +22,7 @@ try {
   if (!apps.length) {
     app = initializeApp(firebaseConfig);
     // Force Long Polling to completely bypass WebSocket/Firewall network drops
-    db = initializeFirestore(app, {
-      experimentalForceLongPolling: true
-    });
+    db = getFirestore(app);
   } else {
     app = getApp();
     db = getFirestore(app);

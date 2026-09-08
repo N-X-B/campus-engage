@@ -36,8 +36,13 @@ export default function LoginPage() {
       
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      const userData = userDoc.data();
+      let userData = null;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+        userData = userDoc.data();
+      } catch (dbErr) {
+        console.warn("[LOGIN] Failed to get user document. Network blocked? Proceeding to onboarding as fallback.", dbErr);
+      }
       
       setLoginState('success');
       setTimeout(() => {

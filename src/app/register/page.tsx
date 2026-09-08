@@ -48,19 +48,22 @@ function RegisterForm() {
       await updateProfile(user, { displayName: name });
       
       console.log("[REGISTER] Saving profile to Firestore...");
-      await Promise.race([
-        setDoc(doc(db, 'users', user.uid), {
-          name,
-          email,
-          createdAt: new Date().toISOString(),
-          onboardingComplete: false,
-          referralCount: 0,
-          referredBy: referralId || null
-        }),
-        timeoutPromise(10000, "Database connection timed out. Firestore is hanging.")
-      ]);
-      
-      console.log("[REGISTER] Firestore save complete!");
+      try {
+        await Promise.race([
+          setDoc(doc(db, 'users', user.uid), {
+            name,
+            email,
+            createdAt: new Date().toISOString(),
+            onboardingComplete: false,
+            referralCount: 0,
+            referredBy: referralId || null
+          }),
+          timeoutPromise(3000, "Database connection timed out. Firestore is hanging.")
+        ]);
+        console.log("[REGISTER] Firestore save complete!");
+      } catch (dbErr) {
+        console.warn("[REGISTER] Firestore failed or timed out, but account was created in Auth. Proceeding anyway...", dbErr);
+      }
 
       if (referralId) {
         console.log("[REGISTER] Updating referral count...");
