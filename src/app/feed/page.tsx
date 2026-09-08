@@ -19,6 +19,10 @@ const ICEBREAKERS = [
   "What's the hardest class you've taken so far?"
 ];
 
+
+const timeoutPromise = (ms: number, message: string) => 
+  new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms));
+
 export default function FeedPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
