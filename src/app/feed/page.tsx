@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { calculateMatchScore } from '@/lib/matchAlgorithm';
 import { getTopMatches } from '@/app/actions/matchmaking';
+import { getProfilesOnServer } from '@/app/actions/profile';
 import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -52,21 +53,23 @@ export default function FeedPage() {
           fetchedProfiles = await demoDb.getProfiles();
         } else {
           try {
-            const q = collection(db, "users");
-            const querySnapshot = (await Promise.race([
-              getDocs(q),
-              timeoutPromise(800, "Firestore connection timed out")
-            ])) as any;
-            querySnapshot.forEach((doc: any) => {
-              fetchedProfiles.push({ id: doc.id, ...doc.data() });
-            });
-            
-            // If the database is completely empty (no users saved), fall back to Demo profiles so the feed isn't blank
-            if (fetchedProfiles.length <= 1) {
-              console.warn("[FEED] Database is empty. Injecting Demo users.");
-              fetchedProfiles = await demoDb.getProfiles();
+            console.log("[FEED] Fetching profiles via Server Action (bypassing firewall)...");
+            const result = await getProfilesOnServer();
+            if (result.success && result.profiles) {
+               fetchedProfiles = result.profiles;
+               
+               if (fetchedProfiles.length <= 1) {
+                 console.warn("[FEED] Database is empty. Injecting Demo users.");
+                 fetchedProfiles = await demoDb.getProfiles();
+               }
+            } else {
+               throw new Error(result.error || "Server Action Failed");
             }
           } catch (err) {
+            console.warn("[FEED] Server Action failed. Falling back to Demo Mode.", err);
+            fetchedProfiles = await demoDb.getProfiles();
+          }
+        } catch (err) {
             console.warn("[FEED] Failed to load from Firestore. Falling back to Demo Mode.", err);
             fetchedProfiles = await demoDb.getProfiles();
           }

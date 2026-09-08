@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { saveProfileOnServer } from '@/app/actions/profile';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { motion } from 'framer-motion';
@@ -47,22 +48,20 @@ function RegisterForm() {
       console.log("[REGISTER] Updating profile...");
       await updateProfile(user, { displayName: name });
       
-      console.log("[REGISTER] Saving profile to Firestore...");
+      console.log("[REGISTER] Saving profile to Firestore via Server Action...");
       try {
-        await Promise.race([
-          setDoc(doc(db, 'users', user.uid), {
+        const result = await saveProfileOnServer(user.uid, {
             name,
             email,
             createdAt: new Date().toISOString(),
             onboardingComplete: false,
             referralCount: 0,
             referredBy: referralId || null
-          }),
-          timeoutPromise(1500, "Database connection timed out. Firestore is hanging.")
-        ]);
-        console.log("[REGISTER] Firestore save complete!");
+        });
+        if (!result.success) throw new Error(result.error);
+        console.log("[REGISTER] Server Action save complete!");
       } catch (dbErr) {
-        console.warn("[REGISTER] Firestore failed or timed out, but account was created in Auth. Proceeding anyway...", dbErr);
+        console.warn("[REGISTER] Server Action failed, but account was created in Auth. Proceeding anyway...", dbErr);
       }
 
       if (referralId) {

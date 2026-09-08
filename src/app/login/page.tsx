@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
+import { getUserOnServer } from '@/app/actions/profile';
 import { doc, getDoc } from 'firebase/firestore';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
@@ -43,10 +44,15 @@ export default function LoginPage() {
       let userData = null;
       let dbFailed = false;
       try {
-        const userDoc = (await Promise.race([ getDoc(doc(db, 'users', userCredential.user.uid)), timeoutPromise(1500, 'timeout') ])) as any;
-        userData = userDoc.data();
+        console.log("[LOGIN] Fetching user doc via Server Action...");
+        const result = await getUserOnServer(userCredential.user.uid);
+        if (result.success) {
+          userData = result.data;
+        } else {
+          throw new Error(result.error);
+        }
       } catch (dbErr) {
-        console.warn("[LOGIN] Failed to get user document. Network blocked? Proceeding to feed as fallback.", dbErr);
+        console.warn("[LOGIN] Server Action failed. Network blocked? Proceeding to feed as fallback.", dbErr);
         dbFailed = true;
       }
       

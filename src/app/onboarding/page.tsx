@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
+import { saveProfileOnServer } from '@/app/actions/profile';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
@@ -135,23 +136,25 @@ export default function OnboardingWizard() {
       }
 
       
-      console.log("[ONBOARDING] Saving profile to Firestore...");
+      console.log("[ONBOARDING] Saving profile via Server Action (bypassing firewall)...");
       try {
-        await Promise.race([
-          setDoc(doc(db, 'users', user.uid), {
-            name: user.displayName || "New User",
-            year,
-            branch,
-            bio,
-            answers,
-            photos: photoUrls,
-            onboarded: true
-          }, { merge: true }),
-          timeoutPromise(8000, "Database save timed out!")
-        ]);
-        console.log("[ONBOARDING] Firestore save complete!");
+        const result = await saveProfileOnServer(user.uid, {
+          name: user.displayName || "New User",
+          year,
+          branch,
+          bio,
+          answers,
+          photos: photoUrls,
+          onboarded: true
+        });
+        
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+        
+        console.log("[ONBOARDING] Server Action save complete!");
       } catch (dbErr) {
-        console.warn("[ONBOARDING] Firestore save failed or timed out. Proceeding to feed anyway...", dbErr);
+        console.warn("[ONBOARDING] Server Action save failed. Proceeding to feed anyway...", dbErr);
       }
       
       // Fire-and-forget AI embedding
