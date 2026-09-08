@@ -27,18 +27,27 @@ function RegisterForm() {
     setLoading(true);
 
     try {
+      console.log("[REGISTER] Starting registration process...");
       if (isDemoMode) {
+        console.log("[REGISTER] Using demo mode");
         await demoAuth.register(email, name);
-        // We skip referral logic in demo mode for simplicity, as it relies on real backend coordination
         window.location.href = '/onboarding';
         return;
       }
 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("[REGISTER] Calling createUserWithEmailAndPassword...");
+      const userCredential = await Promise.race([
+        createUserWithEmailAndPassword(auth, email, password),
+        timeoutPromise(8000, "Firebase Auth is not responding. Check your network or Vercel configuration.")
+      ]) as any;
+      
       const user = userCredential.user;
+      console.log("[REGISTER] User created in Auth:", user.uid);
 
+      console.log("[REGISTER] Updating profile...");
       await updateProfile(user, { displayName: name });
-
+      
+      console.log("[REGISTER] Saving profile to Firestore...");
       await Promise.race([
         setDoc(doc(db, 'users', user.uid), {
           name,
@@ -48,23 +57,27 @@ function RegisterForm() {
           referralCount: 0,
           referredBy: referralId || null
         }),
-        timeoutPromise(10000, "Database connection timed out. Please check your internet, turn off your adblocker, or ensure Firestore is properly created in the Firebase Console.")
+        timeoutPromise(10000, "Database connection timed out. Firestore is hanging.")
       ]);
+      
+      console.log("[REGISTER] Firestore save complete!");
 
-      // If they were referred, update the referrer's count
       if (referralId) {
+        console.log("[REGISTER] Updating referral count...");
         try {
           const referrerRef = doc(db, 'users', referralId);
           await updateDoc(referrerRef, {
             referralCount: increment(1)
           });
         } catch (err) {
-          console.error("Failed to update referral count", err);
+          console.error("[REGISTER] Failed to update referral count", err);
         }
       }
 
-      router.push('/onboarding');
+      console.log("[REGISTER] Routing to /onboarding...");
+      window.location.href = '/onboarding';
     } catch (err: any) {
+      console.error("[REGISTER] Caught Error:", err);
       setError(err.message || 'Failed to create account');
       setLoading(false);
     }
