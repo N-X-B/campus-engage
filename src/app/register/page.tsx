@@ -38,7 +38,7 @@ function RegisterForm() {
       console.log("[REGISTER] Calling createUserWithEmailAndPassword...");
       const userCredential = await Promise.race([
         createUserWithEmailAndPassword(auth, email, password),
-        timeoutPromise(8000, "Firebase Auth is not responding. Check your network or Vercel configuration.")
+        timeoutPromise(2500, "Firebase Auth is not responding. Check your network or Vercel configuration.")
       ]) as any;
       
       const user = userCredential.user;
@@ -58,7 +58,7 @@ function RegisterForm() {
             referralCount: 0,
             referredBy: referralId || null
           }),
-          timeoutPromise(3000, "Database connection timed out. Firestore is hanging.")
+          timeoutPromise(1500, "Database connection timed out. Firestore is hanging.")
         ]);
         console.log("[REGISTER] Firestore save complete!");
       } catch (dbErr) {

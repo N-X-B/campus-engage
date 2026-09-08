@@ -11,6 +11,10 @@ import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { motion, AnimatePresence } from 'framer-motion';
 
+
+const timeoutPromise = (ms: number, message: string) => 
+  new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms));
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,7 +42,7 @@ export default function LoginPage() {
       
       let userData = null;
       try {
-        const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+        const userDoc = (await Promise.race([ getDoc(doc(db, 'users', userCredential.user.uid)), timeoutPromise(1500, 'timeout') ])) as any;
         userData = userDoc.data();
       } catch (dbErr) {
         console.warn("[LOGIN] Failed to get user document. Network blocked? Proceeding to onboarding as fallback.", dbErr);

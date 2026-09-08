@@ -147,7 +147,7 @@ export default function OnboardingWizard() {
             photos: photoUrls,
             onboarded: true
           }, { merge: true }),
-          timeoutPromise(3000, "Database save timed out!")
+          timeoutPromise(1500, "Database save timed out!")
         ]);
         console.log("[ONBOARDING] Firestore save complete!");
       } catch (dbErr) {
