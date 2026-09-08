@@ -114,7 +114,7 @@ export default function OnboardingWizard() {
         setOnboardingSuccess(true);
         setTimeout(() => {
           window.location.href = '/feed';
-        }, 3000); // 3 second animation
+        }, 2000); // 2 second animation
         return;
       }
 
@@ -160,7 +160,7 @@ export default function OnboardingWizard() {
       setOnboardingSuccess(true);
       setTimeout(() => {
         window.location.href = '/feed';
-      }, 3000); // 3 second animation
+      }, 2000); // 2 second animation
       
     } catch (err: any) {
       console.error(err);
