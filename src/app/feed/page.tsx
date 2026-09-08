@@ -60,6 +60,12 @@ export default function FeedPage() {
             querySnapshot.forEach((doc: any) => {
               fetchedProfiles.push({ id: doc.id, ...doc.data() });
             });
+            
+            // If the database is completely empty (no users saved), fall back to Demo profiles so the feed isn't blank
+            if (fetchedProfiles.length <= 1) {
+              console.warn("[FEED] Database is empty. Injecting Demo users.");
+              fetchedProfiles = await demoDb.getProfiles();
+            }
           } catch (err) {
             console.warn("[FEED] Failed to load from Firestore. Falling back to Demo Mode.", err);
             fetchedProfiles = await demoDb.getProfiles();
