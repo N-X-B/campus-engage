@@ -39,14 +39,17 @@ function RegisterForm() {
 
       await updateProfile(user, { displayName: name });
 
-      await setDoc(doc(db, 'users', user.uid), {
-        name,
-        email,
-        createdAt: new Date().toISOString(),
-        onboardingComplete: false,
-        referralCount: 0,
-        referredBy: referralId || null
-      });
+      await Promise.race([
+        setDoc(doc(db, 'users', user.uid), {
+          name,
+          email,
+          createdAt: new Date().toISOString(),
+          onboardingComplete: false,
+          referralCount: 0,
+          referredBy: referralId || null
+        }),
+        timeoutPromise(10000, "Database connection timed out. Please check your internet, turn off your adblocker, or ensure Firestore is properly created in the Firebase Console.")
+      ]);
 
       // If they were referred, update the referrer's count
       if (referralId) {
@@ -143,6 +146,10 @@ function RegisterForm() {
     </div>
   );
 }
+
+
+const timeoutPromise = (ms: number, message: string) => 
+  new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms));
 
 export default function RegisterPage() {
   return (
