@@ -29,7 +29,7 @@ export default function LoginPage() {
         await demoAuth.signIn(email);
         setLoginState('success');
         setTimeout(() => {
-          router.push('/feed'); // using router.push instead of window.location for smoother SPA transition
+          window.location.href = '/feed'; // using router.push instead of window.location for smoother SPA transition
         }, 1200);
         return;
       }
@@ -47,9 +47,9 @@ export default function LoginPage() {
       setLoginState('success');
       setTimeout(() => {
         if (userData && userData.onboarded) {
-          router.push('/feed');
+          window.location.href = '/feed';
         } else {
-          router.push('/onboarding');
+          window.location.href = '/onboarding';
         }
       }, 1200);
     } catch (err: any) {
