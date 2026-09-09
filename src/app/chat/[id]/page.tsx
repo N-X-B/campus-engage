@@ -4,16 +4,18 @@ import { useState, useEffect, useRef } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
-import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import Link from 'next/link';
-import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, doc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { motion } from 'framer-motion';
 
 export default function ChatRoom({ params }: { params: { id: string } }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [otherUser, setOtherUser] = useState<any>(null);
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,134 +26,172 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (!user) return;
-    if (isDemoMode) {
-      setMessages(demoDb.getMessages(params.id));
-      const interval = setInterval(() => {
-        setMessages(demoDb.getMessages(params.id));
-      }, 1000);
-      return () => clearInterval(interval);
-    }
+
+    // First check if the user is authorized for this specific chat
+    const verifyAccess = async () => {
+      try {
+        const convSnap = await getDoc(doc(db, 'conversations', params.id));
+        if (!convSnap.exists()) {
+           setIsAuthorized(false);
+           return;
+        }
+        
+        const data = convSnap.data();
+        if (!data.participants || !data.participants.includes(user.uid)) {
+           setIsAuthorized(false); // Unauthorized!
+           return;
+        }
+
+        setIsAuthorized(true);
+
+        // Fetch other user profile
+        const otherId = data.participants.find((id: string) => id !== user.uid);
+        if (otherId) {
+          const uSnap = await getDoc(doc(db, 'users', otherId));
+          if (uSnap.exists()) {
+             setOtherUser({ id: uSnap.id, ...uSnap.data() });
+          }
+        }
+      } catch (err) {
+        setIsAuthorized(false);
+      }
+    };
+
+    verifyAccess();
+  }, [user, params.id]);
+
+  useEffect(() => {
+    if (isAuthorized !== true || !user) return;
     
-    // Production: Listen to real messages
+    // Listen to real messages strictly bound to this conversation ID
     const q = query(collection(db, `conversations/${params.id}/messages`), orderBy('timestamp', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
        const msgs: any[] = [];
        snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
        setMessages(msgs);
+       setTimeout(() => {
+         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+       }, 100);
     });
+
     return () => unsubscribe();
-  }, [user, params.id]);
+  }, [isAuthorized, params.id, user]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const sendMessage = async (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim() || !user || isAuthorized !== true) return;
 
-    if (isDemoMode) {
-      demoDb.sendMessage(params.id, newMessage.trim(), user.uid, user.displayName || 'Me');
-      setNewMessage('');
-      setMessages(demoDb.getMessages(params.id));
-      return;
-    }
-    
-    // Production: Send real message
-    const msgText = newMessage.trim();
+    const text = newMessage.trim();
     setNewMessage(''); // optimistic clear
-    
-    try {
-      const msgRef = collection(db, `conversations/${params.id}/messages`);
-      await addDoc(msgRef, {
-         text: msgText,
-         senderId: user.uid,
-         senderName: user.displayName || 'Anonymous',
-         timestamp: Date.now()
-      });
 
-      await updateDoc(doc(db, 'conversations', params.id), {
-         lastMessage: msgText,
-         lastUpdated: Date.now()
+    try {
+      await addDoc(collection(db, `conversations/${params.id}/messages`), {
+        text,
+        senderId: user.uid,
+        senderName: user.displayName || 'You',
+        timestamp: Date.now() // Use Date.now for simpler sorting
       });
-    } catch(err) {
-      console.error(err);
+    } catch (err) {
+      console.error("Failed to send message", err);
     }
   };
 
-  if (loading) return <LoadingScreen />;
+  if (loading || isAuthorized === null) return <LoadingScreen />;
+
+  if (isAuthorized === false) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white px-4">
+         <div className="text-6xl mb-6">🔒</div>
+         <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+         <p className="text-zinc-500 mb-8 text-center max-w-sm">This is a strictly secure 1-on-1 private chat. You are not a participant.</p>
+         <Link href="/inbox" className="bg-white text-black px-8 py-3 rounded-full font-bold">Return to Inbox</Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-black font-sans selection:bg-white/20">
-      <header className="bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 p-4 sticky top-0 z-10 flex items-center">
-        <Link href="/inbox" className="mr-4 text-zinc-400 hover:text-white transition w-10 h-10 flex items-center justify-center bg-zinc-900 rounded-full border border-white/5">
-          ←
-        </Link>
-        <div className="flex items-center">
-           <div className="w-10 h-10 bg-zinc-800 rounded-full mr-3 border border-white/10 overflow-hidden flex-shrink-0">
-             <div className="w-full h-full flex items-center justify-center grayscale text-xl">👤</div>
+    <div className="flex flex-col h-[100dvh] bg-black selection:bg-white/20 text-white relative">
+      
+      {/* Header */}
+      <div className="px-4 py-4 sm:py-6 flex justify-between items-center bg-black/80 backdrop-blur-xl border-b border-white/5 z-50 shrink-0">
+         <div className="flex items-center gap-4">
+           <Link href="/inbox" className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center hover:bg-zinc-800 transition-colors border border-white/10">
+             ←
+           </Link>
+           <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 overflow-hidden">
+                {otherUser?.photos?.[0] ? <img src={otherUser.photos[0]} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">👤</div>}
+             </div>
+             <div>
+               <h2 className="font-bold text-lg leading-tight">{otherUser?.name || 'Loading...'}</h2>
+               <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">{otherUser?.major || 'Student'}</p>
+             </div>
            </div>
-           <div>
-             <h2 className="text-lg font-bold text-white leading-tight">Match Chat</h2>
-             
-           </div>
-        </div>
-      </header>
+         </div>
+      </div>
 
-      <main className="flex-1 overflow-y-auto p-4 space-y-6">
-        {messages.length === 0 && (
-           <div className="flex flex-col items-center justify-center h-full opacity-40">
-             <span className="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🧊</span>
-             <p className="text-zinc-500 font-medium">Icebreaker sent. Awaiting response.</p>
-           </div>
-        )}
-        
-        {messages.map((msg, idx) => {
-          const isMe = msg.senderId === user?.uid;
-          const showAvatar = !isMe && (idx === 0 || messages[idx - 1].senderId !== msg.senderId);
-          
-          return (
-            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} items-end group`}>
-              {!isMe && (
-                <div className="w-8 h-8 rounded-full bg-zinc-800 mr-2 flex-shrink-0 border border-white/5 overflow-hidden">
-                  {showAvatar ? <div className="w-full h-full flex items-center justify-center text-xs grayscale">👤</div> : null}
-                </div>
-              )}
-              
-              <div className={`max-w-[75%] px-5 py-3.5 rounded-[1.5rem] ${
-                isMe 
-                  ? 'bg-white text-black rounded-br-sm shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
-                  : 'bg-zinc-900 border border-white/5 text-white rounded-bl-sm shadow-xl'
-              }`}>
-                <p className="text-[15px] leading-relaxed font-medium">{msg.text}</p>
-                <div className={`text-[9px] mt-1.5 font-bold tracking-widest uppercase opacity-50`}>
-                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth custom-scrollbar relative">
+         {/* Background subtle glow */}
+         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[400px] max-h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
+         
+         <div className="max-w-2xl mx-auto flex flex-col gap-3 relative z-10">
+           {messages.length === 0 ? (
+              <div className="text-center py-20">
+                <div className="text-4xl mb-4">💬</div>
+                <p className="text-zinc-500 font-medium">It's quiet here. Break the ice!</p>
               </div>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </main>
+           ) : (
+             messages.map((msg, idx) => {
+               const isMe = msg.senderId === user?.uid;
+               return (
+                 <motion.div 
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ duration: 0.2 }}
+                   key={msg.id || idx} 
+                   className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                 >
+                   <div 
+                     className={`max-w-[80%] px-5 py-3 rounded-2xl ${isMe 
+                       ? 'bg-indigo-500 text-white rounded-br-sm shadow-[0_0_20px_rgba(99,102,241,0.2)]' 
+                       : 'bg-zinc-900 border border-white/5 text-zinc-200 rounded-bl-sm'}`}
+                   >
+                     <p className="leading-relaxed break-words">{msg.text}</p>
+                   </div>
+                 </motion.div>
+               );
+             })
+           )}
+           <div ref={messagesEndRef} />
+         </div>
+      </div>
 
-      <footer className="p-4 bg-zinc-950/80 backdrop-blur-xl border-t border-white/5">
-        <form onSubmit={sendMessage} className="flex gap-3 max-w-3xl mx-auto">
-          <input
-            type="text"
+      {/* Input Area */}
+      <div className="p-4 bg-black/80 backdrop-blur-xl border-t border-white/5 shrink-0 safe-area-pb">
+        <form onSubmit={handleSend} className="max-w-2xl mx-auto relative flex items-end">
+          <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 rounded-full px-6 py-4 bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all shadow-inner"
+            placeholder="Send a message..."
+            className="w-full bg-zinc-900 border border-white/10 rounded-3xl py-4 pl-6 pr-16 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none max-h-[120px] overflow-y-auto"
+            rows={1}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend(e);
+              }
+            }}
           />
-          <button
-            type="submit"
+          <button 
+            type="submit" 
             disabled={!newMessage.trim()}
-            className="bg-white text-black px-8 py-4 rounded-full font-bold disabled:opacity-50 hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95"
+            className="absolute right-2 bottom-2 w-10 h-10 bg-white text-black rounded-full flex items-center justify-center font-bold disabled:opacity-50 disabled:bg-zinc-800 disabled:text-zinc-500 transition-colors"
           >
-            Send
+            ↑
           </button>
         </form>
-      </footer>
+      </div>
     </div>
   );
 }
