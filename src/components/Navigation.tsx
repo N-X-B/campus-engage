@@ -10,6 +10,7 @@ export function Navigation() {
 
   const navItems = [
     { name: 'Discover', path: '/feed' },
+    { name: 'Spotted', path: '/missed-connections' },
     { name: 'Inbox', path: '/inbox' },
     { name: 'Profile', path: '/profile' },
   ];

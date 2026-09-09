@@ -111,7 +111,24 @@ export default function FeedPage() {
             .sort((a, b) => b.matchScore - a.matchScore);
         }
 
+        // --- DAILY SCARCITY LIMIT (15 to 25) ---
+        // Deterministic daily limit based on user UID and Date
+        const today = new Date().toISOString().split('T')[0];
+        const seedStr = user.uid + today;
+        let seed = 0;
+        for (let i = 0; i < seedStr.length; i++) {
+          seed = ((seed << 5) - seed) + seedStr.charCodeAt(i);
+          seed = seed & seed;
+        }
+        
+        // Random limit between 15 and 25
+        const dailyLimit = 15 + (Math.abs(seed) % 11);
+        
+        // Take the top matches up to the daily limit
+        scoredProfiles = scoredProfiles.slice(0, dailyLimit);
+
         setProfiles(scoredProfiles);
+
       } catch (err) {
         console.error("Error fetching profiles:", err);
       } finally {
@@ -269,8 +286,8 @@ export default function FeedPage() {
       <main className="max-w-md mx-auto p-4 sm:p-6 mt-4">
         <div className="flex justify-between items-end mb-8 px-2">
           <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Discover</h1>
-            <p className="text-slate-400 mt-1">Immersive matchability.</p>
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">Your Daily Batch</h1>
+            <p className="text-slate-400 mt-1">Curated picks, refreshing at midnight.</p>
           </div>
           {isDemoMode && <span className="text-xs bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold border border-orange-500/30">DEMO MODE</span>}
         </div>
