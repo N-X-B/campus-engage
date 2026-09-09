@@ -19,13 +19,33 @@ import { signOut, deleteUser } from 'firebase/auth';
 import { doc, deleteDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { deleteUserEmbedding } from '@/app/actions/matchmaking';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const [userData, setUserData] = useState<any>(null);
   const [editingInterests, setEditingInterests] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isIncognito, setIsIncognito] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  
+  useEffect(() => {
+    if (userData) {
+       setIsIncognito(userData.incognito || false);
+    }
+  }, [userData]);
+
+  const toggleIncognito = async () => {
+    const newValue = !isIncognito;
+    setIsIncognito(newValue);
+    try {
+       await updateDoc(doc(db, 'users', user!.uid), { incognito: newValue });
+       setUserData({ ...userData, incognito: newValue });
+    } catch(err) {
+       console.error("Failed to toggle incognito", err);
+    }
+  };
+
   
   useEffect(() => {
     if (userData?.interests) {
@@ -162,25 +182,18 @@ export default function ProfilePage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-8">
-             <div className="bg-black/50 border border-white/5 p-5 rounded-3xl">
-                <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Network Status</span>
-                <span className="text-emerald-400 font-bold flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Connected
+             <div className="bg-black/50 border border-white/5 p-5 rounded-3xl flex flex-col justify-between cursor-pointer" onClick={toggleIncognito}>
+                <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Incognito Mode</span>
+                <span className={`font-bold flex items-center gap-2 ${isIncognito ? 'text-indigo-400' : 'text-zinc-500'}`}>
+                   <div className={`w-10 h-6 rounded-full border relative transition-colors ${isIncognito ? 'bg-indigo-500/20 border-indigo-500/50' : 'bg-zinc-800 border-white/10'}`}>
+                     <motion.div 
+                        animate={{ left: isIncognito ? '1.2rem' : '0.25rem' }} 
+                        className={`w-4 h-4 rounded-full absolute top-0.5 ${isIncognito ? 'bg-indigo-400' : 'bg-zinc-600'}`} 
+                     />
+                   </div>
+                   {isIncognito ? 'On' : 'Off'}
                 </span>
              </div>
-             <div className="bg-black/50 border border-white/5 p-5 rounded-3xl">
-                <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Matchability Score</span>
-                <span className="text-white font-bold">94%</span>
-             </div>
-             <div className="bg-black/50 border border-white/5 p-5 rounded-3xl">
-                <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Discovery Mode</span>
-                <span className="text-white font-bold">Campus Only</span>
-             </div>
-             <div className="bg-black/50 border border-white/5 p-5 rounded-3xl">
-                <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Incognito Mode</span>
-                <span className="text-zinc-500 font-bold flex items-center gap-2">
-                   <div className="w-10 h-6 bg-zinc-800 rounded-full border border-white/10 relative">
-                     <div className="w-4 h-4 bg-zinc-600 rounded-full absolute left-1 top-0.5"></div>
                    </div>
                    Off
                 </span>
@@ -280,13 +293,33 @@ export default function ProfilePage() {
           transition={{ delay: 0.1 }}
           className="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 mb-8"
         >
+          
+          <AnimatePresence>
+            {isIncognito && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-6"
+              >
+                <div onClick={() => router.push('/confessions')} className="w-full bg-indigo-900/30 border border-indigo-500/50 p-5 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-indigo-900/50 transition-colors">
+                  <div>
+                    <h4 className="text-indigo-300 font-bold flex items-center gap-2">🎭 Anonymous Confessions</h4>
+                    <p className="text-xs text-indigo-400/70 mt-1">Unlocked via Incognito Mode</p>
+                  </div>
+                  <span className="text-indigo-400">→</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <h3 className="text-white font-bold text-xl mb-6">Account Settings</h3>
+
           <div className="space-y-4">
-             <button className="w-full flex justify-between items-center bg-black/50 border border-white/5 p-5 rounded-2xl text-white hover:bg-white/5 transition-colors">
+             <button onClick={() => router.push('/onboarding')} className="w-full flex justify-between items-center bg-black/50 border border-white/5 p-5 rounded-2xl text-white hover:bg-white/5 transition-colors">
                 <span className="font-medium">Edit Profile Answers</span>
                 <span className="text-zinc-500">→</span>
              </button>
-             <button className="w-full flex justify-between items-center bg-black/50 border border-white/5 p-5 rounded-2xl text-white hover:bg-white/5 transition-colors">
+             <button onClick={() => router.push('/onboarding')} className="w-full flex justify-between items-center bg-black/50 border border-white/5 p-5 rounded-2xl text-white hover:bg-white/5 transition-colors">
                 <span className="font-medium">Manage Photos</span>
                 <span className="text-zinc-500">→</span>
              </button>
