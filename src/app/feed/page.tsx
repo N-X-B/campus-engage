@@ -87,7 +87,14 @@ export default function FeedPage() {
           
           if (userDoc.exists()) {
              currentUserData = userDoc.data();
+             if (!currentUserData.onboarded) {
+                window.location.href = '/onboarding';
+                return;
+             }
              setUserData(currentUserData);
+          } else {
+             window.location.href = '/onboarding';
+             return;
           }
           
           querySnapshot.forEach(doc => {
