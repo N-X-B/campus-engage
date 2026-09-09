@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { getUserOnServer } from '@/app/actions/profile';
 import { doc, getDoc } from 'firebase/firestore';
@@ -20,9 +20,34 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
   
   const [loginState, setLoginState] = useState<'idle' | 'loading' | 'success'>('idle');
   const router = useRouter();
+
+    const handleResetPassword = async () => {
+    if (!email) {
+      setError('Please enter your university email first to reset your password.');
+      setResetMessage('');
+      return;
+    }
+    if (isDemoMode) {
+      setError('Cannot reset passwords in Demo Mode.');
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetMessage('Password reset link sent! Check your email inbox to create a new password.');
+      setError('');
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found') {
+        setError('No account found with this email.');
+      } else {
+        setError('Failed to send reset email. Please try again.');
+      }
+      setResetMessage('');
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,8 +118,13 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="mb-4 p-3 bg-red-500/10 text-rose-400 text-sm rounded-lg border border-red-500/20 backdrop-blur-md">
                 {error}
+              </motion.div>
+            )}
+            {resetMessage && (
+              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="mb-4 p-3 bg-emerald-500/10 text-emerald-400 text-sm rounded-lg border border-emerald-500/20 backdrop-blur-md">
+                {resetMessage}
               </motion.div>
             )}
 
@@ -116,9 +146,18 @@ export default function LoginPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-1" htmlFor="password">
-                  Password
-                </label>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-sm font-medium text-zinc-300" htmlFor="password">
+                    Password
+                  </label>
+                  <button 
+                    type="button" 
+                    onClick={handleResetPassword}
+                    className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
                 <input
                   id="password"
                   type="password"
