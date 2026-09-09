@@ -326,7 +326,7 @@ export default function FeedPage() {
         )}
       </AnimatePresence>
 
-      <main className="max-w-md mx-auto p-4 sm:p-6 mt-4">
+      <main className="max-w-7xl mx-auto p-4 sm:p-6 mt-4">
         <div className="flex justify-between items-end mb-8 px-2">
           <div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Your Daily Batch</h1>
@@ -357,7 +357,7 @@ export default function FeedPage() {
             <p className="text-zinc-500 mt-2">Check back later for new people.</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
             {profiles.map((p, index) => (
               <motion.div 
                 key={p.id}
