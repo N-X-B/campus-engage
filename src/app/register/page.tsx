@@ -114,7 +114,7 @@ function RegisterForm() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all backdrop-blur-md"
             placeholder="e.g. John Doe"
           />
         </div>
@@ -125,7 +125,7 @@ function RegisterForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all backdrop-blur-md"
             placeholder="student@university.edu"
           />
         </div>
@@ -136,7 +136,7 @@ function RegisterForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all backdrop-blur-md"
             placeholder="••••••••"
           />
         </div>
@@ -168,7 +168,7 @@ const timeoutPromise = (ms: number, message: string) =>
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans selection:bg-white/20">
+    <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans selection:bg-white/20">
       
       {/* Background Orbs */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">

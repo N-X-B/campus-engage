@@ -111,7 +111,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loginState === 'loading'}
                   placeholder="you@university.edu"
-                  className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:opacity-50"
+                  className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 backdrop-blur-md transition-all disabled:opacity-50"
                 />
               </div>
               
@@ -127,7 +127,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loginState === 'loading'}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:opacity-50"
+                  className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 backdrop-blur-md transition-all disabled:opacity-50"
                 />
               </div>
 
