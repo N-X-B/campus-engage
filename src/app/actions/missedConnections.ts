@@ -21,7 +21,7 @@ function toFirestore(obj: any): any {
 function fromFirestore(fields: any): any {
   if (!fields) return {};
   const result: any = {};
-  for (const [key, val] of Object.entries(fields)) {
+  for (const [key, val] of Object.entries(fields) as [string, any][]) {
     if ('stringValue' in val as any) result[key] = (val as any).stringValue;
     else if ('integerValue' in val as any) result[key] = parseInt((val as any).integerValue);
     else if ('booleanValue' in val as any) result[key] = (val as any).booleanValue;
