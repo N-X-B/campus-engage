@@ -121,9 +121,9 @@ export default function Home() {
 
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 28, stiffness: 1000, mass: 0.05 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
+  
+  
+  
 
   useEffect(() => {
     const moveCursor = (e: MouseEvent) => {
@@ -140,7 +140,7 @@ export default function Home() {
       {/* Ghost Cursor */}
       <motion.div 
         className="fixed top-0 left-0 w-8 h-8 rounded-full border border-white/50 bg-white/10 mix-blend-difference pointer-events-none z-[9999] hidden md:block"
-        style={{ x: cursorXSpring, y: cursorYSpring }}
+        style={{ x: cursorX, y: cursorY }}
       />
 
       {/* Navbar */}

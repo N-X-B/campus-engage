@@ -237,7 +237,7 @@ export default function FeedPage() {
                    </div>
                  )}
 
-                 <button onClick={() => { setSelectedProfileForBrief(null); openIcebreaker(selectedProfileForBrief); }} className="w-full bg-white text-black rounded-2xl py-4 font-bold text-lg hover:bg-zinc-200 transition shadow-lg hover:-tranzinc-y-1">
+                 <button onClick={() => { setSelectedProfileForBrief(null); openIcebreaker(selectedProfileForBrief); }} className="w-full bg-white text-black rounded-2xl py-4 font-bold text-lg hover:bg-zinc-200 transition shadow-lg hover:-translate-y-1">
                    Break the Ice
                  </button>
               </div>
@@ -265,8 +265,21 @@ export default function FeedPage() {
                  <button onClick={() => setIcebreakerModal(false)} className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
               </div>
               <div className="bg-indigo-500/10 border border-indigo-500/20 p-6 rounded-2xl mb-8 relative">
-                 <p className="text-indigo-300 font-medium text-xl text-center leading-relaxed">"{selectedPrompt}"</p>
-                 <button onClick={() => setSelectedPrompt(ICEBREAKERS[Math.floor(Math.random() * ICEBREAKERS.length)])} className="absolute -bottom-5 left-1/2 -tranzinc-x-1/2 bg-zinc-800 border border-zinc-700 shadow-xl text-zinc-300 text-xs font-bold px-4 py-2 rounded-full hover:bg-zinc-700 transition">
+                 <div className="h-20 flex items-center justify-center text-center overflow-hidden">
+                   <AnimatePresence mode="wait">
+                     <motion.p 
+                       key={selectedPrompt}
+                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                       animate={{ opacity: 1, y: 0, scale: 1 }}
+                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                       transition={{ duration: 0.2 }}
+                       className="text-indigo-300 font-medium text-xl leading-relaxed"
+                     >
+                       "{selectedPrompt}"
+                     </motion.p>
+                   </AnimatePresence>
+                 </div>
+                 <button onClick={() => setSelectedPrompt(ICEBREAKERS[Math.floor(Math.random() * ICEBREAKERS.length)])} className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 shadow-xl text-zinc-300 text-xs font-bold px-4 py-2 rounded-full hover:bg-zinc-700 transition">
                     🎲 Shuffle Prompt
                  </button>
               </div>
@@ -350,7 +363,7 @@ export default function FeedPage() {
                   <div className="pointer-events-auto">
                     <button 
                       onClick={() => openIcebreaker(p)} 
-                      className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-tranzinc-y-1"
+                      className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1"
                     >
                       Break the Ice 🧊
                     </button>
