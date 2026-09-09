@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
@@ -172,7 +173,7 @@ export default function OnboardingWizard() {
     }
   };
 
-  if (authLoading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  if (authLoading) return <LoadingScreen />;
 
   const slideVariants = {
     initial: { opacity: 0, x: 20 },

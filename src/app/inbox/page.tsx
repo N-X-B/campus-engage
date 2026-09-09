@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
@@ -60,7 +61,7 @@ export default function InboxPage() {
     return () => unsubscribe();
   }, [user]);
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-black pb-24 md:pb-0 font-sans selection:bg-white/20">

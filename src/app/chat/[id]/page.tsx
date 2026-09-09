@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
@@ -78,7 +79,7 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
     }
   };
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="flex flex-col h-[100dvh] bg-black font-sans selection:bg-white/20">

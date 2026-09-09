@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from '@/lib/AuthContext';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
@@ -15,7 +16,7 @@ export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
+  if (loading) return <LoadingScreen />;
   if (!user) {
     router.push('/login');
     return null;

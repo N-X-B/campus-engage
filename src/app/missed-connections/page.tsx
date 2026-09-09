@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { Navigation } from '@/components/Navigation';
@@ -109,7 +110,7 @@ export default function MissedConnectionsPage() {
     }
   };
 
-  if (loading || fetching) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
+  if (loading || fetching) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-black pb-24 md:pb-0 font-sans selection:bg-indigo-500/30">

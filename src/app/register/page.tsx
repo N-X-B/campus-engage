@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -176,7 +177,7 @@ export default function RegisterPage() {
          <motion.div animate={{ rotate: -360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} className="absolute -bottom-1/4 -left-1/4 w-[800px] h-[800px] bg-rose-600/10 rounded-full blur-[120px]" />
       </div>
 
-      <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+      <Suspense fallback={<LoadingScreen />}>
         <RegisterForm />
       </Suspense>
     </div>

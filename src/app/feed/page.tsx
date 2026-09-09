@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, where, doc, setDoc, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -192,7 +193,7 @@ export default function FeedPage() {
   };
 
   if (loading || fetching) {
-    return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   return (
