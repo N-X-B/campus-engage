@@ -81,9 +81,9 @@ export default function MissedConnectionsPage() {
     if (!user || !claimingPost) return;
     
     if (isDemoMode) {
-      const convId = \`conv-\${claimingPost.authorId}\`;
+      const convId = `conv-${claimingPost.authorId}`;
       demoDb.sendMessage(convId, claimMessage, user.uid, user.displayName || 'Anonymous');
-      router.push(\`/chat/\${convId}\`);
+      router.push(`/chat/${convId}`);
       return;
     }
     
@@ -96,14 +96,14 @@ export default function MissedConnectionsPage() {
          lastUpdated: Date.now()
       }, { merge: true });
 
-      await addDoc(collection(db, \`conversations/\${convId}/messages\`), {
+      await addDoc(collection(db, `conversations/${convId}/messages`), {
          text: claimMessage,
          senderId: user.uid,
          senderName: user.displayName || 'Anonymous',
          timestamp: Date.now()
       });
 
-      router.push(\`/chat/\${convId}\`);
+      router.push(`/chat/${convId}`);
     } catch(e) {
       console.error(e);
     }

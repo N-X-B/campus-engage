@@ -69,12 +69,7 @@ export default function FeedPage() {
             console.warn("[FEED] Server Action failed. Falling back to Demo Mode.", err);
             fetchedProfiles = await demoDb.getProfiles();
           }
-        } catch (err) {
-            console.warn("[FEED] Failed to load from Firestore. Falling back to Demo Mode.", err);
-            fetchedProfiles = await demoDb.getProfiles();
-          }
-        }
-        
+        } // CLOSED THE ELSE BLOCK HERE
         
         let scoredProfiles = [];
         
