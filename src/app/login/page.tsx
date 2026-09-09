@@ -84,7 +84,7 @@ export default function LoginPage() {
       setLoginState('success');
       setTimeout(() => {
         // If DB fails, assume they are returning user to avoid forcing onboarding loop
-        if (dbFailed || (userData && userData.onboarded)) {
+        if (dbFailed || (userData && (userData as any).onboarded)) {
           window.location.href = '/feed';
         } else {
           window.location.href = '/onboarding';

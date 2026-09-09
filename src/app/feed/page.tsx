@@ -65,7 +65,7 @@ export default function FeedPage() {
       if (!user) return;
       try {
         let fetchedProfiles: any[] = [];
-        let currentUserData = null;
+        let currentUserData: any = null;
         
         if (isDemoMode) {
           fetchedProfiles = await demoDb.getProfiles();

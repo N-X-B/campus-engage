@@ -31,7 +31,7 @@ export function calculateMatchScore(currentUser: any, targetUser: any): number {
     // If they aren't the exact same, check if they share keywords (e.g. "Computer Science" vs "Data Science")
     const words1 = b1.split(' ');
     const words2 = b2.split(' ');
-    const sharedWords = words1.filter(w => words2.includes(w) && w.length > 3);
+    const sharedWords = words1.filter((w: string) => words2.includes(w) && w.length > 3);
     
     if (sharedWords.length > 0) {
       score += 10; // Related majors
