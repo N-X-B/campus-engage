@@ -1,5 +1,5 @@
 // Mock backend for Demo Mode
-export const isDemoMode = !process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY.includes("your-key");
+export const isDemoMode = false; // FORCE DISABLED
 
 let demoUser: any = null;
 
