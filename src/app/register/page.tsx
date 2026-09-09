@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { saveProfileOnServer } from '@/app/actions/profile';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
@@ -70,7 +70,8 @@ function RegisterForm() {
         try {
           const referrerRef = doc(db, 'users', referralId);
           await updateDoc(referrerRef, {
-            referralCount: increment(1)
+            referralCount: increment(1),
+            referredUsers: arrayUnion(user.uid)
           });
         } catch (err) {
           console.error("[REGISTER] Failed to update referral count", err);
