@@ -109,35 +109,35 @@ export default function MissedConnectionsPage() {
     }
   };
 
-  if (loading || fetching) return <div className="flex h-screen items-center justify-center bg-slate-950 text-white">Loading...</div>;
+  if (loading || fetching) return <div className="flex h-screen items-center justify-center bg-black text-white">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-24 md:pb-0 font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-black pb-24 md:pb-0 font-sans selection:bg-indigo-500/30">
       <Navigation />
       
       {/* Compose Modal */}
       <AnimatePresence>
         {isComposing && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
                <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold text-white">Post a Connection</h2>
-                  <button onClick={() => setIsComposing(false)} className="text-slate-500 hover:text-white text-xl">✕</button>
+                  <button onClick={() => setIsComposing(false)} className="text-zinc-500 hover:text-white text-xl">✕</button>
                </div>
                
                <input 
                  value={location} onChange={e => setLocation(e.target.value)}
                  placeholder="Where did it happen? (e.g. Library, Cafe)"
-                 className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-indigo-500"
+                 className="w-full bg-zinc-800/50 border border-zinc-700 text-white rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-indigo-500"
                />
                
                <textarea 
                  value={newPostText} onChange={e => setNewPostText(e.target.value)}
                  placeholder="To the guy in the red hoodie... you dropped your pen."
-                 className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl px-4 py-3 mb-6 h-32 resize-none focus:outline-none focus:border-indigo-500"
+                 className="w-full bg-zinc-800/50 border border-zinc-700 text-white rounded-xl px-4 py-3 mb-6 h-32 resize-none focus:outline-none focus:border-indigo-500"
                />
                
-               <button onClick={handlePost} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-slate-200 transition">
+               <button onClick={handlePost} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-zinc-200 transition">
                   Post Anonymously
                </button>
             </motion.div>
@@ -149,22 +149,22 @@ export default function MissedConnectionsPage() {
       <AnimatePresence>
         {claimingPost && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
                <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-white">Claim Connection</h2>
-                  <button onClick={() => setClaimingPost(null)} className="text-slate-500 hover:text-white text-xl">✕</button>
+                  <button onClick={() => setClaimingPost(null)} className="text-zinc-500 hover:text-white text-xl">✕</button>
                </div>
                
                <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl mb-6">
                   <p className="text-indigo-300 italic text-sm">"{claimingPost.text}"</p>
                </div>
                
-               <p className="text-slate-300 text-sm mb-4">Send a message to prove it was you. If they reply, your identities will be revealed.</p>
+               <p className="text-zinc-300 text-sm mb-4">Send a message to prove it was you. If they reply, your identities will be revealed.</p>
                
                <textarea 
                  value={claimMessage} onChange={e => setClaimMessage(e.target.value)}
                  placeholder="I think this was me! I was ordering a matcha..."
-                 className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl px-4 py-3 mb-6 h-24 resize-none focus:outline-none focus:border-indigo-500"
+                 className="w-full bg-zinc-800/50 border border-zinc-700 text-white rounded-xl px-4 py-3 mb-6 h-24 resize-none focus:outline-none focus:border-indigo-500"
                />
                
                <button onClick={handleClaim} className="w-full bg-indigo-500 text-white font-bold py-4 rounded-xl hover:bg-indigo-600 transition shadow-[0_0_20px_rgba(99,102,241,0.3)]">
@@ -179,7 +179,7 @@ export default function MissedConnectionsPage() {
         <div className="flex justify-between items-end mb-8 px-2">
           <div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Spotted</h1>
-            <p className="text-slate-400 mt-1">Missed connections on campus.</p>
+            <p className="text-zinc-400 mt-1">Missed connections on campus.</p>
           </div>
           <button onClick={() => setIsComposing(true)} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full font-bold text-sm backdrop-blur-md transition">
              + Post
@@ -190,18 +190,18 @@ export default function MissedConnectionsPage() {
            {posts.length === 0 ? (
               <div className="text-center py-20">
                  <div className="text-4xl mb-4">👀</div>
-                 <p className="text-slate-400 font-medium">No missed connections yet.</p>
-                 <p className="text-slate-500 text-sm mt-1">Be the first to post someone you spotted.</p>
+                 <p className="text-zinc-400 font-medium">No missed connections yet.</p>
+                 <p className="text-zinc-500 text-sm mt-1">Be the first to post someone you spotted.</p>
               </div>
            ) : posts.map(post => (
-              <div key={post.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden group">
+              <div key={post.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-lg relative overflow-hidden group">
                  {/* Top info */}
                  <div className="flex justify-between items-center mb-3">
                     <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-1.5">
                        <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
                        {post.location}
                     </span>
-                    <span className="text-xs font-medium text-slate-500">{post.time}</span>
+                    <span className="text-xs font-medium text-zinc-500">{post.time}</span>
                  </div>
                  
                  {/* The Post */}
@@ -211,7 +211,7 @@ export default function MissedConnectionsPage() {
                  
                  {/* Claim Button */}
                  {user?.uid !== post.authorId && (
-                    <button onClick={() => setClaimingPost(post)} className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl transition-colors border border-slate-700 flex items-center justify-center gap-2">
+                    <button onClick={() => setClaimingPost(post)} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl transition-colors border border-zinc-700 flex items-center justify-center gap-2">
                        🙋‍♂️ That was me
                     </button>
                  )}

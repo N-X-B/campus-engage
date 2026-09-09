@@ -183,7 +183,7 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-20 md:pb-0 font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-black pb-20 md:pb-0 font-sans selection:bg-indigo-500/30">
       <Navigation />
       
       {/* Profile Brief Modal Overlay */}
@@ -197,15 +197,15 @@ export default function FeedPage() {
             <motion.div 
               initial={{ scale: 0.95, opacity: 0, y: 40 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-slate-900 rounded-[2rem] border border-slate-800 overflow-hidden max-w-md w-full shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto"
+              className="bg-zinc-900 rounded-[2rem] border border-zinc-800 overflow-hidden max-w-md w-full shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto"
             >
               <div className="relative aspect-[4/5] w-full shrink-0">
                  {selectedProfileForBrief.photos && selectedProfileForBrief.photos.length > 0 ? (
                    <img src={selectedProfileForBrief.photos[0]} alt="profile" className="object-cover w-full h-full" />
                  ) : (
-                   <div className="w-full h-full bg-slate-800" />
+                   <div className="w-full h-full bg-zinc-800" />
                  )}
-                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
                  
                  <button onClick={() => setSelectedProfileForBrief(null)} className="absolute top-4 right-4 w-10 h-10 bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10">
                    ✕
@@ -215,29 +215,29 @@ export default function FeedPage() {
                     <div className="flex items-center gap-3 mb-2">
                        <h2 className="text-4xl font-bold text-white tracking-tight">{selectedProfileForBrief.name}</h2>
                     </div>
-                    <p className="text-slate-300 font-medium text-lg">{selectedProfileForBrief.branch} • Year {selectedProfileForBrief.year}</p>
+                    <p className="text-zinc-300 font-medium text-lg">{selectedProfileForBrief.branch} • Year {selectedProfileForBrief.year}</p>
                  </div>
               </div>
               
-              <div className="p-6 pt-2 bg-slate-900">
-                 <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/50 mb-6">
-                   <p className="text-slate-300 italic text-lg leading-relaxed">"{selectedProfileForBrief.bio}"</p>
+              <div className="p-6 pt-2 bg-zinc-900">
+                 <div className="bg-zinc-800/50 p-5 rounded-2xl border border-zinc-700/50 mb-6">
+                   <p className="text-zinc-300 italic text-lg leading-relaxed">"{selectedProfileForBrief.bio}"</p>
                  </div>
 
                  {selectedProfileForBrief.answers && (
                    <div className="space-y-5 mb-8">
                      <div>
                        <h3 className="text-xs font-bold uppercase text-indigo-400 mb-2 tracking-widest">Campus Hot Take</h3>
-                       <p className="text-white font-medium text-lg bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">{selectedProfileForBrief.answers.hotTake}</p>
+                       <p className="text-white font-medium text-lg bg-zinc-800/50 p-4 rounded-xl border border-zinc-700/50">{selectedProfileForBrief.answers.hotTake}</p>
                      </div>
                      <div className="flex flex-wrap gap-2">
-                       <span className="bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.studyVibe}</span>
-                       <span className="bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.weekendVibe}</span>
+                       <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.studyVibe}</span>
+                       <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.weekendVibe}</span>
                      </div>
                    </div>
                  )}
 
-                 <button onClick={() => { setSelectedProfileForBrief(null); openIcebreaker(selectedProfileForBrief); }} className="w-full bg-white text-black rounded-2xl py-4 font-bold text-lg hover:bg-slate-200 transition shadow-lg hover:-translate-y-1">
+                 <button onClick={() => { setSelectedProfileForBrief(null); openIcebreaker(selectedProfileForBrief); }} className="w-full bg-white text-black rounded-2xl py-4 font-bold text-lg hover:bg-zinc-200 transition shadow-lg hover:-tranzinc-y-1">
                    Break the Ice
                  </button>
               </div>
@@ -255,22 +255,22 @@ export default function FeedPage() {
           >
             <motion.div 
               initial={{ scale: 0.95, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.95, y: 20, opacity: 0 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl"
+              className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 max-w-md w-full shadow-2xl"
             >
               <div className="flex justify-between items-start mb-6">
                  <div>
                    <h2 className="text-2xl font-bold text-white tracking-tight">Break the ice</h2>
-                   <p className="text-slate-400 mt-1">Sending to {selectedUser.name}</p>
+                   <p className="text-zinc-400 mt-1">Sending to {selectedUser.name}</p>
                  </div>
-                 <button onClick={() => setIcebreakerModal(false)} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-white">✕</button>
+                 <button onClick={() => setIcebreakerModal(false)} className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
               </div>
               <div className="bg-indigo-500/10 border border-indigo-500/20 p-6 rounded-2xl mb-8 relative">
                  <p className="text-indigo-300 font-medium text-xl text-center leading-relaxed">"{selectedPrompt}"</p>
-                 <button onClick={() => setSelectedPrompt(ICEBREAKERS[Math.floor(Math.random() * ICEBREAKERS.length)])} className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-700 shadow-xl text-slate-300 text-xs font-bold px-4 py-2 rounded-full hover:bg-slate-700 transition">
+                 <button onClick={() => setSelectedPrompt(ICEBREAKERS[Math.floor(Math.random() * ICEBREAKERS.length)])} className="absolute -bottom-5 left-1/2 -tranzinc-x-1/2 bg-zinc-800 border border-zinc-700 shadow-xl text-zinc-300 text-xs font-bold px-4 py-2 rounded-full hover:bg-zinc-700 transition">
                     🎲 Shuffle Prompt
                  </button>
               </div>
-              <button onClick={sendIcebreakerMessage} className="w-full bg-white text-black rounded-xl py-4 font-bold text-lg hover:bg-slate-200 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <button onClick={sendIcebreakerMessage} className="w-full bg-white text-black rounded-xl py-4 font-bold text-lg hover:bg-zinc-200 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 Send & Open Chat
               </button>
             </motion.div>
@@ -282,7 +282,7 @@ export default function FeedPage() {
         <div className="flex justify-between items-end mb-8 px-2">
           <div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Your Daily Batch</h1>
-            <p className="text-slate-400 mt-1">Curated picks, refreshing at midnight.</p>
+            <p className="text-zinc-400 mt-1">Curated picks, refreshing at midnight.</p>
           </div>
           {isDemoMode && <span className="text-xs bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold border border-orange-500/30">DEMO MODE</span>}
         </div>
@@ -290,7 +290,7 @@ export default function FeedPage() {
         {profiles.length === 0 ? (
           <div className="text-center py-32">
             <h3 className="text-xl font-bold text-white">No profiles left.</h3>
-            <p className="text-slate-500 mt-2">Check back later for new people.</p>
+            <p className="text-zinc-500 mt-2">Check back later for new people.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-10">
@@ -301,14 +301,14 @@ export default function FeedPage() {
                 whileInView={{ opacity: 1, y: 0, filter: "blur(0px) brightness(1)" }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="relative bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/5] flex flex-col group"
+                className="relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/5] flex flex-col group"
               >
                 {/* Background Image */}
                 <div className="absolute inset-0 cursor-pointer" onClick={() => setSelectedProfileForBrief(p)}>
                   {p.photos && p.photos.length > 0 ? (
                     <img src={p.photos[0]} alt={p.name} className="object-cover w-full h-full" />
                   ) : (
-                    <div className="w-full h-full bg-slate-800" />
+                    <div className="w-full h-full bg-zinc-800" />
                   )}
                   {/* Heavy dark gradient overlay at bottom for text readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
@@ -332,7 +332,7 @@ export default function FeedPage() {
                   <div className="flex justify-between items-end mb-2">
                     <h2 className="text-4xl font-extrabold text-white tracking-tight drop-shadow-lg">{p.name}</h2>
                   </div>
-                  <p className="text-slate-300 font-medium mb-3 text-lg drop-shadow-md">{p.branch} • Year {p.year}</p>
+                  <p className="text-zinc-300 font-medium mb-3 text-lg drop-shadow-md">{p.branch} • Year {p.year}</p>
                   
                   <div className="flex flex-wrap gap-2 mb-6">
                     {p.answers && (
@@ -350,7 +350,7 @@ export default function FeedPage() {
                   <div className="pointer-events-auto">
                     <button 
                       onClick={() => openIcebreaker(p)} 
-                      className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1"
+                      className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-tranzinc-y-1"
                     >
                       Break the Ice 🧊
                     </button>
