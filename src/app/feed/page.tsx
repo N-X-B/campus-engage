@@ -135,7 +135,8 @@ export default function FeedPage() {
 
   const openIcebreaker = (targetUser: any) => {
     setSelectedUser(targetUser);
-    setSelectedPrompt(ICEBREAKERS[Math.floor(Math.random() * ICEBREAKERS.length)]);
+    const shuffled = [...ICEBREAKERS].sort(() => 0.5 - Math.random());
+    setPromptOptions(shuffled.slice(0, 3));
     setIcebreakerModal(true);
   };
 
