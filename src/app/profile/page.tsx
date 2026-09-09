@@ -66,8 +66,8 @@ export default function ProfilePage() {
     if (selectedInterests.includes(interest)) {
       setSelectedInterests(prev => prev.filter(i => i !== interest));
     } else {
-      if (selectedInterests.length >= 3) {
-        setInterestError("You can only select up to 3 campus groups!");
+      if (selectedInterests.length >= 5) {
+        setInterestError("You can only select up to 5 campus groups!");
         return;
       }
       setSelectedInterests(prev => [...prev, interest]);
@@ -267,9 +267,9 @@ export default function ProfilePage() {
              </div>
           ) : (
              <div className="space-y-6">
-               <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest mb-2">Select up to 3 groups:</p>
+               <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest mb-2">Select up to 5 groups:</p>
                {interestError && <p className="text-rose-400 text-sm font-bold mb-4">{interestError}</p>}
-               {selectedInterests.length >= 3 && !interestError && <p className="text-emerald-400 text-sm font-bold mb-4">You've reached the 3 group limit!</p>}
+               {selectedInterests.length >= 5 && !interestError && <p className="text-emerald-400 text-sm font-bold mb-4">You've reached the 5 group limit!</p>}
                {Object.entries(INTEREST_GROUPS).map(([category, tags]) => (
                  <div key={category}>
                    <h4 className="text-zinc-500 text-sm font-bold mb-3">{category}</h4>
@@ -280,8 +280,8 @@ export default function ProfilePage() {
                          <button
                            key={tag}
                            onClick={() => handleToggleInterest(tag)}
-                           disabled={!isSelected && selectedInterests.length >= 3}
-                           className={`px-4 py-2 rounded-full font-bold text-sm transition-all ${isSelected ? 'bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] border-transparent' : (!isSelected && selectedInterests.length >= 3) ? 'bg-black/20 text-zinc-600 border border-white/5 cursor-not-allowed' : 'bg-black/50 text-zinc-400 border border-white/10 hover:border-white/30'}`}
+                           disabled={!isSelected && selectedInterests.length >= 5}
+                           className={`px-4 py-2 rounded-full font-bold text-sm transition-all ${isSelected ? 'bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] border-transparent' : (!isSelected && selectedInterests.length >= 5) ? 'bg-black/20 text-zinc-600 border border-white/5 cursor-not-allowed' : 'bg-black/50 text-zinc-400 border border-white/10 hover:border-white/30'}`}
                          >
                            {tag}
                          </button>
