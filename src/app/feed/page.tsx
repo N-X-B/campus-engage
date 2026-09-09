@@ -35,6 +35,8 @@ export default function FeedPage() {
   const [icebreakerModal, setIcebreakerModal] = useState(false);
   const [reportModal, setReportModal] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState("");
+  const [promptOptions, setPromptOptions] = useState<string[]>([]);
+  const [breakingIceId, setBreakingIceId] = useState<string | null>(null);
   const [selectedProfileForBrief, setSelectedProfileForBrief] = useState<any | null>(null);
 
   useEffect(() => {
