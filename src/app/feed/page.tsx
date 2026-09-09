@@ -153,7 +153,7 @@ export default function FeedPage() {
       openIcebreaker(p);
       setBreakingIceId(null);
       setShatterPos(null);
-    }, 800);
+    }, 400);
   };
 
   const openIcebreaker = (targetUser: any) => {
@@ -433,66 +433,48 @@ export default function FeedPage() {
           </div>
         )}
       
-      {/* Global Shatter Animation Overlay */}
+      {/* Global Shatter Animation Overlay (Optimized for Mobile) */}
       <AnimatePresence>
         {shatterPos && (
           <div className="fixed inset-0 pointer-events-none z-[200]">
-            {/* Left Quarter */}
-            <motion.div 
-              initial={{ x: shatterPos.x, y: shatterPos.y, rotate: 0, opacity: 1 }}
-              animate={{ x: shatterPos.x - 200, y: window.innerHeight + 200, rotate: -80, opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeIn" }}
-              className="absolute bg-white/10 bg-zinc-800 border border-white/30 text-white rounded-l-2xl py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
-              style={{ width: shatterPos.width * 0.33, clipPath: 'polygon(0 0, 100% 0, 80% 100%, 0 100%)' }}
-            >
-              <span>Br</span>
-            </motion.div>
+            {/* The Main Flash */}
+            <motion.div
+              initial={{ x: shatterPos.x, y: shatterPos.y, width: shatterPos.width, height: 60, opacity: 1, scale: 1 }}
+              animate={{ opacity: 0, scale: 1.5 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="absolute bg-white rounded-2xl"
+            />
             
-            {/* Middle Quarter */}
-            <motion.div 
-              initial={{ x: shatterPos.x + shatterPos.width * 0.33, y: shatterPos.y, rotate: 0, opacity: 1 }}
-              animate={{ x: shatterPos.x, y: window.innerHeight + 200, rotate: 20, opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeIn" }}
-              className="absolute bg-white/10 bg-zinc-800 border-t border-b border-white/30 text-white py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
-              style={{ width: shatterPos.width * 0.34, clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0 100%)' }}
-            >
-              <span>eak the</span>
-            </motion.div>
-
-            {/* Right Quarter */}
-            <motion.div 
-              initial={{ x: shatterPos.x + shatterPos.width * 0.67, y: shatterPos.y, rotate: 0, opacity: 1 }}
-              animate={{ x: shatterPos.x + shatterPos.width + 200, y: window.innerHeight + 200, rotate: 80, opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeIn" }}
-              className="absolute bg-white/10 bg-zinc-800 border-t border-b border-r border-white/30 text-white rounded-r-2xl py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
-              style={{ width: shatterPos.width * 0.33, clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0 100%)' }}
-            >
-              <span> Ice</span>
-            </motion.div>
-
-            {/* 20 Melting Ice Cubes exploding! */}
-            {[...Array(8)].map((_, i) => (
-               <motion.div
-                 key={i}
-                 initial={{ 
-                   y: shatterPos.y + 20, 
-                   x: shatterPos.x + (shatterPos.width / 2), 
-                   scale: Math.random() * 2 + 1, 
-                   opacity: 1 
-                 }}
-                 animate={{ 
-                   y: window.innerHeight + 200, 
-                   x: shatterPos.x + (shatterPos.width / 2) + (Math.random() - 0.5) * 600,
-                   scale: 0, 
-                   opacity: 0,
-                   rotate: Math.random() * 720 - 360
-                 }}
-                 transition={{ duration: 0.8 + Math.random() * 0.4, delay: Math.random() * 0.1, ease: "easeIn" }}
-                 className="absolute text-4xl drop-shadow-2xl"
-               >
-                 🧊
-               </motion.div>
-            ))}
+            {/* Ice Particles */}
+            {[...Array(6)].map((_, i) => {
+              const angle = (i / 6) * Math.PI * 2;
+              const distance = 150 + Math.random() * 100;
+              const destX = shatterPos.x + shatterPos.width / 2 + Math.cos(angle) * distance;
+              const destY = shatterPos.y + 30 + Math.sin(angle) * distance;
+              
+              return (
+                <motion.div 
+                  key={i}
+                  initial={{ 
+                    x: shatterPos.x + shatterPos.width / 2, 
+                    y: shatterPos.y + 30, 
+                    scale: 0.5 + Math.random(),
+                    rotate: 0, 
+                    opacity: 1 
+                  }}
+                  animate={{ 
+                    x: destX, 
+                    y: destY, 
+                    rotate: Math.random() * 360, 
+                    opacity: 0,
+                    scale: 0 
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="absolute w-6 h-6 bg-blue-100 rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                  style={{ willChange: 'transform, opacity' }}
+                />
+              );
+            })}
           </div>
         )}
       </AnimatePresence>
