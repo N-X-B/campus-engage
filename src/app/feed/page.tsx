@@ -139,28 +139,24 @@ export default function FeedPage() {
     setIcebreakerModal(true);
   };
 
-  const sendIcebreakerMessage = async () => {
+  const sendIcebreakerMessage = async (promptToSend: string) => {
     if (!user || !selectedUser) return;
     if (isDemoMode) {
       const convId = `conv-${selectedUser.id}`;
-      demoDb.sendMessage(convId, selectedPrompt, user.uid, user.displayName || 'Unknown');
+      demoDb.sendMessage(convId, promptToSend, user.uid, user.displayName || 'Unknown');
       router.push(`/chat/${convId}`);
       return;
     }
     try {
-      
       const convId = [user.uid, selectedUser.id].sort().join('_');
-      
-      // Initialize conversation document
       await setDoc(doc(db, 'conversations', convId), {
          participants: [user.uid, selectedUser.id],
-         lastMessage: selectedPrompt,
+         lastMessage: promptToSend,
          lastUpdated: Date.now()
       }, { merge: true });
 
-      // Add the message
       await addDoc(collection(db, `conversations/${convId}/messages`), {
-         text: selectedPrompt,
+         text: promptToSend,
          senderId: user.uid,
          senderName: user.displayName || 'Anonymous',
          timestamp: Date.now()
@@ -264,27 +260,22 @@ export default function FeedPage() {
                  </div>
                  <button onClick={() => setIcebreakerModal(false)} className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
               </div>
-              <div className="bg-indigo-500/10 border border-indigo-500/20 p-6 rounded-2xl mb-8 relative">
-                 <div className="h-20 flex items-center justify-center text-center overflow-hidden">
-                   <AnimatePresence mode="wait">
-                     <motion.p 
-                       key={selectedPrompt}
-                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                       transition={{ duration: 0.2 }}
-                       className="text-indigo-300 font-medium text-xl leading-relaxed"
-                     >
-                       "{selectedPrompt}"
-                     </motion.p>
-                   </AnimatePresence>
-                 </div>
-                 <button onClick={() => setSelectedPrompt(ICEBREAKERS[Math.floor(Math.random() * ICEBREAKERS.length)])} className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 shadow-xl text-zinc-300 text-xs font-bold px-4 py-2 rounded-full hover:bg-zinc-700 transition">
-                    🎲 Shuffle Prompt
-                 </button>
+              <div className="space-y-3 mb-8">
+                {promptOptions.map((prompt, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => sendIcebreakerMessage(prompt)}
+                    className="w-full text-left p-4 bg-zinc-800/50 hover:bg-white hover:text-black border border-zinc-700/50 rounded-2xl text-zinc-300 transition-all font-medium text-lg shadow-sm"
+                  >
+                    "{prompt}"
+                  </button>
+                ))}
               </div>
-              <button onClick={sendIcebreakerMessage} className="w-full bg-white text-black rounded-xl py-4 font-bold text-lg hover:bg-zinc-200 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                Send & Open Chat
+              <button onClick={() => {
+                const shuffled = [...ICEBREAKERS].sort(() => 0.5 - Math.random());
+                setPromptOptions(shuffled.slice(0, 3));
+              }} className="w-full py-3 text-sm text-zinc-500 font-bold hover:text-white transition uppercase tracking-widest bg-zinc-800/30 rounded-xl">
+                🎲 Shuffle Options
               </button>
             </motion.div>
           </motion.div>
@@ -362,7 +353,7 @@ export default function FeedPage() {
                   
                   <div className="pointer-events-auto">
                     <button 
-                      onClick={() => openIcebreaker(p)} 
+                      onClick={(e) => { e.stopPropagation(); openIcebreaker(p); }} 
                       className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1"
                     >
                       Break the Ice 🧊
