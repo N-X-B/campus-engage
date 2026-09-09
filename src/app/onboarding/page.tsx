@@ -5,7 +5,6 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
-import { saveProfileOnServer } from '@/app/actions/profile';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
@@ -121,7 +120,7 @@ export default function OnboardingWizard() {
       }
 
       
-      const timeoutPromise = (ms: number, msg: string) => new Promise((_, reject) => setTimeout(() => reject(new Error(msg)), ms));
+      
 
       const validFiles = files.filter(f => f !== null) as File[];
       const photoUrls: string[] = [];
@@ -137,9 +136,9 @@ export default function OnboardingWizard() {
       }
 
       
-      console.log("[ONBOARDING] Saving profile via Server Action (bypassing firewall)...");
+      console.log("[ONBOARDING] Saving profile directly to Firestore...");
       try {
-        const result = await saveProfileOnServer(user.uid, {
+        await setDoc(doc(db, "users", user.uid), {
           name: user.displayName || "New User",
           year,
           branch,
@@ -147,15 +146,10 @@ export default function OnboardingWizard() {
           answers,
           photos: photoUrls,
           onboarded: true
-        });
-        
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-        
-        console.log("[ONBOARDING] Server Action save complete!");
+        }, { merge: true });
+        console.log("[ONBOARDING] Profile written successfully!");
       } catch (dbErr) {
-        console.warn("[ONBOARDING] Server Action save failed. Proceeding to feed anyway...", dbErr);
+        console.warn("[ONBOARDING] Database write failed. Network blocked?", dbErr);
       }
       
       // Fire-and-forget AI embedding
