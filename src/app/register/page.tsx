@@ -38,10 +38,7 @@ function RegisterForm() {
       }
 
       console.log("[REGISTER] Calling createUserWithEmailAndPassword...");
-      const userCredential = await Promise.race([
-        createUserWithEmailAndPassword(auth, email, password),
-        timeoutPromise(2500, "Firebase Auth is not responding. Check your network or Vercel configuration.")
-      ]) as any;
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
       const user = userCredential.user;
       console.log("[REGISTER] User created in Auth:", user.uid);
@@ -165,8 +162,7 @@ function RegisterForm() {
 }
 
 
-const timeoutPromise = (ms: number, message: string) => 
-  new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms));
+
 
 export default function RegisterPage() {
   return (
