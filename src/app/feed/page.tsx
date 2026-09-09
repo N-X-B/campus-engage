@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, where, doc, setDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, setDoc, addDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
@@ -30,6 +30,7 @@ export default function FeedPage() {
   const router = useRouter();
   const [profiles, setProfiles] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
+  const [userData, setUserData] = useState<any>(null);
 
   // Modals state
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
@@ -51,6 +52,10 @@ export default function FeedPage() {
     const fetchProfiles = async () => {
       if (!user) return;
       try {
+        if (!isDemoMode) {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) setUserData(userDoc.data());
+        }
         let fetchedProfiles: any[] = [];
         
         if (isDemoMode) {

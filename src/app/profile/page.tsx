@@ -154,18 +154,18 @@ export default function ProfilePage() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-[50px] -z-10" />
             <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
               🏆 Network Expansion
-              {(userData?.referralCount || 0) >= 5 && <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full uppercase tracking-widest font-black ml-auto">UNLOCKED</span>}
+              {((userData?.referredUsers?.length || userData?.referralCount || 0)) >= 5 && <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full uppercase tracking-widest font-black ml-auto">UNLOCKED</span>}
             </h3>
             
             <div className="flex gap-2 mb-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className={`h-3 flex-1 rounded-full transition-all ${i < (userData?.referralCount || 0) ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10'}`} />
+                <div key={i} className={`h-3 flex-1 rounded-full transition-all ${i < ((userData?.referredUsers?.length || userData?.referralCount || 0)) ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10'}`} />
               ))}
             </div>
             
             <div className="flex justify-between items-center text-xs font-medium text-zinc-400 mb-6">
-              <span>{userData?.referralCount || 0} / 5 Friends Referred</span>
-              <span>{(userData?.referralCount || 0) >= 5 ? 'Unlimited Messaging Active' : 'Unlock Unlimited Messaging'}</span>
+              <span>{(userData?.referredUsers?.length || userData?.referralCount || 0)} / 5 Friends Referred</span>
+              <span>{((userData?.referredUsers?.length || userData?.referralCount || 0)) >= 5 ? 'Unlimited Messaging Active' : 'Unlock Unlimited Messaging'}</span>
             </div>
 
             <button 
