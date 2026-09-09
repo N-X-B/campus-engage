@@ -93,7 +93,7 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
            </div>
            <div>
              <h2 className="text-lg font-bold text-white leading-tight">Match Chat</h2>
-             <span className="text-[10px] text-emerald-500 font-bold tracking-widest uppercase">Online</span>
+             
            </div>
         </div>
       </header>
