@@ -152,7 +152,7 @@ export default function FeedPage() {
       openIcebreaker(p);
       setBreakingIceId(null);
       setShatterPos(null);
-    }, 1500);
+    }, 800);
   };
 
   const openIcebreaker = (targetUser: any) => {
@@ -164,30 +164,37 @@ export default function FeedPage() {
 
   const sendIcebreakerMessage = async (promptToSend: string) => {
     if (!user || !selectedUser) return;
+    
+    // In Demo Mode, just behave normally
     if (isDemoMode) {
-      const convId = `conv-${selectedUser.id}`;
-      demoDb.sendMessage(convId, promptToSend, user.uid, user.displayName || 'Unknown');
-      router.push(`/chat/${convId}`);
+      alert("Icebreaker sent! (Demo Mode)");
+      setIcebreakerModal(false);
       return;
     }
+
     try {
       const convId = [user.uid, selectedUser.id].sort().join('_');
+      
+      // We create a conversation document but mark it as pending
+      // and we store the prompt so the receiver can see it before accepting.
       await setDoc(doc(db, 'conversations', convId), {
          participants: [user.uid, selectedUser.id],
-         lastMessage: promptToSend,
+         status: 'pending',
+         senderId: user.uid,
+         receiverId: selectedUser.id,
+         icebreakerPrompt: promptToSend,
          lastUpdated: Date.now()
       }, { merge: true });
 
-      await addDoc(collection(db, `conversations/${convId}/messages`), {
-         text: promptToSend,
-         senderId: user.uid,
-         senderName: user.displayName || 'Anonymous',
-         timestamp: Date.now()
-      });
-
-      router.push(`/chat/${convId}`);
+      alert("Invitation sent! You can chat once they accept your Icebreaker.");
+      setIcebreakerModal(false);
+      
+      // Remove them from the feed locally so we don't see them again
+      setProfiles(prev => prev.filter(p => p.id !== selectedUser.id));
+      
     } catch(e) {
       console.error(e);
+      alert("Failed to send invitation.");
     }
   };
 
@@ -210,7 +217,7 @@ export default function FeedPage() {
         {selectedProfileForBrief && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 bg-zinc-800 p-4"
             onClick={() => setSelectedProfileForBrief(null)}
           >
             <motion.div 
@@ -396,7 +403,7 @@ export default function FeedPage() {
                           key="btn"
                           exit={{ opacity: 0, scale: 1.1 }}
                           onClick={(e) => handleBreakIceClick(e, p)} 
-                          className="absolute inset-0 w-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
+                          className="absolute inset-0 w-full bg-white/10 hover:bg-white/20 bg-zinc-800 border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
                         >
                           Break the Ice 🧊
                         </motion.button>
@@ -417,8 +424,8 @@ export default function FeedPage() {
             <motion.div 
               initial={{ x: shatterPos.x, y: shatterPos.y, rotate: 0, opacity: 1 }}
               animate={{ x: shatterPos.x - 200, y: window.innerHeight + 200, rotate: -80, opacity: 0 }}
-              transition={{ duration: 1.5, ease: "easeIn" }}
-              className="absolute bg-white/10 backdrop-blur-xl border border-white/30 text-white rounded-l-2xl py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
+              transition={{ duration: 0.8, ease: "easeIn" }}
+              className="absolute bg-white/10 bg-zinc-800 border border-white/30 text-white rounded-l-2xl py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
               style={{ width: shatterPos.width * 0.33, clipPath: 'polygon(0 0, 100% 0, 80% 100%, 0 100%)' }}
             >
               <span>Br</span>
@@ -428,8 +435,8 @@ export default function FeedPage() {
             <motion.div 
               initial={{ x: shatterPos.x + shatterPos.width * 0.33, y: shatterPos.y, rotate: 0, opacity: 1 }}
               animate={{ x: shatterPos.x, y: window.innerHeight + 200, rotate: 20, opacity: 0 }}
-              transition={{ duration: 1.4, ease: "easeIn" }}
-              className="absolute bg-white/10 backdrop-blur-xl border-t border-b border-white/30 text-white py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
+              transition={{ duration: 0.8, ease: "easeIn" }}
+              className="absolute bg-white/10 bg-zinc-800 border-t border-b border-white/30 text-white py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
               style={{ width: shatterPos.width * 0.34, clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0 100%)' }}
             >
               <span>eak the</span>
@@ -439,15 +446,15 @@ export default function FeedPage() {
             <motion.div 
               initial={{ x: shatterPos.x + shatterPos.width * 0.67, y: shatterPos.y, rotate: 0, opacity: 1 }}
               animate={{ x: shatterPos.x + shatterPos.width + 200, y: window.innerHeight + 200, rotate: 80, opacity: 0 }}
-              transition={{ duration: 1.5, ease: "easeIn" }}
-              className="absolute bg-white/10 backdrop-blur-xl border-t border-b border-r border-white/30 text-white rounded-r-2xl py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
+              transition={{ duration: 0.8, ease: "easeIn" }}
+              className="absolute bg-white/10 bg-zinc-800 border-t border-b border-r border-white/30 text-white rounded-r-2xl py-4 font-bold text-lg flex justify-center items-center overflow-hidden"
               style={{ width: shatterPos.width * 0.33, clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0 100%)' }}
             >
               <span> Ice</span>
             </motion.div>
 
             {/* 20 Melting Ice Cubes exploding! */}
-            {[...Array(20)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
                <motion.div
                  key={i}
                  initial={{ 
@@ -463,7 +470,7 @@ export default function FeedPage() {
                    opacity: 0,
                    rotate: Math.random() * 720 - 360
                  }}
-                 transition={{ duration: 1.3 + Math.random() * 0.4, delay: Math.random() * 0.1, ease: "easeIn" }}
+                 transition={{ duration: 0.8 + Math.random() * 0.4, delay: Math.random() * 0.1, ease: "easeIn" }}
                  className="absolute text-4xl drop-shadow-2xl"
                >
                  🧊

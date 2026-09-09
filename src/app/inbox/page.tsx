@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { Navigation } from '@/components/Navigation';
 import { motion } from 'framer-motion';
-import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getDocs, updateDoc, doc, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function InboxPage() {
@@ -18,6 +18,25 @@ export default function InboxPage() {
   const [allUsers, setAllUsers] = useState<any[]>([]);
 
   useEffect(() => {
+  const handleAccept = async (convId: string, prompt: string, senderId: string) => {
+    try {
+      await updateDoc(doc(db, 'conversations', convId), {
+        status: 'active',
+        lastMessage: prompt,
+        lastUpdated: Date.now()
+      });
+      // Add the prompt as the first actual message
+      await addDoc(collection(db, `conversations/${convId}/messages`), {
+         text: prompt,
+         senderId: senderId,
+         senderName: 'Connection',
+         timestamp: Date.now()
+      });
+    } catch(err) {
+      console.error("Failed to accept", err);
+    }
+  };
+
     if (!loading && !user) {
       router.push('/login');
     }
@@ -49,12 +68,17 @@ export default function InboxPage() {
           convos.push({
              id: d.id,
              otherUserId,
+             status: data.status || 'active',
+             senderId: data.senderId,
+             receiverId: data.receiverId,
+             icebreakerPrompt: data.icebreakerPrompt,
              lastMessage: data.lastMessage,
-             lastUpdated: data.lastUpdated,
+             lastUpdated: data.lastUpdated || 0,
              read: true
           });
        });
-       convos.sort((a, b) => b.lastUpdated - a.lastUpdated);
+       // Sort correctly to have latest at the top
+       convos.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
        setConversations(convos);
     });
 
