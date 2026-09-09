@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const DB_PATH = process.env.VERCEL ? '/tmp/local-db.json' : path.join(process.cwd(), 'local-db.json');
+const DB_PATH = path.join(process.cwd(), 'local-db.json');
 
 // Initialize local DB if it doesn't exist
 if (!fs.existsSync(DB_PATH)) {
