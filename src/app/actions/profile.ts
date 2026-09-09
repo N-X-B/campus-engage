@@ -33,7 +33,7 @@ function fromFirestore(fields: any): any {
 
 export async function saveProfileOnServer(uid: string, data: any) {
   try {
-    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/(default)/documents/users/\${uid}\`;
+    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/default/documents/users/\${uid}\`;
     
     // We do a PATCH to merge data
     // To merge in REST, we must pass updateMask.fieldPaths for every key we want to update
@@ -41,7 +41,7 @@ export async function saveProfileOnServer(uid: string, data: any) {
     const fullUrl = \`\${url}?\${maskParams}\`;
 
     const payload = {
-      name: \`projects/\${PROJECT_ID}/databases/(default)/documents/users/\${uid}\`,
+      name: \`projects/\${PROJECT_ID}/databases/default/documents/users/\${uid}\`,
       fields: toFirestore(data)
     };
 
@@ -65,7 +65,7 @@ export async function saveProfileOnServer(uid: string, data: any) {
 
 export async function getProfilesOnServer() {
   try {
-    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/(default)/documents/users\`;
+    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/default/documents/users\`;
     const res = await fetch(url, { cache: 'no-store' });
     
     if (!res.ok) {
@@ -93,7 +93,7 @@ export async function getProfilesOnServer() {
 
 export async function getUserOnServer(uid: string) {
   try {
-    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/(default)/documents/users/\${uid}\`;
+    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/default/documents/users/\${uid}\`;
     const res = await fetch(url, { cache: 'no-store' });
     
     if (res.status === 404) {

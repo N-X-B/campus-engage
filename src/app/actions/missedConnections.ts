@@ -34,7 +34,7 @@ function fromFirestore(fields: any): any {
 
 export async function getMissedConnections() {
   try {
-    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/(default)/documents/missedConnections?key=\${API_KEY}\`;
+    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/default/documents/missedConnections?key=\${API_KEY}\`;
     const res = await fetch(url, { cache: 'no-store' });
     
     if (!res.ok) throw new Error("REST API Error fetching missed connections");
@@ -59,7 +59,7 @@ export async function getMissedConnections() {
 
 export async function postMissedConnection(data: any) {
   try {
-    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/(default)/documents/missedConnections?key=\${API_KEY}\`;
+    const url = \`https://firestore.googleapis.com/v1/projects/\${PROJECT_ID}/databases/default/documents/missedConnections?key=\${API_KEY}\`;
     
     const payload = {
       fields: toFirestore(data)
