@@ -16,6 +16,7 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
   const [newMessage, setNewMessage] = useState('');
   const [otherUser, setOtherUser] = useState<any>(null);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+  const [errorMsg, setErrorMsg] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,9 +80,43 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
     if (!newMessage.trim() || !user || isAuthorized !== true) return;
 
     const text = newMessage.trim();
+    const lowerText = text.toLowerCase();
+    
+    // Strict regex rules to prevent off-platform sharing
+    const blockRules = [
+      // Phone numbers (e.g. 123-456-7890, 1234567890, 123 456 7890)
+      /(?:\d[\s\-\.]*){10}/,
+      // Emails
+      /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
+      // Instagram / Snapchat keywords
+      /insta|instagram|ig\s+@|ig\s*:|snapchat|snap\s+me|snap\s+@|sc\s*:|add\s+my\s+snap/i,
+      // Naked handles (anything starting with @)
+      /@[\w\.\_]+/
+    ];
+
+    for (const rule of blockRules) {
+      if (rule.test(lowerText)) {
+        setErrorMsg("⚠️ For your safety, sharing Instagram, Snapchat, Phone Numbers, or Emails is not allowed.");
+        return;
+      }
+    }
+
+    // Secondary heuristic: Words that sound like phone numbers spelled out
+    const numberWords = ["zero","one","two","three","four","five","six","seven","eight","nine"];
+    let numCount = 0;
+    numberWords.forEach(w => {
+       const regex = new RegExp("\\b" + w + "\\b", "g");
+       const matches = lowerText.match(regex);
+       if (matches) numCount += matches.length;
+    });
+    if (numCount >= 7) {
+       setErrorMsg("⚠️ For your safety, sharing phone numbers is not allowed.");
+       return;
+    }
     setNewMessage(''); // optimistic clear
 
     try {
