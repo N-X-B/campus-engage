@@ -9,7 +9,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { calculateMatchScore } from '@/lib/matchAlgorithm';
 import { getTopMatches } from '@/app/actions/matchmaking';
-import { getProfilesOnServer } from '@/app/actions/profile';
 import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -65,87 +64,78 @@ export default function FeedPage() {
     const fetchProfiles = async () => {
       if (!user) return;
       try {
-        if (!isDemoMode) {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists()) setUserData(userDoc.data());
-        }
         let fetchedProfiles: any[] = [];
+        let currentUserData = null;
         
         if (isDemoMode) {
           fetchedProfiles = await demoDb.getProfiles();
         } else {
-          try {
-            console.log("[FEED] Fetching profiles via Server Action (bypassing firewall)...");
-            const result = await getProfilesOnServer();
-            if (result.success && result.profiles) {
-               fetchedProfiles = result.profiles;
-               
-               if (fetchedProfiles.length <= 1) {
-                 console.warn("[FEED] Database is empty. Injecting Demo users.");
-                 fetchedProfiles = await demoDb.getProfiles();
-               }
-            } else {
-               throw new Error(result.error || "Server Action Failed");
-            }
-          } catch (err) {
-            console.warn("[FEED] Server Action failed. Falling back to Demo Mode.", err);
-            fetchedProfiles = await demoDb.getProfiles();
+          // Parallelize network requests!
+          const userDocPromise = getDoc(doc(db, 'users', user.uid));
+          const querySnapshotPromise = getDocs(query(collection(db, 'users'), where('onboarded', '==', true)));
+          // Server action API call can also run in parallel
+          const aiMatchesPromise = getTopMatches(user.uid, 50).catch(e => {
+             console.error("AI Matchmaking skipped/failed:", e);
+             return { success: false, matches: [] };
+          });
+          
+          const [userDoc, querySnapshot, aiMatches] = await Promise.all([
+             userDocPromise, 
+             querySnapshotPromise,
+             aiMatchesPromise
+          ]);
+          
+          if (userDoc.exists()) {
+             currentUserData = userDoc.data();
+             setUserData(currentUserData);
           }
-        } // CLOSED THE ELSE BLOCK HERE
-        
-        let scoredProfiles = [];
-        
-        // Try AI Vector Database Matchmaking first
-        if (!isDemoMode && user) {
-          try {
-            const aiMatches = await getTopMatches(user.uid, 50);
-            if (aiMatches.success && aiMatches.matches.length > 0) {
+          
+          querySnapshot.forEach(doc => {
+             const d = doc.data();
+             if (d.onboarded && doc.id !== user.uid) {
+               fetchedProfiles.push({ id: doc.id, ...d });
+             }
+          });
+          
+          let scoredProfiles = [];
+          
+          if (aiMatches && aiMatches.success && aiMatches.matches.length > 0) {
               const aiScoreMap = new Map();
               aiMatches.matches.forEach((m: any) => aiScoreMap.set(m.id, m.score));
               
               scoredProfiles = fetchedProfiles
-                .filter(p => p.onboarded && p.id !== user.uid && aiScoreMap.has(p.id))
+                .filter(p => aiScoreMap.has(p.id))
                 .map(p => ({
                   ...p,
-                  // Scale Pinecone cosine similarity (usually 0 to 1, sometimes 0 to 100) to our 1-100 scale
                   matchScore: Math.round(aiScoreMap.get(p.id) * 100)
                 }))
                 .sort((a, b) => b.matchScore - a.matchScore);
-            }
-          } catch (e) {
-            console.error("AI Matchmaking skipped/failed (using fallback):", e);
           }
+          
+          if (scoredProfiles.length === 0) {
+              scoredProfiles = fetchedProfiles
+                .map(p => ({
+                  ...p,
+                  matchScore: calculateMatchScore(currentUserData, p)
+                }))
+                .sort((a, b) => b.matchScore - a.matchScore);
+          }
+          
+          // Seed logic
+          const today = new Date().toISOString().split('T')[0];
+          const seedStr = user.uid + today;
+          let seed = 0;
+          for (let i = 0; i < seedStr.length; i++) {
+            seed = ((seed << 5) - seed) + seedStr.charCodeAt(i);
+            seed = seed & seed;
+          }
+          const dailyLimit = 15 + (Math.abs(seed) % 11);
+          const limitedProfiles = scoredProfiles.slice(0, dailyLimit);
+          
+          setAllFetchedProfiles(limitedProfiles);
+          setProfiles(limitedProfiles);
         }
         
-        // Fallback to basic string-matching algorithm if AI is missing keys or fails
-        if (scoredProfiles.length === 0) {
-          scoredProfiles = fetchedProfiles
-            .filter(p => p.onboarded && p.id !== user.uid)
-            .map(p => ({
-              ...p,
-              matchScore: calculateMatchScore(user, p)
-            }))
-            .sort((a, b) => b.matchScore - a.matchScore);
-        }
-
-        // --- DAILY SCARCITY LIMIT (15 to 25) ---
-        // Deterministic daily limit based on user UID and Date
-        const today = new Date().toISOString().split('T')[0];
-        const seedStr = user.uid + today;
-        let seed = 0;
-        for (let i = 0; i < seedStr.length; i++) {
-          seed = ((seed << 5) - seed) + seedStr.charCodeAt(i);
-          seed = seed & seed;
-        }
-        
-        // Random limit between 15 and 25
-        const dailyLimit = 15 + (Math.abs(seed) % 11);
-        
-        // Take the top matches up to the daily limit
-        scoredProfiles = scoredProfiles.slice(0, dailyLimit);
-
-        setProfiles(scoredProfiles);
-
       } catch (err) {
         console.error("Error fetching profiles:", err);
       } finally {
