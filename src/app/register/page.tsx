@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { saveProfileOnServer } from '@/app/actions/profile';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { motion } from 'framer-motion';
@@ -46,20 +45,19 @@ function RegisterForm() {
       console.log("[REGISTER] Updating profile...");
       await updateProfile(user, { displayName: name });
       
-      console.log("[REGISTER] Saving profile to Firestore via Server Action...");
+      console.log("[REGISTER] Saving profile directly to Firestore...");
       try {
-        const result = await saveProfileOnServer(user.uid, {
+        await setDoc(doc(db, "users", user.uid), {
             name,
             email,
             createdAt: new Date().toISOString(),
             onboardingComplete: false,
             referralCount: 0,
             referredBy: referralId || null
-        });
-        if (!result.success) throw new Error(result.error);
-        console.log("[REGISTER] Server Action save complete!");
+        }, { merge: true });
+        console.log("[REGISTER] Document written successfully!");
       } catch (dbErr) {
-        console.warn("[REGISTER] Server Action failed, but account was created in Auth. Proceeding anyway...", dbErr);
+        console.warn("[REGISTER] Database write failed, but Auth succeeded. Continuing...", dbErr);
       }
 
       if (referralId) {
