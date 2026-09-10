@@ -172,6 +172,30 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
     }
   };
 
+  const handleReport = async () => {
+    if (!user || !otherUser?.id) return;
+    const confirmed = window.confirm(`Are you sure you want to report ${otherUser.name}? Our trust and safety team will review the profile.`);
+    if (!confirmed) return;
+    
+    try {
+      const userRef = doc(db, 'users', otherUser.id);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+         const currentReports = userSnap.data().reportCount || 0;
+         const newCount = currentReports + 1;
+         const updates: any = { reportCount: newCount };
+         if (newCount >= 5) {
+            updates.status = 'under_review'; // Takes them off the feed automatically
+         }
+         await updateDoc(userRef, updates);
+         alert("Report submitted successfully. Thank you for keeping CampusEngage safe.");
+      }
+    } catch (err) {
+      console.error("Report failed", err);
+      alert("Failed to submit report.");
+    }
+  };
+
   if (loading || isAuthorized === null) return <LoadingScreen />;
 
   if (isAuthorized === false) {
@@ -204,6 +228,9 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
              </div>
            </div>
          </div>
+         <button onClick={handleReport} className="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-full transition-colors border border-red-500/20">
+           Report
+         </button>
       </div>
 
       {/* Messages Area */}

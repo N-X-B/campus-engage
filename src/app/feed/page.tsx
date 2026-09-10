@@ -108,7 +108,7 @@ export default function FeedPage() {
           
           querySnapshot.forEach(doc => {
              const d = doc.data();
-             if (d.onboarded && doc.id !== user.uid) {
+             if (d.onboarded && doc.id !== user.uid && d.status !== 'under_review') {
                fetchedProfiles.push({ id: doc.id, ...d });
              }
           });
@@ -544,12 +544,7 @@ export default function FeedPage() {
                      {p.matchScore}% Match
                   </div>
                   */}
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setSelectedUser(p); setReportModal(true); }} 
-                    className="bg-black/40 hover:bg-red-500/90 backdrop-blur-md text-white text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100 border border-white/10"
-                  >
-                    Report
-                  </button>
+                  <div className="flex-1"></div> {/* Spacer to keep alignment if needed */}
                 </div>
                 
                 {/* Content at Bottom */}
