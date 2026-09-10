@@ -1,5 +1,4 @@
 "use client";
-import { SonarBackground } from '@/components/SonarBackground';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
@@ -155,9 +154,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <>
-      <SonarBackground />
-      <div className="min-h-screen relative z-10 pb-24 md:pb-0 font-sans selection:bg-white/20">
+    <div className="min-h-screen bg-black pb-24 md:pb-0 font-sans selection:bg-white/20">
       <Navigation />
       
       <main className="max-w-2xl mx-auto p-4 sm:p-6 mt-4">
@@ -482,6 +479,5 @@ export default function ProfilePage() {
         )}
       </AnimatePresence>
     </div>
-    </>
   );
 }
