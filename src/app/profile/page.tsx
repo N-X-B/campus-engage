@@ -69,6 +69,7 @@ export default function ProfilePage() {
     hotTake: ''
   });
   const [savingAnswers, setSavingAnswers] = useState(false);
+  const [editBranch, setEditBranch] = useState('');
 
   // Photo Edit Modal State
   const [showEditPhotosModal, setShowEditPhotosModal] = useState(false);
@@ -358,6 +359,9 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-2xl font-bold text-white tracking-tight">{user.displayName || "Anonymous Student"}</h2>
               <p className="text-zinc-400 font-medium">{user.email || "No email provided"}</p>
+              {userData?.branch && (
+                <p className="text-indigo-400 text-sm font-bold mt-1 uppercase tracking-wider">{userData.branch}</p>
+              )}
             </div>
           </div>
 
@@ -590,11 +594,12 @@ export default function ProfilePage() {
                      stressLevel: userData?.answers?.stressLevel || '',
                      hotTake: userData?.answers?.hotTake || ''
                    });
+                   setEditBranch(userData?.branch || '');
                    setShowEditAnswersModal(true);
                 }} 
                 className="w-full flex justify-between items-center bg-black/50 border border-white/5 p-5 rounded-2xl text-white hover:bg-white/5 transition-colors"
              >
-                <span className="font-medium">Edit Profile Answers</span>
+                <span className="font-medium">Edit Profile & Branch</span>
                 <span className="text-zinc-500">→</span>
              </button>
              <button 
@@ -747,9 +752,20 @@ export default function ProfilePage() {
                 ✕
               </button>
 
-              <h2 className="text-xl font-bold mb-6 text-white tracking-tight">Edit Vibe Check</h2>
+              <h2 className="text-xl font-bold mb-6 text-white tracking-tight">Edit Profile & Answers</h2>
               
               <div className="space-y-6">
+                <div>
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Branch / Major</label>
+                  <input 
+                     type="text"
+                     value={editBranch}
+                     onChange={(e) => setEditBranch(e.target.value)}
+                     placeholder="e.g. Computer Science"
+                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Study Vibe</label>
                   <select 
@@ -801,8 +817,8 @@ export default function ProfilePage() {
                   onClick={async () => {
                     setSavingAnswers(true);
                     try {
-                      await updateDoc(doc(db, 'users', user!.uid), { answers: editAnswers });
-                      setUserData({ ...userData, answers: editAnswers });
+                      await updateDoc(doc(db, 'users', user!.uid), { answers: editAnswers, branch: editBranch });
+                      setUserData({ ...userData, answers: editAnswers, branch: editBranch });
                       setShowEditAnswersModal(false);
                     } catch(err) {
                       console.error("Failed to update answers", err);
