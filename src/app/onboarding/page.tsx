@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as nsfwjs from 'nsfwjs';
 
 
 const compressImageToBase64 = (file: File): Promise<string> => {
@@ -87,6 +88,15 @@ export default function OnboardingWizard() {
   
   // New state for the success animation
   const [onboardingSuccess, setOnboardingSuccess] = useState(false);
+  const [nsfwModel, setNsfwModel] = useState<nsfwjs.NSFWJS | null>(null);
+  const [isScanningImage, setIsScanningImage] = useState(false);
+
+  useEffect(() => {
+    // Silently preload the NSFW classification model in the background
+    nsfwjs.load().then(model => {
+      setNsfwModel(model);
+    }).catch(err => console.error("Failed to load NSFW model", err));
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -94,9 +104,34 @@ export default function OnboardingWizard() {
     }
   }, [user, authLoading, router]);
 
-  const handleFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setError('');
+      
+      if (nsfwModel) {
+        setIsScanningImage(true);
+        try {
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          await new Promise((resolve) => { img.onload = resolve; });
+          
+          const predictions = await nsfwModel.classify(img);
+          const isExplicit = predictions.some(p => 
+            (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.65
+          );
+          
+          if (isExplicit) {
+            setError("🚨 Explicit content detected. Please upload an appropriate profile photo.");
+            setIsScanningImage(false);
+            return;
+          }
+        } catch (err) {
+          console.error("Image scan failed", err);
+        }
+        setIsScanningImage(false);
+      }
+
       const newFiles = [...files];
       newFiles[index] = file;
       setFiles(newFiles);
