@@ -52,7 +52,6 @@ export function Navigation() {
 
   let navItems = [
     { name: 'Discover', path: '/feed' },
-    { name: 'Spotted', path: '/confessions' },
     { name: 'Speed Bump', path: '/speed-bump' },
     { name: 'Inbox', path: '/inbox' },
     { name: 'Profile', path: '/profile' },
