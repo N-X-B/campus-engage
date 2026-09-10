@@ -178,13 +178,13 @@ export default function Home() {
           {/* Cyber Scramble + Kinetic Stretch */}
           <motion.h1 
             style={{ letterSpacing: letterStretch }}
-            className="text-2xl md:text-4xl lg:text-5xl font-black leading-tight tracking-widest sm:tracking-[0.2em] mb-6 flex justify-center flex-wrap sm:flex-nowrap w-full"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-[8rem] font-black leading-none tracking-widest sm:tracking-[0.1em] mb-6 flex justify-center flex-wrap sm:flex-nowrap w-full px-4 md:px-0"
           >
             <ScrambleText text="MEET YOUR CAMPUS." />
           </motion.h1>
           
           <motion.p 
-            className="text-sm md:text-base text-zinc-400 font-medium max-w-xl mx-auto mb-10 drop-shadow-xl"
+            className="text-base md:text-xl lg:text-2xl text-zinc-400 font-medium max-w-3xl mx-auto mb-12 drop-shadow-xl"
             initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 1.5, delay: 1 }}
@@ -235,8 +235,8 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-4 leading-tight">Stop Swiping.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Start scrolling.</span></h2>
-            <p className="text-sm md:text-base text-zinc-400 mb-8 leading-relaxed">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mb-6 leading-[1.1]">Stop Swiping.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Start scrolling.</span></h2>
+            <p className="text-base md:text-xl lg:text-2xl text-zinc-400 mb-8 leading-relaxed max-w-lg">
               We scrapped the boring swiping mechanics. Experience a premium, immersive vertical feed that feels more like a modern social network than a corporate directory.
             </p>
           </motion.div>
