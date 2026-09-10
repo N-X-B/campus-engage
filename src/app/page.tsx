@@ -241,7 +241,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div 
-            className="relative h-[500px] md:h-[600px] w-full max-w-[280px] md:max-w-[320px] mx-auto perspective-1000 shrink-0"
+            className="relative aspect-[9/19] w-full max-w-[300px] md:max-w-[340px] mx-auto perspective-1000 shrink-0"
             initial={{ opacity: 0, y: 150, rotateY: 30, rotateZ: -10, filter: "blur(30px) brightness(1.5)" }}
             whileInView={{ opacity: 1, y: 0, rotateY: 0, rotateZ: 0, filter: "blur(0px) brightness(1)" }}
             viewport={{ once: true, margin: "-100px" }}
@@ -302,45 +302,51 @@ export default function Home() {
             <div className="inline-block border border-white/10 rounded-full px-4 py-1.5 mb-6 bg-white/5 backdrop-blur-md">
               <span className="text-zinc-400 font-bold text-xs uppercase tracking-widest">Powered by AI</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tighter mb-2">The Mathematics of Vibes.</h2>
-            <p className="text-sm md:text-base text-zinc-400 max-w-lg mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-4 leading-tight">The Mathematics of Vibes.</h2>
+            <p className="text-base md:text-lg text-zinc-400 max-w-xl mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
           </motion.div>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
             {/* Bento 1 */}
-            <motion.div whileHover={{ y: -5 }} className="md:col-span-2 bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 h-full flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-1">Semantic Hot Takes</h3>
-                  <p className="text-zinc-400 text-sm">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
-                </div>
-                <div className="mt-8 p-4 bg-zinc-900 rounded-2xl border border-white/5 relative overflow-hidden">
-                  <p className="text-zinc-500 font-mono text-xs tracking-tighter overflow-hidden">
-                    [0.82, -0.14, 0.55, 0.91, -0.22, 0.34, 0.77, -0.05, 0.12, 0.88, ...]<br/>
-                    <span className="text-indigo-400">&gt; Match Found: "Dining hall sushi is a scam"</span>
-                  </p>
+            <TiltCard className="md:col-span-2">
+              <div className="w-full h-full bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 h-full flex flex-col justify-between" style={{ transform: "translateZ(30px)" }}>
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-1">Semantic Hot Takes</h3>
+                    <p className="text-zinc-400 text-sm">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
+                  </div>
+                  <div className="mt-8 p-4 bg-zinc-900 rounded-2xl border border-white/5 relative overflow-hidden" style={{ transform: "translateZ(20px)" }}>
+                    <p className="text-zinc-500 font-mono text-xs tracking-tighter overflow-hidden">
+                      [0.82, -0.14, 0.55, 0.91, -0.22, 0.34, 0.77, -0.05, 0.12, 0.88, ...]<br/>
+                      <span className="text-indigo-400">&gt; Match Found: "Dining hall sushi is a scam"</span>
+                    </p>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </TiltCard>
 
             {/* Bento 2 */}
-            <motion.div whileHover={{ y: -5 }} className="bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
-              <div className="relative z-10">
-                <h3 className="text-lg font-bold text-white mb-1 relative z-10">Study Energy</h3>
-                <p className="text-zinc-400 relative z-10 text-sm">Match with library rats or coffee shop regulars.</p>
+            <TiltCard>
+              <div className="w-full h-full bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+                <div className="relative z-10" style={{ transform: "translateZ(30px)" }}>
+                  <h3 className="text-lg font-bold text-white mb-1 relative z-10">Study Energy</h3>
+                  <p className="text-zinc-400 relative z-10 text-sm">Match with library rats or coffee shop regulars.</p>
+                </div>
+                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
               </div>
-              <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
-            </motion.div>
+            </TiltCard>
 
             {/* Bento 3 */}
-            <motion.div whileHover={{ y: -5 }} className="bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
-              <div className="relative z-10">
-                <h3 className="text-lg font-bold text-white mb-1 relative z-10">5-Cluster Matrix</h3>
-                <p className="text-zinc-400 relative z-10 text-sm">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
+            <TiltCard>
+              <div className="w-full h-full bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+                <div className="relative z-10" style={{ transform: "translateZ(30px)" }}>
+                  <h3 className="text-lg font-bold text-white mb-1 relative z-10">5-Cluster Matrix</h3>
+                  <p className="text-zinc-400 relative z-10 text-sm">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
+                </div>
+                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
               </div>
-              <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
-            </motion.div>
+            </TiltCard>
 
             {/* Bento 4 */}
             <TiltCard className="md:col-span-2">
