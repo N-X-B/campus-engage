@@ -241,7 +241,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div 
-            className="relative aspect-[9/19] w-full max-w-[320px] mx-auto perspective-1000 shrink-0"
+            className="relative h-[500px] md:h-[600px] w-full max-w-[280px] md:max-w-[320px] mx-auto perspective-1000 shrink-0"
             initial={{ opacity: 0, y: 150, rotateY: 30, rotateZ: -10, filter: "blur(30px) brightness(1.5)" }}
             whileInView={{ opacity: 1, y: 0, rotateY: 0, rotateZ: 0, filter: "blur(0px) brightness(1)" }}
             viewport={{ once: true, margin: "-100px" }}
@@ -250,15 +250,16 @@ export default function Home() {
             <div className="absolute inset-0 bg-zinc-900 rounded-[3rem] p-2 shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/5 relative z-10">
               <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative border border-white/5 flex flex-col justify-end p-6">
                 
-                {/* Abstract UI Elements instead of Fake Profile */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.8))] z-0" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                  <div className="w-32 h-32 rounded-full border-[10px] border-indigo-500 border-t-transparent animate-spin" />
+                {/* Static Placeholder (Replaced infinite spinner so it doesn't look like a broken image) */}
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/40 via-purple-500/20 to-black z-0" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                  <span className="text-[8rem] filter grayscale blur-[1px]">👤</span>
                 </div>
+                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.9))] z-0" />
                 
                 <div className="relative z-10 w-full space-y-4">
-                  <div className="h-6 w-3/4 bg-white/10 rounded-full animate-pulse" />
-                  <div className="h-4 w-1/2 bg-white/5 rounded-full animate-pulse" />
+                  <div className="h-6 w-3/4 bg-white/20 rounded-full" />
+                  <div className="h-4 w-1/2 bg-white/10 rounded-full" />
                   
                   <div className="w-full h-10 mt-6 bg-white/10 backdrop-blur-2xl rounded-2xl flex items-center justify-center text-white text-sm font-bold border border-white/10 shadow-xl overflow-hidden relative group cursor-none">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
