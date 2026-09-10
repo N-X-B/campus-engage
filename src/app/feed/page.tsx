@@ -524,7 +524,7 @@ export default function FeedPage() {
                 whileInView={{ opacity: 1, y: 0, filter: "blur(0px) brightness(1)" }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/5] flex flex-col group hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 cursor-pointer z-10"
+                className="relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[3/4] flex flex-col group hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 cursor-pointer z-10"
               >
                 {/* Background Image */}
                 <div className="absolute inset-0 cursor-pointer" onClick={() => setSelectedProfileForBrief(p)}>
@@ -534,40 +534,36 @@ export default function FeedPage() {
                     <div className="w-full h-full bg-zinc-800" />
                   )}
                   {/* Heavy dark gradient overlay at bottom for text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent h-2/3 mt-auto" />
                 </div>
                 
                 {/* Badges Overlay */}
                 <div className="absolute top-5 left-5 right-5 flex justify-between z-10">
-                  {/* MATCH SCORE HIDDEN PER USER REQUEST
-                  <div className={`px-3 py-1.5 rounded-full border text-xs font-bold shadow-lg backdrop-blur-md ${getMatchColor(p.matchScore)}`}>
-                     {p.matchScore}% Match
-                  </div>
-                  */}
-                  <div className="flex-1"></div> {/* Spacer to keep alignment if needed */}
+                  {/* MATCH SCORE HIDDEN PER USER REQUEST */}
+                  <div className="flex-1"></div>
                 </div>
                 
                 {/* Content at Bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 z-10 pointer-events-none">
-                  <div className="flex justify-between items-end mb-2">
-                    <h2 className="text-4xl font-extrabold text-white tracking-tight drop-shadow-lg">{p.name}</h2>
+                <div className="absolute bottom-0 left-0 right-0 p-5 z-10 pointer-events-none">
+                  <div className="flex justify-between items-end mb-1">
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-lg">{p.name}</h2>
                   </div>
-                  <p className="text-zinc-300 font-medium mb-3 text-lg drop-shadow-md">{p.branch} • Year {p.year}</p>
+                  <p className="text-zinc-300 font-medium mb-2 text-sm drop-shadow-md">{p.branch} • Year {p.year}</p>
                   
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {p.answers && (
                       <>
-                        <span className="bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-full shadow-sm">
+                        <span className="bg-black/30 backdrop-blur-md border border-white/10 text-white text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-full shadow-sm">
                           {p.answers.weekendVibe}
                         </span>
-                        <span className="bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-full shadow-sm">
+                        <span className="bg-black/30 backdrop-blur-md border border-white/10 text-white text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-full shadow-sm">
                           {p.answers.studyVibe.includes('Beats') ? 'Coffee Shop' : 'Library'}
                         </span>
                       </>
                     )}
                   </div>
                   
-                  <div className="pointer-events-auto relative h-16 w-full">
+                  <div className="pointer-events-auto relative h-12 w-full">
                     <AnimatePresence>
                       {breakingIceId === p.id ? (
                         <div className="absolute inset-0 pointer-events-none" />
@@ -576,7 +572,7 @@ export default function FeedPage() {
                           key="btn"
                           exit={{ opacity: 0, scale: 1.1 }}
                           onClick={(e) => handleBreakIceClick(e, p)} 
-                          className="absolute inset-0 w-full bg-white/10 hover:bg-white/20 bg-zinc-800 border border-white/30 text-white rounded-2xl py-4 font-bold text-lg transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
+                          className="absolute inset-0 w-full bg-white/10 hover:bg-white/20 bg-zinc-800/80 backdrop-blur-md border border-white/20 text-white rounded-xl py-3 font-bold text-sm transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
                         >
                           Break the Ice 🧊
                         </motion.button>
