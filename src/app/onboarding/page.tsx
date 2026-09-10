@@ -259,7 +259,7 @@ export default function OnboardingWizard() {
           <div>
             <h3 className="text-amber-500 font-bold text-sm tracking-wide uppercase mb-1">Early Adopter Bonus</h3>
             <p className="text-amber-200/80 text-xs font-medium leading-relaxed">
-              Complete your profile within the next <strong className="text-white">3 days</strong> to unlock <strong className="text-white">Double Daily Matches</strong> (14 Icebreakers/day) for your first week!
+              Complete your profile within the next <strong className="text-white">3 days</strong> to unlock <strong className="text-white">Double Daily Matches</strong> (10 Icebreakers/day) for your first week!
             </p>
           </div>
         </div>
