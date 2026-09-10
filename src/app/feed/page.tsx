@@ -133,9 +133,11 @@ export default function FeedPage() {
                 .map(p => ({
                   ...p,
                   matchScore: calculateMatchScore(currentUserData, p)
-                }))
-                .sort((a, b) => b.matchScore - a.matchScore);
+                }));
           }
+
+          // Dynamically shuffle the feed every time the site loads so anyone can appear
+          scoredProfiles = scoredProfiles.sort(() => 0.5 - Math.random());
           
           // Seed logic
           const today = new Date().toISOString().split('T')[0];
