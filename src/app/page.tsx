@@ -465,8 +465,7 @@ export default function Home() {
             <h4 className="text-white font-bold tracking-widest uppercase mb-6 text-xs">Social</h4>
             <ul className="space-y-4">
               <li><a href="#" className="text-zinc-500 hover:text-white transition-colors cursor-none">Instagram</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-white transition-colors cursor-none">TikTok</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-white transition-colors cursor-none">Twitter</a></li>
+              <li><a href="#" className="text-zinc-500 hover:text-white transition-colors cursor-none">Reddit</a></li>
             </ul>
           </div>
           <div>
