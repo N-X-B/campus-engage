@@ -173,7 +173,7 @@ export default function Home() {
            <motion.div animate={{ y: [0, -100, 0], x: [0, -50, 0] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_rgba(225,29,72,0.1)_0%,_transparent_60%)]" />
         </div>
         
-        <motion.div style={{ y: yBg, opacity: opacityText }} className="text-center w-full max-w-7xl mt-20 z-10 relative">
+        <motion.div style={{ y: yBg, opacity: opacityText }} className="text-center w-full max-w-7xl mt-10 md:mt-20 z-10 relative">
           
           {/* Cyber Scramble + Kinetic Stretch */}
           <motion.h1 
@@ -226,8 +226,8 @@ export default function Home() {
       </section>
 
       {/* Feature 1: The Feed */}
-      <section className="py-32 px-4 relative">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+      <section className="py-16 md:py-16 md:py-32 px-4 relative">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
           <motion.div 
             initial={{ opacity: 0, x: -100, filter: "blur(20px)" }}
             whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
@@ -278,7 +278,7 @@ export default function Home() {
       </section>
 
       {/* Feature 2: Bento Box Algorithm with 3D Tilt */}
-      <section className="py-32 px-4 bg-zinc-950 border-y border-zinc-900/50 relative overflow-hidden">
+      <section className="py-16 md:py-32 px-4 bg-zinc-950 border-y border-zinc-900/50 relative overflow-hidden">
         
         <motion.div 
           className="absolute -top-40 -right-40 w-[600px] h-[600px] border border-white/5 rounded-full border-dashed opacity-50 pointer-events-none"
@@ -374,7 +374,7 @@ export default function Home() {
       </section>
 
       {/* Feature 3: How it Works */}
-      <section className="py-40 px-4 relative overflow-hidden bg-black">
+      <section className="py-20 md:py-40 px-4 relative overflow-hidden bg-black">
         <motion.div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] border border-white/[0.03] rounded-full pointer-events-none"
           animate={{ rotate: 360 }}
@@ -386,14 +386,14 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto relative z-10">
           <motion.div 
-            className="text-center mb-32"
+            className="text-center mb-16 md:mb-32"
             initial={{ opacity: 0, y: 50, filter: "blur(20px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
             transition={{ duration: 1 }}
           >
           </motion.div>
-          <div className="text-center mb-24">
+          <div className="text-center mb-12 md:mb-24">
             <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-4">System Architecture.</h2>
             <p className="text-sm md:text-base text-zinc-500">Three simple steps to build your network on campus.</p>
           </div>
@@ -430,7 +430,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-4 text-center relative overflow-hidden bg-black border-t border-white/5">
+      <section className="py-16 md:py-32 px-4 text-center relative overflow-hidden bg-black border-t border-white/5">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/20 via-black to-black pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600">READY?</h2>

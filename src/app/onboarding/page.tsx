@@ -92,7 +92,7 @@ export default function OnboardingWizard() {
   const [isScanningImage, setIsScanningImage] = useState(false);
 
   const [isRestoring, setIsRestoring] = useState(true);
-
+  const [showRulesModal, setShowRulesModal] = useState(true);
   useEffect(() => {
     // Silently preload the NSFW classification model in the background
     nsfwjs.load().then(model => {
@@ -145,11 +145,14 @@ export default function OnboardingWizard() {
               if (data.course && data.branch && data.year && data.gender) {
                 if (data.studyVibe && data.weekendVibe) {
                   setStep(4);
+                  setShowRulesModal(false);
                 } else {
                   setStep(3);
+                  setShowRulesModal(false);
                 }
               } else {
                 setStep(2);
+                setShowRulesModal(false);
               }
             }
           }
@@ -373,6 +376,61 @@ export default function OnboardingWizard() {
   return (
     <div className="flex flex-col min-h-[100dvh] bg-black items-center justify-center py-12 px-4 overflow-hidden relative">
       
+      {/* Guidelines / Rules Modal */}
+      <AnimatePresence>
+        {showRulesModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20, opacity: 0 }} 
+              animate={{ scale: 1, y: 0, opacity: 1 }} 
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="bg-zinc-900 border border-white/10 rounded-[2.5rem] p-8 max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/20 blur-[60px] pointer-events-none rounded-full -translate-y-1/2 translate-x-1/2" />
+              
+              <h2 className="text-3xl font-black text-white mb-6 tracking-tighter">Read Before You Enter.</h2>
+              
+              <div className="space-y-6 mb-8 relative z-10">
+                <div className="flex gap-4">
+                  <div className="text-2xl">✨</div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg mb-1">Aura is Everything</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed">Your actions dictate your Aura Score. Get reported? Your score drops. If your Aura drops too low, girls can automatically filter you out of their inbox.</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="text-2xl">🛡️</div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg mb-1">Zero Tolerance</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed">Creepy behavior, harassment, or unsolicited toxicity results in an instant ban and an IP block. We keep our community extremely safe.</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="text-2xl">💌</div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg mb-1">The Vouch System (Waitlist)</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed">Male spots are heavily limited. Soon, guys will only be able to bypass the waitlist if a female user directly vouches for them. Secure your spot now.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setShowRulesModal(false)}
+                className="w-full bg-white text-black py-4 rounded-full font-bold text-lg hover:bg-zinc-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-[1.02]"
+              >
+                I Understand, Let's Go
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Promo Banner */}
       <div className="mb-6 w-full max-w-md z-10 bg-zinc-900 border border-amber-500/30 shadow-2xl p-4 rounded-2xl relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-rose-500/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
