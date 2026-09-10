@@ -1,4 +1,5 @@
 "use client";
+import { SonarBackground } from '@/components/SonarBackground';
 
 import { useEffect, useState } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -106,7 +107,9 @@ export default function InboxPage() {
   const sentRequests = conversations.filter(c => c.status === 'pending' && c.senderId === user.uid);
 
   return (
-    <div className="min-h-screen bg-black font-sans selection:bg-white/20 pb-20">
+    <>
+      <SonarBackground />
+      <div className="min-h-screen relative z-10 font-sans selection:bg-white/20 pb-20">
       <Navigation />
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-8">
@@ -248,5 +251,6 @@ export default function InboxPage() {
         </div>
       </main>
     </div>
+    </>
   );
 }

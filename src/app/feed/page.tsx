@@ -1,4 +1,5 @@
 "use client";
+import { SonarBackground } from '@/components/SonarBackground';
 
 import { useEffect, useState } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -232,7 +233,9 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pb-20 md:pb-0 font-sans selection:bg-indigo-500/30">
+    <>
+      <SonarBackground />
+      <div className="min-h-screen relative z-10 pb-20 md:pb-0 font-sans selection:bg-indigo-500/30">
       <Navigation />
       
       
@@ -592,5 +595,6 @@ export default function FeedPage() {
       </main>
 
     </div>
+    </>
   );
 }
