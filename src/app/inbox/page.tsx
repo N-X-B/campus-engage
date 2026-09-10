@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, query, where, onSnapshot, getDocs, getDoc, updateDoc, doc, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getDocs, getDoc, updateDoc, doc, addDoc, deleteDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function InboxPage() {
@@ -36,6 +36,34 @@ export default function InboxPage() {
       });
     } catch(err) {
       console.error("Failed to accept", err);
+    }
+  };
+  const handleReject = async (convId: string, senderId: string) => {
+    try {
+      if (window.confirm("Report and block this user?")) {
+        // Drop creep's aura score
+        const targetDoc = await getDoc(doc(db, 'users', senderId));
+        if (targetDoc.exists()) {
+           const currentAura = targetDoc.data().auraScore || 20;
+           await updateDoc(doc(db, 'users', senderId), {
+             auraScore: Math.max(0, currentAura - 50)
+           });
+        }
+        
+        // Add to blocked array
+        if (user) {
+          await updateDoc(doc(db, 'users', user.uid), {
+            blockedUsers: arrayUnion(senderId)
+          });
+        }
+
+        await updateDoc(doc(db, 'conversations', convId), {
+          status: 'rejected',
+          lastUpdated: Date.now()
+        });
+      }
+    } catch(err) {
+      console.error("Failed to reject", err);
     }
   };
 
@@ -253,12 +281,21 @@ export default function InboxPage() {
                              <p className="text-xs text-indigo-300 mt-1">Wants to break the ice!</p>
                            </div>
                          </div>
-                         <button 
-                           onClick={() => handleAccept(chat.id, chat.icebreakerPrompt || 'Hey!', chat.senderId)}
-                           className="bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-                         >
-                           Accept Request
-                         </button>
+                         <div className="flex gap-2">
+                           <button 
+                             onClick={() => handleReject(chat.id, chat.senderId)}
+                             className="bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white px-4 py-2 rounded-full font-bold text-sm transition-colors border border-rose-500/20"
+                             title="Report & Block"
+                           >
+                             🚩 Block
+                           </button>
+                           <button 
+                             onClick={() => handleAccept(chat.id, chat.icebreakerPrompt || 'Hey!', chat.senderId)}
+                             className="bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-2 rounded-full font-bold text-sm transition-colors shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                           >
+                             Accept Request
+                           </button>
+                         </div>
                       </motion.div>
                     )
                   })}

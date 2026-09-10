@@ -4,7 +4,7 @@ import { SonarBackground } from '@/components/SonarBackground';
 import { useEffect, useState } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, where, doc, setDoc, addDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, setDoc, addDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/lib/AuthContext';
@@ -108,7 +108,8 @@ export default function FeedPage() {
           
           querySnapshot.forEach(doc => {
              const d = doc.data();
-             if (d.onboarded && doc.id !== user.uid && d.status !== 'under_review') {
+             const blockedByMe = currentUserData.blockedUsers || [];
+             if (d.onboarded && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
                fetchedProfiles.push({ id: doc.id, ...d });
              }
           });
@@ -186,9 +187,49 @@ export default function FeedPage() {
     setProfiles(filtered);
   }, [selectedFilters, selectedYearFilter, allFetchedProfiles]);
 
-  const handleBreakIceClick = (e: any, p: any, isModal: boolean = false) => {
-    haptic.medium();
+  const handleBlockUser = async (e: any, p: any) => {
     e.stopPropagation();
+    if (!user) return;
+    
+    // Optimistic UI removal
+    setAllFetchedProfiles(prev => prev.filter(profile => profile.id !== p.id));
+    setProfiles(prev => prev.filter(profile => profile.id !== p.id));
+    if (selectedProfileForBrief?.id === p.id) setSelectedProfileForBrief(null);
+    haptic.success();
+    
+    if (!isDemoMode) {
+      try {
+        await updateDoc(doc(db, 'users', user.uid), {
+          blockedUsers: arrayUnion(p.id)
+        });
+        
+        // Drop creep's aura score
+        const targetDoc = await getDoc(doc(db, 'users', p.id));
+        if (targetDoc.exists()) {
+           const currentAura = targetDoc.data().auraScore || 20;
+           await updateDoc(doc(db, 'users', p.id), {
+             auraScore: Math.max(0, currentAura - 50)
+           });
+        }
+      } catch (err) {
+         console.error("Failed to block user", err);
+      }
+    }
+  };
+
+  const handleBreakIceClick = (e: any, p: any, isModal: boolean = false) => {
+    e.stopPropagation();
+    
+    // Aura Filter Check
+    const myAura = userData?.auraScore ?? 20;
+    const reqAura = p.minAuraRequired || 0;
+    
+    if (myAura < reqAura) {
+       alert(`🛡️ Aura Shield Active!\n\n${p.name} requires a minimum Aura Score of ${reqAura} to receive messages.\nYour current Aura is ${myAura}.\n\nRaise your Aura by getting praises from others!`);
+       return;
+    }
+
+    haptic.medium();
     const rect = e.currentTarget.getBoundingClientRect();
     setShatterPos({ x: rect.left, y: rect.top, width: rect.width });
     setBreakingIceId(p.id);
@@ -356,9 +397,24 @@ export default function FeedPage() {
                  )}
                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
                  
-                 <button onClick={() => setSelectedProfileForBrief(null)} className="absolute top-4 right-4 w-10 h-10 bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10">
-                   ✕
-                 </button>
+                 <div className="absolute top-4 right-4 flex gap-2">
+                   <button 
+                     onClick={(e) => {
+                       if (window.confirm(`Are you sure you want to report and block ${selectedProfileForBrief.name}?`)) {
+                         handleBlockUser(e, selectedProfileForBrief);
+                       } else {
+                         e.stopPropagation();
+                       }
+                     }}
+                     className="w-10 h-10 bg-black/40 hover:bg-rose-500/80 backdrop-blur-md text-white/70 hover:text-white rounded-full flex items-center justify-center transition-all border border-white/10 shadow-lg"
+                     title="Report & Block"
+                   >
+                     🚩
+                   </button>
+                   <button onClick={() => setSelectedProfileForBrief(null)} className="w-10 h-10 bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10">
+                     ✕
+                   </button>
+                 </div>
                  
                  <div className="absolute bottom-6 left-6 right-6">
                     <div className="flex items-center gap-3 mb-2">
@@ -545,6 +601,21 @@ export default function FeedPage() {
                 <div className="absolute top-5 left-5 right-5 flex justify-between z-10">
                   {/* MATCH SCORE HIDDEN PER USER REQUEST */}
                   <div className="flex-1"></div>
+                  
+                  {/* Block / Report Flag */}
+                  <button 
+                    onClick={(e) => {
+                      if (window.confirm(`Are you sure you want to report and block ${p.name}? This will drop their Aura score and remove them from your feed.`)) {
+                        handleBlockUser(e, p);
+                      } else {
+                        e.stopPropagation();
+                      }
+                    }}
+                    className="w-10 h-10 bg-black/40 hover:bg-rose-500/80 backdrop-blur-md rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all shadow-lg border border-white/10 z-20 pointer-events-auto"
+                    title="Report & Block"
+                  >
+                    🚩
+                  </button>
                 </div>
                 
                 {/* Content at Bottom */}

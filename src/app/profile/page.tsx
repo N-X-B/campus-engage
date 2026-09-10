@@ -399,6 +399,34 @@ export default function ProfilePage() {
              </div>
           </div>
 
+          {/* Aura Message Filter Settings */}
+          <div className="bg-black/50 border border-white/5 p-6 rounded-3xl mb-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-indigo-500/5 blur-[50px] -z-10" />
+            <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
+              🛡️ Aura Filter
+            </h3>
+            <p className="text-zinc-400 text-xs mb-4">
+              Set the minimum Aura Score required for someone to send you an Icebreaker. Protect your inbox from low-vibe users.
+            </p>
+            <div className="flex items-center gap-4">
+               <span className="text-sm font-bold text-zinc-500">0</span>
+               <input 
+                 type="range" 
+                 min="0" 
+                 max="100" 
+                 step="10"
+                 defaultValue={userData.minAuraRequired || 0}
+                 onChange={(e) => {
+                   const val = parseInt(e.target.value);
+                   setUserData({ ...userData, minAuraRequired: val });
+                   updateDoc(doc(db, 'users', user!.uid), { minAuraRequired: val }).catch(console.error);
+                 }}
+                 className="flex-1 accent-indigo-500 bg-zinc-800 rounded-lg appearance-none h-2"
+               />
+               <span className="text-sm font-bold text-indigo-400">{userData.minAuraRequired || 0}+</span>
+            </div>
+          </div>
+
           <div className="mb-8">
             <button 
               onClick={() => {
