@@ -6,6 +6,7 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, where, doc, setDoc, addDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/lib/AuthContext';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
 import { calculateMatchScore } from '@/lib/matchAlgorithm';
@@ -169,6 +170,7 @@ export default function FeedPage() {
   }, [selectedFilters, allFetchedProfiles]);
 
   const handleBreakIceClick = (e: any, p: any, isModal: boolean = false) => {
+    haptic.medium();
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     setShatterPos({ x: rect.left, y: rect.top, width: rect.width });
@@ -193,9 +195,11 @@ export default function FeedPage() {
     
     // Optimistic UI updates
     setSendingPrompt(promptToSend);
+    haptic.light();
     
     setTimeout(() => {
       setSentSuccess(true);
+      haptic.success();
       setTimeout(() => {
          setIcebreakerModal(false);
          setSendingPrompt(null);
@@ -453,7 +457,7 @@ export default function FeedPage() {
         {/* Intent / Domain Selector */}
         <div className="flex flex-wrap gap-2 mb-6">
           <button 
-             onClick={() => setShowFilterModal(true)}
+             onClick={() => { haptic.medium(); setShowFilterModal(true); }}
              className="px-4 py-2 rounded-full font-bold text-sm transition-all bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] flex items-center gap-2"
           >
              <span className="text-lg">🎯</span> Filter Vibes {selectedFilters.length > 0 && `(${selectedFilters.length}/5)`}

@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext';
 import Link from 'next/link';
 import { collection, query, orderBy, onSnapshot, addDoc, doc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { haptic } from '@/lib/haptics';
 import { motion } from 'framer-motion';
 
 export default function ChatRoom({ params }: { params: Promise<{ id: string }> }) {
@@ -119,8 +120,10 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
     for (let i = 0; i < blockRules.length; i++) {
       if (blockRules[i].test(lowerText)) {
         if (i <= 2) {
+           haptic.error();
            setErrorMsg("🚨 Message blocked: Contains inappropriate, abusive, violent, or sexually explicit content.");
         } else {
+           haptic.error();
            setErrorMsg("⚠️ For your safety, sharing Instagram, Snapchat, Phone Numbers, or Emails is not allowed.");
         }
         return;
@@ -136,10 +139,12 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
        if (matches) numCount += matches.length;
     });
     if (numCount >= 7) {
-       setErrorMsg("⚠️ For your safety, sharing phone numbers is not allowed.");
+       haptic.error();
+           setErrorMsg("⚠️ For your safety, sharing phone numbers is not allowed.");
        return;
     }
     setNewMessage(''); // optimistic clear
+    haptic.light();
 
     try {
       await addDoc(collection(db, `conversations/${resolvedParams.id}/messages`), {

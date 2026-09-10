@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { haptic } from '@/lib/haptics';
 
 export function Navigation() {
   const { user } = useAuth();
@@ -52,6 +53,7 @@ export function Navigation() {
             <Link 
               key={item.path} 
               href={item.path}
+              onClick={() => haptic.light()}
               className={`relative text-sm font-bold tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 ${
                 pathname === item.path 
                   ? 'text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.9)]' 
