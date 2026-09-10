@@ -345,8 +345,8 @@ export default function Home() {
                 </div>
                 <div className="mt-8 p-5 bg-zinc-950/80 rounded-2xl border border-indigo-500/10 relative z-10 shadow-inner" style={{ transform: "translateZ(20px)" }}>
                   <div className="flex items-end gap-2">
-                    <span className="text-3xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">784</span>
-                    <span className="text-zinc-500 font-bold mb-1 uppercase text-xs tracking-widest">/ 850 (Exceptional)</span>
+                    <span className="text-3xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">92</span>
+                    <span className="text-zinc-500 font-bold mb-1 uppercase text-xs tracking-widest">/ 100 (Exceptional)</span>
                   </div>
                   <div className="w-full h-2 bg-zinc-900 rounded-full mt-4 overflow-hidden">
                      <div className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 w-[92%] shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
