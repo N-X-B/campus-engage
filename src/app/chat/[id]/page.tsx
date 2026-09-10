@@ -5,7 +5,7 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import Link from 'next/link';
-import { collection, query, orderBy, onSnapshot, addDoc, doc, serverTimestamp, getDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, getDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { haptic } from '@/lib/haptics';
 import { motion } from 'framer-motion';
@@ -57,6 +57,11 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
         }
 
         setIsAuthorized(true);
+        
+        // Reset unread count for current user
+        updateDoc(doc(db, 'conversations', resolvedParams.id), {
+          [`unread_${user.uid}`]: 0
+        }).catch(e => console.error(e));
 
         // Fetch other user profile
         const otherId = data.participants.find((id: string) => id !== user.uid);
@@ -153,6 +158,15 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
         senderName: user.displayName || 'You',
         timestamp: Date.now() // Use Date.now for simpler sorting
       });
+      
+      // Update the parent document with the latest message and unread count for the other user
+      if (otherUser?.id) {
+        await updateDoc(doc(db, 'conversations', resolvedParams.id), {
+          lastMessage: text,
+          lastUpdated: Date.now(),
+          [`unread_${otherUser.id}`]: increment(1)
+        });
+      }
     } catch (err) {
       console.error("Failed to send message", err);
     }

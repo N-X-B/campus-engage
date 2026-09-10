@@ -43,6 +43,23 @@ const compressImageToBase64 = (file: File): Promise<string> => {
   });
 };
 
+const Typewriter = ({ text }: { text: string }) => {
+  return (
+    <motion.h1 className="text-3xl font-bold text-slate-900" initial={{ opacity: 1 }}>
+      {text.split('').map((char, index) => (
+        <motion.span
+          key={index}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.05, delay: index * 0.03 }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </motion.h1>
+  );
+};
+
 export default function OnboardingWizard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -54,11 +71,14 @@ export default function OnboardingWizard() {
   const [files, setFiles] = useState<(File | null)[]>([null, null, null]);
   const [previews, setPreviews] = useState<(string | null)[]>([null, null, null]);
   
+  const [course, setCourse] = useState('');
   const [year, setYear] = useState('');
   const [branch, setBranch] = useState('');
+  const [gender, setGender] = useState('');
 
   const [studyVibe, setStudyVibe] = useState('');
   const [weekendVibe, setWeekendVibe] = useState('');
+  const [skipClass, setSkipClass] = useState('');
   const [stressLevel, setStressLevel] = useState('');
   const [hotTake, setHotTake] = useState('');
 
@@ -105,12 +125,13 @@ export default function OnboardingWizard() {
       const answers = { 
         studyVibe: studyVibe || "Dead Silence (Library)", 
         weekendVibe: weekendVibe || "Downtown Bar", 
+        skipClass: skipClass || "Cafe",
         stressLevel: stressLevel || "12 hours before", 
         hotTake: hotTake || "I have no hot takes." 
       };
       
       if (isDemoMode) {
-        await demoDb.updateProfile(user.uid, { year, branch, bio, photos: previews.filter(p => p !== null), answers });
+        await demoDb.updateProfile(user.uid, { course, year, branch, bio, photos: previews.filter(p => p !== null), answers });
         
         setOnboardingSuccess(true);
         setTimeout(() => {
@@ -140,8 +161,10 @@ export default function OnboardingWizard() {
       try {
         await setDoc(doc(db, "users", user.uid), {
           name: user.displayName || "New User",
+          course,
           year,
           branch,
+          gender,
           bio,
           answers,
           photos: photoUrls,
@@ -220,7 +243,7 @@ export default function OnboardingWizard() {
                 {step === 1 && (
                   <motion.div key="step1" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
-                      <h1 className="text-3xl font-bold text-slate-900">Let's build your profile.</h1>
+                      <Typewriter text="Let's build your profile." />
                       <p className="text-slate-500 mt-2">First impressions matter. Add your best photos and a bio.</p>
                     </div>
 
@@ -253,27 +276,58 @@ export default function OnboardingWizard() {
                 {step === 2 && (
                   <motion.div key="step2" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
-                      <h1 className="text-3xl font-bold text-slate-900">The Academics</h1>
+                      <Typewriter text="The Academics" />
                       <p className="text-slate-500 mt-2">Who are you on campus?</p>
                     </div>
 
                     <div className="space-y-6 mt-12">
                       <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">Year of Study</label>
+                        <label className="block text-sm font-semibold text-slate-900 mb-2">Course</label>
                         <select 
-                          value={year}
-                          onChange={(e) => setYear(e.target.value)}
+                          value={course}
+                          onChange={(e) => { setCourse(e.target.value); setYear(''); }}
                           className="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-lg transition-colors"
                         >
-                          <option value="" disabled>Select Year</option>
-                          <option value="1">1st Year (Fresher)</option>
-                          <option value="2">2nd Year</option>
-                          <option value="3">3rd Year</option>
-                          <option value="4">4th Year</option>
-                          <option value="postgrad">Postgraduate</option>
+                          <option value="" disabled>Select Course</option>
+                          <option value="BTech">B.Tech (4 Years)</option>
+                          <option value="BBA">BBA (3 Years)</option>
+                          <option value="Masters">Masters (2 Years)</option>
+                          <option value="PhD">PhD (5 Years)</option>
                         </select>
                       </div>
                       
+                      {course && (
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-900 mb-2">Year of Study</label>
+                          <select 
+                            value={year}
+                            onChange={(e) => setYear(e.target.value)}
+                            className="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-lg transition-colors"
+                          >
+                            <option value="" disabled>Select Year</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            {(course === 'BTech' || course === 'BBA' || course === 'PhD') && <option value="3">3rd Year</option>}
+                            {(course === 'BTech' || course === 'PhD') && <option value="4">4th Year</option>}
+                            {course === 'PhD' && <option value="5">5th Year</option>}
+                          </select>
+                        </div>
+                      )}
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-900 mb-2">Gender</label>
+                        <select 
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-lg transition-colors"
+                        >
+                          <option value="" disabled>Select Gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="non-binary">Non-binary</option>
+                        </select>
+                      </div>
+
                       <div>
                         <label className="block text-sm font-semibold text-slate-900 mb-2">Branch / Major</label>
                         <input
@@ -291,7 +345,7 @@ export default function OnboardingWizard() {
                 {step === 3 && (
                   <motion.div key="step3" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
-                      <h1 className="text-3xl font-bold text-slate-900">The Vibe Check (1/2)</h1>
+                      <Typewriter text="The Vibe Check (1/2)" />
                       <p className="text-slate-500 mt-2">We use this to match you with similar energies.</p>
                     </div>
 
@@ -301,6 +355,17 @@ export default function OnboardingWizard() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {["Dead Silence (Library)", "Low-fi Beats (Coffee Shop)"].map(opt => (
                             <button key={opt} onClick={() => setStudyVibe(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${studyVibe === opt ? 'border-slate-900 bg-slate-900 text-white shadow-md' : 'border-slate-100 hover:border-slate-300 bg-slate-50'}`}>
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-semibold text-slate-900 mb-4">Where are you most likely to skip class to?</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {["Cafe / Canteen", "Dorm Bed", "Gym", "Library (ironic)"].map(opt => (
+                            <button key={opt} onClick={() => setSkipClass(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${skipClass === opt ? 'border-slate-900 bg-slate-900 text-white shadow-md' : 'border-slate-100 hover:border-slate-300 bg-slate-50'}`}>
                               {opt}
                             </button>
                           ))}
@@ -324,7 +389,7 @@ export default function OnboardingWizard() {
                 {step === 4 && (
                   <motion.div key="step4" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
-                      <h1 className="text-3xl font-bold text-slate-900">The Vibe Check (2/2)</h1>
+                      <Typewriter text="The Vibe Check (2/2)" />
                       <p className="text-slate-500 mt-2">Almost done.</p>
                     </div>
 

@@ -40,6 +40,7 @@ export default function FeedPage() {
   const [profiles, setProfiles] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedYearFilter, setSelectedYearFilter] = useState('all');
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterError, setFilterError] = useState("");
   // Keep all fetched profiles to filter locally
@@ -144,7 +145,12 @@ export default function FeedPage() {
             seed = ((seed << 5) - seed) + seedStr.charCodeAt(i);
             seed = seed & seed;
           }
-          const dailyLimit = 15 + (Math.abs(seed) % 11);
+          let dailyLimit = 15 + (Math.abs(seed) % 11);
+          
+          if (currentUserData.gender === 'female') {
+             dailyLimit = Infinity;
+          }
+          
           const limitedProfiles = scoredProfiles.slice(0, dailyLimit);
           
           setAllFetchedProfiles(limitedProfiles);
@@ -162,16 +168,21 @@ export default function FeedPage() {
 
     
   useEffect(() => {
-    if (selectedFilters.length === 0) {
-      setProfiles(allFetchedProfiles);
-      return;
+    let filtered = allFetchedProfiles;
+    
+    if (selectedYearFilter !== 'all') {
+      filtered = filtered.filter(p => String(p.year) === selectedYearFilter);
     }
-    const filtered = allFetchedProfiles.filter(p => {
-      if (!p.interests || !Array.isArray(p.interests)) return false;
-      return selectedFilters.some(filter => p.interests.includes(filter));
-    });
+    
+    if (selectedFilters.length > 0) {
+      filtered = filtered.filter(p => {
+        if (!p.interests || !Array.isArray(p.interests)) return false;
+        return selectedFilters.some(filter => p.interests.includes(filter));
+      });
+    }
+    
     setProfiles(filtered);
-  }, [selectedFilters, allFetchedProfiles]);
+  }, [selectedFilters, selectedYearFilter, allFetchedProfiles]);
 
   const handleBreakIceClick = (e: any, p: any, isModal: boolean = false) => {
     haptic.medium();
@@ -468,9 +479,23 @@ export default function FeedPage() {
           </button>
           
           {selectedFilters.length === 0 && (
-             <span className="px-4 py-2 rounded-full font-bold text-sm bg-white text-black shadow-sm">
-               All Campus
-             </span>
+            <div className="relative">
+              <select 
+                className="px-5 py-2 rounded-full font-bold text-sm bg-white text-black shadow-sm outline-none appearance-none cursor-pointer pr-8 hover:bg-slate-50 transition-colors"
+                value={selectedYearFilter}
+                onChange={(e) => setSelectedYearFilter(e.target.value)}
+              >
+                <option value="all">All Campus</option>
+                <option value="1">Year 1</option>
+                <option value="2">Year 2</option>
+                <option value="3">Year 3</option>
+                <option value="4">Year 4</option>
+                <option value="postgrad">Postgrad</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg className="h-4 w-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
           )}
 
           {selectedFilters.map(filter => (
@@ -514,9 +539,11 @@ export default function FeedPage() {
                 
                 {/* Badges Overlay */}
                 <div className="absolute top-5 left-5 right-5 flex justify-between z-10">
+                  {/* MATCH SCORE HIDDEN PER USER REQUEST
                   <div className={`px-3 py-1.5 rounded-full border text-xs font-bold shadow-lg backdrop-blur-md ${getMatchColor(p.matchScore)}`}>
                      {p.matchScore}% Match
                   </div>
+                  */}
                   <button 
                     onClick={(e) => { e.stopPropagation(); setSelectedUser(p); setReportModal(true); }} 
                     className="bg-black/40 hover:bg-red-500/90 backdrop-blur-md text-white text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100 border border-white/10"

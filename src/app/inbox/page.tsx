@@ -96,7 +96,7 @@ export default function InboxPage() {
              icebreakerPrompt: data.icebreakerPrompt,
              lastMessage: data.lastMessage,
              lastUpdated: data.lastUpdated || 0,
-             read: true
+             unreadCount: data[`unread_${user.uid}`] || 0
           });
        });
        // Sort correctly to have latest at the top
@@ -180,14 +180,21 @@ export default function InboxPage() {
                          </div>
                        </div>
                        
-                       <div className="flex-1 min-w-0">
-                         <div className="flex justify-between items-baseline mb-1">
-                           <h3 className="text-white font-bold truncate pr-4">{otherUser?.name || 'Unknown User'}</h3>
-                           <span className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase flex-shrink-0">
-                             {new Date(chat.lastUpdated).toLocaleDateString()}
-                           </span>
+                       <div className="flex-1 min-w-0 flex items-center justify-between">
+                         <div className="flex-1 min-w-0 pr-4">
+                           <div className="flex justify-between items-baseline mb-1">
+                             <h3 className={`font-bold truncate pr-4 ${chat.unreadCount > 0 ? 'text-white' : 'text-zinc-300'}`}>{otherUser?.name || 'Unknown User'}</h3>
+                             <span className={`text-[10px] font-bold tracking-widest uppercase flex-shrink-0 ${chat.unreadCount > 0 ? 'text-indigo-400' : 'text-zinc-500'}`}>
+                               {new Date(chat.lastUpdated).toLocaleDateString()}
+                             </span>
+                           </div>
+                           <p className={`text-sm truncate ${chat.unreadCount > 0 ? 'text-white font-medium' : 'text-zinc-400'}`}>{chat.lastMessage || 'Say hi!'}</p>
                          </div>
-                         <p className="text-zinc-400 text-sm truncate">{chat.lastMessage || 'Say hi!'}</p>
+                         {chat.unreadCount > 0 && (
+                           <div className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg shrink-0">
+                             {chat.unreadCount}
+                           </div>
+                         )}
                        </div>
                      </Link>
                    </motion.div>
