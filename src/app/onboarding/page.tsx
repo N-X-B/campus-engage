@@ -177,6 +177,21 @@ export default function OnboardingWizard() {
 
   return (
     <div className="flex flex-col min-h-[100dvh] bg-slate-50 items-center justify-center py-12 px-4 overflow-hidden relative">
+      
+      {/* Promo Banner */}
+      <div className="mb-6 w-full max-w-md z-10 bg-zinc-900 border border-amber-500/30 shadow-2xl p-4 rounded-2xl relative overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-rose-500/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+        <div className="flex items-start gap-3 relative z-10">
+          <div className="text-2xl">🔥</div>
+          <div>
+            <h3 className="text-amber-500 font-bold text-sm tracking-wide uppercase mb-1">Early Adopter Bonus</h3>
+            <p className="text-amber-200/80 text-xs font-medium leading-relaxed">
+              Complete your profile within the next <strong className="text-white">3 days</strong> to unlock <strong className="text-white">Double Daily Matches</strong> (14 Icebreakers/day) for your first week!
+            </p>
+          </div>
+        </div>
+      </div>
+
       <AnimatePresence mode="wait">
         {!onboardingSuccess ? (
           <motion.div 
