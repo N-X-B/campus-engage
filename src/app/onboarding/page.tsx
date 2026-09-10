@@ -46,7 +46,7 @@ const compressImageToBase64 = (file: File): Promise<string> => {
 
 const Typewriter = ({ text }: { text: string }) => {
   return (
-    <motion.h1 className="text-3xl font-bold text-slate-900" initial={{ opacity: 1 }}>
+    <motion.h1 className="text-3xl font-bold text-white" initial={{ opacity: 1 }}>
       {text.split('').map((char, index) => (
         <motion.span
           key={index}
@@ -284,7 +284,7 @@ export default function OnboardingWizard() {
   };
 
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-slate-50 items-center justify-center py-12 px-4 overflow-hidden relative">
+    <div className="flex flex-col min-h-[100dvh] bg-black items-center justify-center py-12 px-4 overflow-hidden relative">
       
       {/* Promo Banner */}
       <div className="mb-6 w-full max-w-md z-10 bg-zinc-900 border border-amber-500/30 shadow-2xl p-4 rounded-2xl relative overflow-hidden group">
@@ -317,7 +317,7 @@ export default function OnboardingWizard() {
               ))}
             </div>
 
-            <div className="w-full bg-white rounded-3xl shadow-sm border border-slate-100 p-8 md:p-12 overflow-hidden relative min-h-[500px]">
+            <div className="w-full bg-black/50 backdrop-blur-3xl rounded-3xl shadow-sm border border-white/10 p-8 md:p-12 overflow-hidden relative min-h-[500px]">
               {error && (
                 <div className="mb-6 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
                   {error}
@@ -329,30 +329,30 @@ export default function OnboardingWizard() {
                   <motion.div key="step1" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
                       <Typewriter text="Let's build your profile." />
-                      <p className="text-slate-500 mt-2">First impressions matter. Add your best photos and a bio.</p>
+                      <p className="text-zinc-400 mt-2">First impressions matter. Add your best photos and a bio.</p>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                       {[0, 1, 2].map((index) => (
-                        <label key={index} className="aspect-[3/4] bg-slate-100 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors relative overflow-hidden group">
-                          <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(index, e)} />
+                        <label key={index} className="aspect-[3/4] bg-white/5 rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:bg-black text-white transition-colors relative overflow-hidden group">
+                          <input type="file" accept="image/*" className="text-white hidden" onChange={(e) => handleFileChange(index, e)} />
                           {previews[index] ? (
                             <img src={previews[index]!} alt="preview" className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
                           ) : (
-                            <span className="text-3xl text-slate-400 group-hover:scale-125 transition-transform">+</span>
+                            <span className="text-3xl text-zinc-500 group-hover:scale-125 transition-transform">+</span>
                           )}
                         </label>
                       ))}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-slate-900 mb-2">Your Bio</label>
+                      <label className="block text-sm font-semibold text-white mb-2">Your Bio</label>
                       <textarea
                         rows={4}
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
                         placeholder="Keep it brief, authentic, and engaging..."
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 resize-none bg-slate-50 transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none bg-black text-white transition-colors"
                       />
                     </div>
                   </motion.div>
@@ -362,16 +362,16 @@ export default function OnboardingWizard() {
                   <motion.div key="step2" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
                       <Typewriter text="The Academics" />
-                      <p className="text-slate-500 mt-2">Who are you on campus?</p>
+                      <p className="text-zinc-400 mt-2">Who are you on campus?</p>
                     </div>
 
                     <div className="space-y-6 mt-12">
                       <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">Course</label>
+                        <label className="block text-sm font-semibold text-white mb-2">Course</label>
                         <select 
                           value={course}
                           onChange={(e) => { setCourse(e.target.value); setYear(''); }}
-                          className="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-lg transition-colors"
+                          className="w-full px-4 py-4 rounded-xl border border-white/20 bg-black text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-lg transition-colors"
                         >
                           <option value="" disabled>Select Course</option>
                           <option value="BTech">B.Tech (4 Years)</option>
@@ -383,11 +383,11 @@ export default function OnboardingWizard() {
                       
                       {course && (
                         <div>
-                          <label className="block text-sm font-semibold text-slate-900 mb-2">Year of Study</label>
+                          <label className="block text-sm font-semibold text-white mb-2">Year of Study</label>
                           <select 
                             value={year}
                             onChange={(e) => setYear(e.target.value)}
-                            className="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-lg transition-colors"
+                            className="w-full px-4 py-4 rounded-xl border border-white/20 bg-black text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-lg transition-colors"
                           >
                             <option value="" disabled>Select Year</option>
                             <option value="1">1st Year</option>
@@ -400,11 +400,11 @@ export default function OnboardingWizard() {
                       )}
                       
                       <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">Gender</label>
+                        <label className="block text-sm font-semibold text-white mb-2">Gender</label>
                         <select 
                           value={gender}
                           onChange={(e) => setGender(e.target.value)}
-                          className="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-lg transition-colors"
+                          className="w-full px-4 py-4 rounded-xl border border-white/20 bg-black text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-lg transition-colors"
                         >
                           <option value="" disabled>Select Gender</option>
                           <option value="male">Male</option>
@@ -414,13 +414,13 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">Branch / Major</label>
+                        <label className="block text-sm font-semibold text-white mb-2">Branch / Major</label>
                         <input
                           type="text"
                           value={branch}
                           onChange={(e) => setBranch(e.target.value)}
                           placeholder="e.g. Computer Science, Architecture"
-                          className="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-lg transition-colors"
+                          className="w-full px-4 py-4 rounded-xl border border-white/20 bg-black text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-lg transition-colors"
                         />
                       </div>
                     </div>
@@ -431,15 +431,15 @@ export default function OnboardingWizard() {
                   <motion.div key="step3" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
                       <Typewriter text="The Vibe Check (1/2)" />
-                      <p className="text-slate-500 mt-2">We use this to match you with similar energies.</p>
+                      <p className="text-zinc-400 mt-2">We use this to match you with similar energies.</p>
                     </div>
 
                     <div className="space-y-8">
                       <div>
-                        <label className="block text-base font-semibold text-slate-900 mb-4">Dead silence in the library, or low-fi beats in a busy coffee shop?</label>
+                        <label className="block text-base font-semibold text-white mb-4">Dead silence in the library, or low-fi beats in a busy coffee shop?</label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {["Dead Silence (Library)", "Low-fi Beats (Coffee Shop)"].map(opt => (
-                            <button key={opt} onClick={() => setStudyVibe(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${studyVibe === opt ? 'border-slate-900 bg-slate-900 text-white shadow-md' : 'border-slate-100 hover:border-slate-300 bg-slate-50'}`}>
+                            <button key={opt} onClick={() => setStudyVibe(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${studyVibe === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
                           ))}
@@ -447,10 +447,10 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div>
-                        <label className="block text-base font-semibold text-slate-900 mb-4">Where are you most likely to skip class to?</label>
+                        <label className="block text-base font-semibold text-white mb-4">Where are you most likely to skip class to?</label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {["Cafe / Canteen", "Dorm Bed", "Gym", "Library (ironic)"].map(opt => (
-                            <button key={opt} onClick={() => setSkipClass(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${skipClass === opt ? 'border-slate-900 bg-slate-900 text-white shadow-md' : 'border-slate-100 hover:border-slate-300 bg-slate-50'}`}>
+                            <button key={opt} onClick={() => setSkipClass(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${skipClass === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
                           ))}
@@ -458,10 +458,10 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div>
-                        <label className="block text-base font-semibold text-slate-900 mb-4">Friday night vibe?</label>
+                        <label className="block text-base font-semibold text-white mb-4">Friday night vibe?</label>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           {["Frat Basement", "Downtown Bar", "Movie in Dorm"].map(opt => (
-                            <button key={opt} onClick={() => setWeekendVibe(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${weekendVibe === opt ? 'border-slate-900 bg-slate-900 text-white shadow-md' : 'border-slate-100 hover:border-slate-300 bg-slate-50'}`}>
+                            <button key={opt} onClick={() => setWeekendVibe(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${weekendVibe === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
                           ))}
@@ -475,15 +475,15 @@ export default function OnboardingWizard() {
                   <motion.div key="step4" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
                       <Typewriter text="The Vibe Check (2/2)" />
-                      <p className="text-slate-500 mt-2">Almost done.</p>
+                      <p className="text-zinc-400 mt-2">Almost done.</p>
                     </div>
 
                     <div className="space-y-8">
                       <div>
-                        <label className="block text-base font-semibold text-slate-900 mb-4">Do you start essays a week early, or 12 hours before the deadline?</label>
+                        <label className="block text-base font-semibold text-white mb-4">Do you start essays a week early, or 12 hours before the deadline?</label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {["A week early", "12 hours before"].map(opt => (
-                            <button key={opt} onClick={() => setStressLevel(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${stressLevel === opt ? 'border-slate-900 bg-slate-900 text-white shadow-md' : 'border-slate-100 hover:border-slate-300 bg-slate-50'}`}>
+                            <button key={opt} onClick={() => setStressLevel(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${stressLevel === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
                           ))}
@@ -491,13 +491,13 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div>
-                        <label className="block text-base font-semibold text-slate-900 mb-2">What is the most overrated tradition at this university?</label>
+                        <label className="block text-base font-semibold text-white mb-2">What is the most overrated tradition at this university?</label>
                         <textarea
                           rows={3}
                           value={hotTake}
                           onChange={(e) => setHotTake(e.target.value)}
                           placeholder="Drop your campus hot take here..."
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 resize-none bg-slate-50 transition-colors"
+                          className="w-full px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none bg-black text-white transition-colors"
                         />
                       </div>
                     </div>
@@ -506,15 +506,15 @@ export default function OnboardingWizard() {
               </AnimatePresence>
 
               {/* Navigation Buttons */}
-              <div className="absolute bottom-0 left-0 right-0 flex justify-between p-8 bg-white border-t border-slate-100">
+              <div className="absolute bottom-0 left-0 right-0 flex justify-between p-8 bg-black/50 backdrop-blur-3xl border-t border-white/10">
                 {step > 1 ? (
-                  <Button variant="ghost" onClick={prevStep} className="text-slate-500 hover:text-slate-900">Back</Button>
+                  <Button variant="ghost" onClick={prevStep} className="text-zinc-400 hover:text-white">Back</Button>
                 ) : <div />}
                 
                 {step < totalSteps ? (
-                  <Button onClick={nextStep} className="bg-slate-900 text-white hover:bg-slate-800 rounded-lg px-8">Continue</Button>
+                  <Button onClick={nextStep} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8">Continue</Button>
                 ) : (
-                  <Button onClick={handleSubmit} disabled={saving} className="bg-slate-900 text-white hover:bg-slate-800 rounded-lg px-8 shadow-md">
+                  <Button onClick={handleSubmit} disabled={saving} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8 shadow-md">
                     {saving ? (error ? error : 'Completing...') : 'Finish Profile'}
                   </Button>
                 )}
@@ -526,20 +526,20 @@ export default function OnboardingWizard() {
             key="success-brand"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 flex items-center justify-center bg-slate-50 z-50"
+            className="absolute inset-0 flex items-center justify-center bg-black z-50"
           >
              <motion.div 
                initial={{ scale: 0.8 }}
                animate={{ scale: 1 }}
                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-               className="flex font-extrabold text-5xl md:text-7xl tracking-tighter text-slate-900 items-center"
+               className="flex font-extrabold text-5xl md:text-7xl tracking-tighter text-white items-center"
              >
                <span className="relative z-10">C</span>
                <motion.span 
                  initial={{ width: 0, opacity: 0 }}
                  animate={{ width: "auto", opacity: 1 }}
                  transition={{ delay: 0.8, duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                 className="overflow-hidden whitespace-nowrap block text-slate-800 pr-2"
+                 className="overflow-hidden whitespace-nowrap block text-zinc-300 pr-2"
                >
                  ampus
                </motion.span>
@@ -548,7 +548,7 @@ export default function OnboardingWizard() {
                  initial={{ width: 0, opacity: 0 }}
                  animate={{ width: "auto", opacity: 1 }}
                  transition={{ delay: 0.8, duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                 className="overflow-hidden whitespace-nowrap block text-slate-800 pr-2"
+                 className="overflow-hidden whitespace-nowrap block text-zinc-300 pr-2"
                >
                  ngage.
                </motion.span>
