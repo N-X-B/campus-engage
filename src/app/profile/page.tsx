@@ -46,9 +46,15 @@ export default function ProfilePage() {
   const toggleIncognito = async () => {
     const newValue = !isIncognito;
     setIsIncognito(newValue);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(30);
+    
     try {
        await updateDoc(doc(db, 'users', user!.uid), { incognito: newValue });
        setUserData({ ...userData, incognito: newValue });
+       
+       if (newValue === true) {
+         router.push('/missed-connections');
+       }
     } catch(err) {
        console.error("Failed to toggle incognito", err);
     }
