@@ -7,6 +7,7 @@ import { Navigation } from '@/components/Navigation';
 import { motion } from 'framer-motion';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, getDoc, doc } from 'firebase/firestore';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 const VULGAR_WORDS = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'slut', 'whore', 'cunt', 'nigger', 'faggot', 'rape'];
 
@@ -17,7 +18,7 @@ export default function ConfessionsPage() {
   const [newConfession, setNewConfession] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [error, setError] = useState('');
-  const [isIncognito, setIsIncognito] = useState(false);
+  const [isIncognito, setIsIncognito] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -79,7 +80,8 @@ export default function ConfessionsPage() {
     }
   };
 
-  if (!isIncognito) return null; // Wait until incognito is verified
+  if (loading || isIncognito === null) return <LoadingScreen />; // Prevent blank screen lag
+  if (isIncognito === false) return null;
 
   return (
     <div className="min-h-screen bg-black font-sans selection:bg-white/20 pb-20 text-white">
