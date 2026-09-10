@@ -146,7 +146,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loginState === 'loading'}
                   placeholder="lastname_firstname@srmap.edu.in"
-                  className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 backdrop-blur-md transition-all disabled:opacity-50"
+                  className="w-full px-4 py-3 rounded-lg bg-white border border-transparent text-black placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:opacity-50 font-medium"
                 />
               </div>
               
@@ -172,7 +172,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loginState === 'loading'}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 backdrop-blur-md transition-all disabled:opacity-50"
+                    className="w-full px-4 py-3 rounded-lg bg-white border border-transparent text-black placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:opacity-50 font-medium"
                   />
                 </motion.div>
               )}
@@ -180,10 +180,10 @@ export default function LoginPage() {
               <Button 
                 type="submit" 
                 disabled={loginState === 'loading'} 
-                className="w-full bg-white text-black hover:bg-zinc-200 shadow-[0_0_20px_rgba(255,255,255,0.2)] h-14 text-lg font-medium rounded-xl mt-6 shadow-md transition-all active:scale-95 flex items-center justify-center overflow-hidden relative"
+                className="w-full bg-indigo-500 text-white hover:bg-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.3)] h-14 text-lg font-bold rounded-xl mt-6 shadow-md transition-all active:scale-95 flex items-center justify-center overflow-hidden relative"
               >
                 {loginState === 'loading' ? (
-                  <div className="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 ) : isResetMode ? 'Send Reset Link' : 'Sign In'}
               </Button>
               
