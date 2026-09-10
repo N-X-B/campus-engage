@@ -23,16 +23,16 @@ const INTEREST_GROUPS = {
 };
 
 const ICEBREAKERS = [
-  "What's the most overrated dining hall on campus?",
-  "If you had to study in one library forever, which one?",
   "What is your most controversial campus opinion?",
-  "Best spot for a late-night food run?",
-  "What's the hardest class you've taken so far?",
-  "Who is the toughest professor you've survived?",
-  "Best place to skip class and chill?",
-  "What's your go-to coffee order during midterms?",
+  "Best spot around campus for a late-night food run?",
+  "What's the hardest subject you've taken so far?",
+  "Who is the strictest professor you've survived?",
+  "Best hidden spot on campus to skip class and chill?",
   "If you could change one university rule, what would it be?",
-  "Which dorm has the absolute worst vibes?"
+  "Which hostel or campus block has the absolute worst vibes?",
+  "What's your ultimate survival tip for exam week?",
+  "Best place to grab chai or coffee near campus?",
+  "If you had to describe your major in three words, what would they be?"
 ];
 
 
