@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { useAuth } from '@/lib/AuthContext';
 
 const timeoutPromise = (ms: number, message: string) => 
   new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms));
@@ -24,6 +24,13 @@ export default function LoginPage() {
   const [loginState, setLoginState] = useState<'idle' | 'loading' | 'success'>('idle');
   const [isResetMode, setIsResetMode] = useState(false);
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (user && !loading) {
+      router.push('/feed');
+    }
+  }, [user, loading, router]);
 
     const handleResetPassword = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
