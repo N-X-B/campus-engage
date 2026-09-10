@@ -91,6 +91,10 @@ export default function FeedPage() {
           
           if (userDoc.exists()) {
              currentUserData = userDoc.data();
+             if (currentUserData.incognito) {
+                window.location.href = '/missed-connections';
+                return;
+             }
              if (!currentUserData.onboarded) {
                 window.location.href = '/onboarding';
                 return;

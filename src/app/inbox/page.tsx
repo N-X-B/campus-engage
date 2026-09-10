@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, query, where, onSnapshot, getDocs, updateDoc, doc, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getDocs, getDoc, updateDoc, doc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function InboxPage() {
@@ -65,6 +65,13 @@ export default function InboxPage() {
 
   useEffect(() => {
     if (!user) return;
+
+    // Check incognito status
+    getDoc(doc(db, 'users', user.uid)).then((docSnap: any) => {
+      if (docSnap.exists() && docSnap.data().incognito) {
+         window.location.href = '/missed-connections';
+      }
+    });
 
     // Load all users to get names/photos for the inbox
     getDocs(collection(db, 'users')).then(snapshot => {
