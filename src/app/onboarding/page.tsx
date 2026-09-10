@@ -253,6 +253,7 @@ export default function OnboardingWizard() {
           bio,
           answers,
           photos: photoUrls,
+          auraScore: 20,
           onboarded: true
         }, { merge: true });
         console.log("[ONBOARDING] Profile written successfully!");

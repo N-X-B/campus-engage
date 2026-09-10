@@ -55,7 +55,7 @@ export default function ProfilePage() {
        setUserData({ ...userData, incognito: newValue });
        
        if (newValue === true) {
-         router.push('/missed-connections');
+         router.push('/confessions');
        }
     } catch(err) {
        console.error("Failed to toggle incognito", err);
@@ -243,6 +243,25 @@ export default function ProfilePage() {
                    </div>
                    {isIncognito ? 'On' : 'Off'}
                 </span>
+             </div>
+
+             <div className="bg-black/50 border border-white/5 p-5 rounded-3xl flex flex-col justify-between">
+                <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 flex justify-between items-center">
+                  Aura Score
+                  <span className="text-amber-500/80 text-xs text-shadow-glow">✨</span>
+                </span>
+                <div className="flex items-end gap-1">
+                   <span className="text-2xl font-black text-white">{userData.auraScore ?? 20}</span>
+                   <span className="text-sm font-bold text-zinc-600 mb-1.5">/ 100</span>
+                </div>
+                <div className="w-full h-1 bg-zinc-800/80 rounded-full mt-2 overflow-hidden">
+                   <motion.div 
+                     initial={{ width: 0 }}
+                     animate={{ width: `${Math.min(100, Math.max(0, userData.auraScore ?? 20))}%` }}
+                     transition={{ duration: 1, delay: 0.5 }}
+                     className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" 
+                   />
+                </div>
              </div>
           </div>
 
