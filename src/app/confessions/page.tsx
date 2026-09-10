@@ -18,7 +18,6 @@ export default function ConfessionsPage() {
   const [newConfession, setNewConfession] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [error, setError] = useState('');
-  const [isIncognito, setIsIncognito] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -29,15 +28,6 @@ export default function ConfessionsPage() {
   useEffect(() => {
     if (!user) return;
     
-    // Check if they are actually in Incognito Mode
-    getDoc(doc(db, 'users', user.uid)).then(docSnap => {
-      if (docSnap.exists() && docSnap.data().incognito) {
-        setIsIncognito(true);
-      } else {
-        router.push('/profile'); // Kick them out if not incognito
-      }
-    });
-
     const q = query(collection(db, 'confessions'), orderBy('timestamp', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
        const docs: any[] = [];
@@ -80,8 +70,7 @@ export default function ConfessionsPage() {
     }
   };
 
-  if (loading || isIncognito === null) return <LoadingScreen />; // Prevent blank screen lag
-  if (isIncognito === false) return null;
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-black font-sans selection:bg-white/20 pb-20 text-white">
