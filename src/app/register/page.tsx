@@ -27,6 +27,14 @@ function RegisterForm() {
     setError('');
     setLoading(true);
 
+    // Strict SRM AP Email Validation
+    const srmRegex = /^[a-zA-Z0-9]+_[a-zA-Z0-9]+@srmap\.edu\.in$/i;
+    if (!srmRegex.test(email.trim()) && !isDemoMode) {
+      setError("Access Denied: You must use your official SRM AP student email (e.g., lastname_firstname@srmap.edu.in).");
+      setLoading(false);
+      return;
+    }
+
     try {
       console.log("[REGISTER] Starting registration process...");
       if (isDemoMode) {
@@ -131,14 +139,14 @@ function RegisterForm() {
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">University Email</label>
+          <label className="block text-sm font-bold text-zinc-400 uppercase tracking-widest mb-2">SRM AP Email</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all backdrop-blur-md"
-            placeholder="student@university.edu"
+            placeholder="lastname_firstname@srmap.edu.in"
           />
         </div>
         <div>
