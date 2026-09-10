@@ -108,6 +108,22 @@ export default function OnboardingWizard() {
 
   const nextStep = () => {
     setError('');
+    
+    // Step validation
+    if (step === 1) {
+       const hasPhoto = files.some(f => f !== null) || previews.some(p => p !== null);
+       if (!hasPhoto) { setError("Please upload at least one photo."); return; }
+       if (!bio.trim()) { setError("Please add a short bio."); return; }
+    } else if (step === 2) {
+       if (!course || !year || !branch.trim() || !gender) {
+          setError("Please fill out all academic fields."); return;
+       }
+    } else if (step === 3) {
+       if (!studyVibe || !weekendVibe || !skipClass) {
+          setError("Please answer all vibe checks."); return;
+       }
+    }
+    
     if (step < totalSteps) setStep(step + 1);
   };
 
@@ -119,15 +135,39 @@ export default function OnboardingWizard() {
   const handleSubmit = async () => {
     if (!user) return;
     setError('');
+    
+    // Safety check for abusive content
+    const blockRules = [
+      /\b(fuck|bitch|cunt|asshole|motherfucker|dickhead|whore|slut|faggot|retard|nigger|nigga|chink|spic|kike|dyke|tranny|kys|kill\s+yourself)\b/i,
+      /\b(kill|murder|stab|shoot|bomb|terrorist|rape|strangle|massacre|lynch|behead|assassinate)\b/i,
+      /\b(nudes|send\s+pics|boobs|tits|dick|cock|pussy|vagina|penis|porn|horny|cum|jerk\s+off|masturbate|blowjob|handjob|squirt|creampie|threesome|orgy|onlyfans|of\s+link)\b/i,
+    ];
+    
+    const containsViolations = (text: string) => {
+      if (!text) return false;
+      return blockRules.some(rule => rule.test(text.toLowerCase()));
+    };
+
+    if (containsViolations(bio) || containsViolations(branch) || containsViolations(hotTake)) {
+       setError("🚨 Profile blocked: Your bio or responses contain inappropriate, abusive, violent, or explicit content that violates our Terms of Service.");
+       setStep(1); // send them back to start
+       return;
+    }
+
+    if (!course || !year || !branch || !gender || !bio || !hotTake) {
+       setError("⚠️ Please ensure all fields across all steps are fully filled out before completing your profile.");
+       return;
+    }
+
     setSaving(true);
 
     try {
       const answers = { 
         studyVibe: studyVibe || "Dead Silence (Library)", 
         weekendVibe: weekendVibe || "Downtown Bar", 
-        skipClass: skipClass || "Cafe",
+        skipClass: skipClass || "Cafe / Canteen",
         stressLevel: stressLevel || "12 hours before", 
-        hotTake: hotTake || "I have no hot takes." 
+        hotTake: hotTake 
       };
       
       if (isDemoMode) {
