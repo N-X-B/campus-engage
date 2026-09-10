@@ -20,7 +20,7 @@ export default function MissedConnectionsPage() {
       <main className="max-w-md mx-auto p-4 sm:p-6 mt-4">
         <div className="flex justify-between items-end mb-8 px-2">
           <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Spotted</h1>
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">Confessions</h1>
             <p className="text-zinc-400 mt-1">Missed connections on campus.</p>
           </div>
         </div>
@@ -29,7 +29,7 @@ export default function MissedConnectionsPage() {
            <div className="text-center py-32 border border-dashed border-white/10 rounded-3xl bg-zinc-900/20">
              <div className="text-4xl mb-4">🚧</div>
              <h3 className="text-xl font-bold text-white mb-2">Undergoing Renovations</h3>
-             <p className="text-zinc-500 text-sm px-4">The spotted section and posting have been temporarily disabled for a major upgrade.</p>
+             <p className="text-zinc-500 text-sm px-4">The confessions section and posting have been temporarily disabled for a major upgrade.</p>
            </div>
         </div>
       </main>

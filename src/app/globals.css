@@ -1,7 +1,23 @@
 @import "tailwindcss";
 @layer base {
   body {
-    background-color: white;
-    color: black;
+    background-color: black;
+    color: white;
+    /* Native App Feel Optimizations */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    overscroll-behavior-y: none;
+  }
+  
+  /* Allow text selection only where explicitly needed like inputs */
+  input, textarea {
+    user-select: auto;
+  }
+
+  /* Hardware acceleration for smooth scrolling */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
