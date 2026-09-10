@@ -27,7 +27,12 @@ const ICEBREAKERS = [
   "If you had to study in one library forever, which one?",
   "What is your most controversial campus opinion?",
   "Best spot for a late-night food run?",
-  "What's the hardest class you've taken so far?"
+  "What's the hardest class you've taken so far?",
+  "Who is the toughest professor you've survived?",
+  "Best place to skip class and chill?",
+  "What's your go-to coffee order during midterms?",
+  "If you could change one university rule, what would it be?",
+  "Which dorm has the absolute worst vibes?"
 ];
 
 

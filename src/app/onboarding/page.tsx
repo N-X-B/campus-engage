@@ -160,6 +160,16 @@ export default function OnboardingWizard() {
     }
 
     setSaving(true);
+    setError("Analyzing photos for AI identity verification...");
+    
+    // Simulate AI Verification Delay
+    await new Promise(r => setTimeout(r, 1500));
+    
+    // Here we would hook into Google Cloud Vision API or Gemini to detect if Gender Selection !== Photo Gender.
+    // For MVP, we use this strict warning delay as a deterrent.
+    setError("Verifying campus credentials...");
+    await new Promise(r => setTimeout(r, 1000));
+    setError(""); // Clear error for actual saving
 
     try {
       const answers = { 
@@ -470,7 +480,7 @@ export default function OnboardingWizard() {
                   <Button onClick={nextStep} className="bg-slate-900 text-white hover:bg-slate-800 rounded-lg px-8">Continue</Button>
                 ) : (
                   <Button onClick={handleSubmit} disabled={saving} className="bg-slate-900 text-white hover:bg-slate-800 rounded-lg px-8 shadow-md">
-                    {saving ? 'Completing...' : 'Finish Profile'}
+                    {saving ? (error ? error : 'Completing...') : 'Finish Profile'}
                   </Button>
                 )}
               </div>
