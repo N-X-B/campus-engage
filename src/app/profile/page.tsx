@@ -16,7 +16,7 @@ const INTEREST_GROUPS = {
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { auth } from '@/lib/firebase';
 import { signOut, deleteUser } from 'firebase/auth';
-import { doc, deleteDoc, getDoc, updateDoc, setDoc, arrayUnion } from 'firebase/firestore';
+import { doc, deleteDoc, getDoc, updateDoc, setDoc, arrayUnion, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -126,11 +126,31 @@ export default function ProfilePage() {
   };
 
 
+  const [praises, setPraises] = useState<any[]>([]);
+
   useEffect(() => {
     if (user && !isDemoMode) {
       getDoc(doc(db, 'users', user.uid)).then(d => {
         if (d.exists()) setUserData(d.data());
       });
+      
+      const fetchPraises = async () => {
+        try {
+          const q = query(collection(db, 'superlative_votes'), where('receiverId', '==', user.uid));
+          const snap = await getDocs(q);
+          const fetched: any[] = [];
+          snap.forEach(docSnap => fetched.push(docSnap.data()));
+          fetched.sort((a, b) => {
+             const tA = a.timestamp?.toMillis?.() || 0;
+             const tB = b.timestamp?.toMillis?.() || 0;
+             return tB - tA;
+          });
+          setPraises(fetched);
+        } catch (err) {
+          console.error("Failed to fetch praises", err);
+        }
+      };
+      fetchPraises();
     }
   }, [user]);
   const router = useRouter();
@@ -265,6 +285,40 @@ export default function ProfilePage() {
              </div>
           </div>
 
+          {/* Praises UI */}
+          {praises.length > 0 && (
+            <div className="bg-black/50 border border-indigo-500/20 p-6 rounded-3xl mb-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-[50px] -z-10" />
+              <h3 className="text-white font-bold text-base mb-4 flex items-center gap-2">
+                ✨ Recent Praises
+              </h3>
+              <div className="flex flex-col gap-3">
+                {praises.slice(0, 5).map((praise, idx) => {
+                  const emojiMatch = praise.prompt.match(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u);
+                  const emoji = emojiMatch ? emojiMatch[0] : '✨';
+                  const text = praise.prompt.replace(emoji, '').trim();
+                  
+                  return (
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 10 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      transition={{ delay: idx * 0.1 }}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5"
+                    >
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-indigo-500/20 flex items-center justify-center text-xl border border-indigo-500/20">
+                        {emoji}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white leading-tight">{text}</p>
+                        <p className="text-xs text-indigo-400 mt-0.5 font-medium">Someone voted for you!</p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           
           {/* Referral Progress UI */}
           <div className="bg-black/50 border border-white/5 p-6 rounded-3xl mb-6 relative overflow-hidden">
