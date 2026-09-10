@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
@@ -9,7 +9,8 @@ import { collection, query, orderBy, onSnapshot, addDoc, doc, serverTimestamp, g
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
 
-export default function ChatRoom({ params }: { params: { id: string } }) {
+export default function ChatRoom({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const { user, loading } = useAuth();
   const router = useRouter();
   const [messages, setMessages] = useState<any[]>([]);
@@ -31,16 +32,27 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
     // First check if the user is authorized for this specific chat
     const verifyAccess = async () => {
       try {
-        const convSnap = await getDoc(doc(db, 'conversations', params.id));
+        const convSnap = await getDoc(doc(db, 'conversations', resolvedParams.id));
         if (!convSnap.exists()) {
            setIsAuthorized(false);
            return;
         }
         
         const data = convSnap.data();
-        if (!data.participants || !data.participants.includes(user.uid)) {
+        // Fallback for older database documents that might not have participants array
+        const isParticipant = 
+          (data.participants && data.participants.includes(user.uid)) || 
+          data.senderId === user.uid || 
+          data.receiverId === user.uid;
+          
+        if (!isParticipant) {
            setIsAuthorized(false); // Unauthorized!
            return;
+        }
+        
+        // Ensure data.participants exists for the rest of the code
+        if (!data.participants) {
+          data.participants = [data.senderId, data.receiverId];
         }
 
         setIsAuthorized(true);
@@ -59,13 +71,13 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
     };
 
     verifyAccess();
-  }, [user, params.id]);
+  }, [user, resolvedParams.id]);
 
   useEffect(() => {
     if (isAuthorized !== true || !user) return;
     
     // Listen to real messages strictly bound to this conversation ID
-    const q = query(collection(db, `conversations/${params.id}/messages`), orderBy('timestamp', 'asc'));
+    const q = query(collection(db, `conversations/${resolvedParams.id}/messages`), orderBy('timestamp', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
        const msgs: any[] = [];
        snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
@@ -76,7 +88,7 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
     });
 
     return () => unsubscribe();
-  }, [isAuthorized, params.id, user]);
+  }, [isAuthorized, resolvedParams.id, user]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +142,7 @@ export default function ChatRoom({ params }: { params: { id: string } }) {
     setNewMessage(''); // optimistic clear
 
     try {
-      await addDoc(collection(db, `conversations/${params.id}/messages`), {
+      await addDoc(collection(db, `conversations/${resolvedParams.id}/messages`), {
         text,
         senderId: user.uid,
         senderName: user.displayName || 'You',
