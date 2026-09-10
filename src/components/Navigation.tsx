@@ -52,7 +52,7 @@ export function Navigation() {
 
   let navItems = [
     { name: 'Discover', path: '/feed' },
-    { name: 'Confessions', path: '/missed-connections' },
+    { name: 'Spotted', path: '/missed-connections' },
     { name: 'Inbox', path: '/inbox' },
     { name: 'Profile', path: '/profile' },
   ];
