@@ -51,6 +51,8 @@ export default function FeedPage() {
   const [reportModal, setReportModal] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState("");
   const [promptOptions, setPromptOptions] = useState<string[]>([]);
+  const [sendingPrompt, setSendingPrompt] = useState<string | null>(null);
+  const [sentSuccess, setSentSuccess] = useState(false);
   const [breakingIceId, setBreakingIceId] = useState<string | null>(null);
   const [shatterPos, setShatterPos] = useState<{x: number, y: number, width: number} | null>(null);
   const [selectedProfileForBrief, setSelectedProfileForBrief] = useState<any | null>(null);
@@ -176,7 +178,7 @@ export default function FeedPage() {
       openIcebreaker(p);
       setBreakingIceId(null);
       setShatterPos(null);
-    }, 400);
+    }, 300);
   };
 
   const openIcebreaker = (targetUser: any) => {
@@ -186,40 +188,36 @@ export default function FeedPage() {
     setIcebreakerModal(true);
   };
 
-  const sendIcebreakerMessage = async (promptToSend: string) => {
+  const sendIcebreakerMessage = (promptToSend: string) => {
     if (!user || !selectedUser) return;
     
-    // In Demo Mode, just behave normally
-    if (isDemoMode) {
-      alert("Icebreaker sent! (Demo Mode)");
-      setIcebreakerModal(false);
-      return;
-    }
+    // Optimistic UI updates
+    setSendingPrompt(promptToSend);
+    
+    setTimeout(() => {
+      setSentSuccess(true);
+      setTimeout(() => {
+         setIcebreakerModal(false);
+         setSendingPrompt(null);
+         setSentSuccess(false);
+         setProfiles(prev => prev.filter(p => p.id !== selectedUser.id));
+      }, 1000);
+    }, 400); // Tiny fake delay to feel the button click
 
-    try {
-      const convId = [user.uid, selectedUser.id].sort().join('_');
-      
-      // We create a conversation document but mark it as pending
-      // and we store the prompt so the receiver can see it before accepting.
-      await setDoc(doc(db, 'conversations', convId), {
-         participants: [user.uid, selectedUser.id],
-         status: 'pending',
-         senderId: user.uid,
-         receiverId: selectedUser.id,
-         icebreakerPrompt: promptToSend,
-         lastUpdated: Date.now()
-      }, { merge: true });
+    if (isDemoMode) return;
 
-      alert("Invitation sent! You can chat once they accept your Icebreaker.");
-      setIcebreakerModal(false);
-      
-      // Remove them from the feed locally so we don't see them again
-      setProfiles(prev => prev.filter(p => p.id !== selectedUser.id));
-      
-    } catch(e) {
-      console.error(e);
-      alert("Failed to send invitation.");
-    }
+    // Fire-and-forget network request to eliminate lag
+    const convId = [user.uid, selectedUser.id].sort().join('_');
+    setDoc(doc(db, 'conversations', convId), {
+       participants: [user.uid, selectedUser.id],
+       status: 'pending',
+       senderId: user.uid,
+       receiverId: selectedUser.id,
+       icebreakerPrompt: promptToSend,
+       lastUpdated: Date.now()
+    }, { merge: true }).catch(e => {
+       console.error("Failed to send icebreaker in background", e);
+    });
   };
 
   const getMatchColor = (score: number) => {
@@ -405,25 +403,39 @@ export default function FeedPage() {
                    <h2 className="text-2xl font-bold text-white tracking-tight">Break the ice</h2>
                    <p className="text-zinc-400 mt-1">Sending to {selectedUser.name}</p>
                  </div>
-                 <button onClick={() => setIcebreakerModal(false)} className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
+                 <button onClick={() => { setIcebreakerModal(false); setSendingPrompt(null); setSentSuccess(false); }} className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 hover:text-white">✕</button>
               </div>
               <div className="space-y-3 mb-8">
-                {promptOptions.map((prompt, i) => (
-                  <button 
-                    key={i}
-                    onClick={() => sendIcebreakerMessage(prompt)}
-                    className="w-full text-left p-4 bg-zinc-800/50 hover:bg-white hover:text-black border border-zinc-700/50 rounded-2xl text-zinc-300 transition-all font-medium text-lg shadow-sm"
-                  >
-                    "{prompt}"
-                  </button>
-                ))}
+                {promptOptions.map((prompt, i) => {
+                  const isThisSending = sendingPrompt === prompt;
+                  const isAnotherSending = sendingPrompt && sendingPrompt !== prompt;
+                  
+                  return (
+                    <button 
+                      key={i}
+                      disabled={!!sendingPrompt}
+                      onClick={() => sendIcebreakerMessage(prompt)}
+                      className={`w-full text-left p-4 rounded-2xl transition-all font-medium text-lg shadow-sm border ${
+                        isThisSending 
+                          ? (sentSuccess ? 'bg-green-500 text-white border-green-400 scale-[1.02]' : 'bg-white text-black border-white scale-[1.02]')
+                          : isAnotherSending 
+                            ? 'bg-zinc-800/20 text-zinc-600 border-zinc-800/50 opacity-50 scale-95' 
+                            : 'bg-zinc-800/50 hover:bg-white hover:text-black border-zinc-700/50 text-zinc-300'
+                      }`}
+                    >
+                      {isThisSending && sentSuccess ? "Sent! 🧊" : `"${prompt}"`}
+                    </button>
+                  );
+                })}
               </div>
-              <button onClick={() => {
-                const shuffled = [...ICEBREAKERS].sort(() => 0.5 - Math.random());
-                setPromptOptions(shuffled.slice(0, 3));
-              }} className="w-full py-3 text-sm text-zinc-500 font-bold hover:text-white transition uppercase tracking-widest bg-zinc-800/30 rounded-xl">
-                🎲 Shuffle Options
-              </button>
+              {!sendingPrompt && (
+                <button onClick={() => {
+                  const shuffled = [...ICEBREAKERS].sort(() => 0.5 - Math.random());
+                  setPromptOptions(shuffled.slice(0, 3));
+                }} className="w-full py-3 text-sm text-zinc-500 font-bold hover:text-white transition uppercase tracking-widest bg-zinc-800/30 rounded-xl">
+                  🎲 Shuffle Options
+                </button>
+              )}
             </motion.div>
           </motion.div>
         )}
