@@ -20,6 +20,37 @@ import { doc, deleteDoc, getDoc, updateDoc, setDoc, arrayUnion, collection, quer
 import { db } from '@/lib/firebase';
 import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as nsfwjs from 'nsfwjs';
+
+const compressImageToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 600;
+        const MAX_HEIGHT = 600;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.6));
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
@@ -38,6 +69,21 @@ export default function ProfilePage() {
     hotTake: ''
   });
   const [savingAnswers, setSavingAnswers] = useState(false);
+
+  // Photo Edit Modal State
+  const [showEditPhotosModal, setShowEditPhotosModal] = useState(false);
+  const [editPhotos, setEditPhotos] = useState<(string | null)[]>([null, null, null]);
+  const [nsfwModel, setNsfwModel] = useState<nsfwjs.NSFWJS | null>(null);
+  const [isScanningImage, setIsScanningImage] = useState(false);
+  const [photoError, setPhotoError] = useState('');
+  const [savingPhotos, setSavingPhotos] = useState(false);
+
+  useEffect(() => {
+    // Silently preload the NSFW classification model in the background when profile loads
+    nsfwjs.load().then(model => {
+      setNsfwModel(model);
+    }).catch(err => console.error("Failed to load NSFW model", err));
+  }, []);
   
   useEffect(() => {
     if (userData) {
@@ -101,6 +147,66 @@ export default function ProfilePage() {
     }
     setIsVoting(false);
   };
+  const handlePhotoChange = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoError('');
+
+    if (nsfwModel) {
+      setIsScanningImage(true);
+      try {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        await new Promise((resolve) => { img.onload = resolve; });
+        
+        const predictions = await nsfwModel.classify(img);
+        const isExplicit = predictions.some(p => 
+          (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.65
+        );
+        
+        if (isExplicit) {
+          setPhotoError("🚨 Explicit content detected. Please select a different photo.");
+          setIsScanningImage(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Image scan failed", err);
+      }
+      setIsScanningImage(false);
+    }
+
+    try {
+      const base64 = await compressImageToBase64(file);
+      const newPhotos = [...editPhotos];
+      newPhotos[index] = base64;
+      setEditPhotos(newPhotos);
+    } catch (err) {
+      setPhotoError("Failed to process image.");
+    }
+  };
+
+  const handleSavePhotos = async () => {
+    if (!user) return;
+    
+    // Validate they have at least one photo
+    if (!editPhotos.some(p => p !== null)) {
+      setPhotoError("You must have at least one profile photo.");
+      return;
+    }
+
+    setSavingPhotos(true);
+    try {
+      const cleanPhotos = editPhotos.filter(p => p !== null);
+      await updateDoc(doc(db, 'users', user.uid), { photos: cleanPhotos });
+      setUserData({ ...userData, photos: cleanPhotos });
+      setShowEditPhotosModal(false);
+    } catch (err) {
+      console.error(err);
+      setPhotoError("Failed to save photos.");
+    }
+    setSavingPhotos(false);
+  };
+
 
   const handleToggleInterest = (interest: string) => {
     setInterestError("");
@@ -487,7 +593,13 @@ export default function ProfilePage() {
                 <span className="font-medium">Edit Profile Answers</span>
                 <span className="text-zinc-500">→</span>
              </button>
-             <button onClick={() => router.push('/onboarding')} className="w-full flex justify-between items-center bg-black/50 border border-white/5 p-5 rounded-2xl text-white hover:bg-white/5 transition-colors">
+             <button 
+                onClick={() => {
+                   setEditPhotos([...(userData?.photos || [null, null, null])]);
+                   setShowEditPhotosModal(true);
+                }} 
+                className="w-full flex justify-between items-center bg-black/50 border border-white/5 p-5 rounded-2xl text-white hover:bg-white/5 transition-colors"
+             >
                 <span className="font-medium">Manage Photos</span>
                 <span className="text-zinc-500">→</span>
              </button>
@@ -529,6 +641,83 @@ export default function ProfilePage() {
 
       </main>
     
+      {/* Edit Photos Modal */}
+      <AnimatePresence>
+        {showEditPhotosModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              onClick={() => setShowEditPhotosModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-zinc-900 border border-white/10 p-6 rounded-[2rem] w-full max-w-md relative z-10 max-h-[90vh] overflow-y-auto custom-scrollbar"
+            >
+              <button 
+                onClick={() => setShowEditPhotosModal(false)}
+                className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+
+              <h2 className="text-xl font-bold mb-6 text-white tracking-tight">Manage Photos</h2>
+              
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-black/50 border-2 border-dashed border-white/10 flex flex-col items-center justify-center group">
+                    {editPhotos[index] ? (
+                      <>
+                        <img src={editPhotos[index]!} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                           <span className="text-white text-xs font-bold mb-2">Change</span>
+                           <button 
+                             onClick={(e) => { e.preventDefault(); const newPhotos = [...editPhotos]; newPhotos[index] = null; setEditPhotos(newPhotos); }}
+                             className="text-rose-400 text-xs font-bold bg-black/50 px-2 py-1 rounded-full hover:bg-rose-500/20"
+                           >
+                             Remove
+                           </button>
+                        </div>
+                      </>
+                    ) : (
+                      <span className="text-2xl text-white/20">+</span>
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => handlePhotoChange(index, e)}
+                      className="absolute inset-0 opacity-0 cursor-pointer" 
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {isScanningImage && (
+                <p className="text-indigo-400 text-sm mb-4 font-medium animate-pulse text-center">
+                  🤖 Scanning image for safety...
+                </p>
+              )}
+              {photoError && (
+                <p className="text-rose-400 text-sm mb-4 font-medium text-center">{photoError}</p>
+              )}
+
+              <button
+                onClick={handleSavePhotos}
+                disabled={savingPhotos || isScanningImage}
+                className="w-full bg-indigo-500 text-white py-4 rounded-xl font-bold hover:bg-indigo-400 transition-colors shadow-[0_0_20px_rgba(99,102,241,0.3)] disabled:opacity-50"
+              >
+                {savingPhotos ? "Saving..." : "Save Photos"}
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Edit Answers Modal */}
       <AnimatePresence>
         {showEditAnswersModal && (
