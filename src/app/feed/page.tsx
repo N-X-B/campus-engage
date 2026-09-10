@@ -480,6 +480,16 @@ export default function FeedPage() {
              <span className="text-lg">🎯</span> Filter Vibes {selectedFilters.length > 0 && `(${selectedFilters.length}/5)`}
           </button>
           
+          <button 
+             onClick={() => {
+               if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(20);
+               setProfiles(prev => [...prev].sort(() => 0.5 - Math.random()));
+             }}
+             className="px-4 py-2 rounded-full font-bold text-sm transition-all bg-white hover:bg-zinc-200 text-black shadow-sm flex items-center gap-2"
+          >
+             <span className="text-lg">🔀</span> Shuffle Feed
+          </button>
+
           {selectedFilters.length === 0 && (
             <div className="relative">
               <select 
