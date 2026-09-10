@@ -37,7 +37,7 @@ export function Navigation() {
         
         // Route Guard: If incognito and trying to access blocked pages, kick them to spotted
         if (incognito && (pathname === '/feed' || pathname === '/inbox')) {
-           router.replace('/missed-connections');
+           router.replace('/confessions');
         }
       }
     });
@@ -52,14 +52,15 @@ export function Navigation() {
 
   let navItems = [
     { name: 'Discover', path: '/feed' },
-    { name: 'Spotted', path: '/missed-connections' },
+    { name: 'Spotted', path: '/confessions' },
+    { name: 'Speed Bump', path: '/speed-bump' },
     { name: 'Inbox', path: '/inbox' },
     { name: 'Profile', path: '/profile' },
   ];
 
   if (isIncognito) {
     navItems = [
-      { name: 'Confessions', path: '/missed-connections' },
+      { name: 'Confessions', path: '/confessions' },
       { name: 'Profile', path: '/profile' },
     ];
   }
