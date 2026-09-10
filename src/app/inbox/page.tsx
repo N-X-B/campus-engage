@@ -16,7 +16,8 @@ export default function InboxPage() {
   const router = useRouter();
   const [conversations, setConversations] = useState<any[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
-  const [view, setView] = useState<'messages' | 'invitations'>('messages');
+  const [crushes, setCrushes] = useState<any[]>([]);
+  const [view, setView] = useState<'messages' | 'invitations' | 'crushes'>('messages');
   const [isWiping, setIsWiping] = useState(false);
 
   const handleAccept = async (convId: string, prompt: string, senderId: string) => {
@@ -104,7 +105,19 @@ export default function InboxPage() {
        setConversations(convos);
     });
 
-    return () => unsubscribe();
+    // Listen to secret crushes
+    const qCrush = query(collection(db, 'secret_crushes'), where('receiverId', '==', user.uid));
+    const unsubscribeCrush = onSnapshot(qCrush, (snapshot) => {
+      const crushList: any[] = [];
+      snapshot.forEach(d => crushList.push({ id: d.id, ...d.data() }));
+      crushList.sort((a, b) => b.timestamp?.toMillis() - a.timestamp?.toMillis());
+      setCrushes(crushList);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeCrush();
+    };
   }, [user]);
 
   if (loading || !user) return <LoadingScreen />;
@@ -144,6 +157,17 @@ export default function InboxPage() {
                 {pendingRequests.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full text-[10px] flex items-center justify-center text-white">
                     {pendingRequests.length}
+                  </span>
+                )}
+              </button>
+              <button 
+                onClick={() => setView('crushes')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors relative ${view === 'crushes' ? 'bg-rose-500 text-white' : 'text-zinc-500 hover:text-white'}`}
+              >
+                Crushes
+                {crushes.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-rose-500 rounded-full text-[10px] flex items-center justify-center font-black">
+                    {crushes.length}
                   </span>
                 )}
               </button>
@@ -261,6 +285,44 @@ export default function InboxPage() {
                 </div>
               )}
             </>
+          )}
+
+          {view === 'crushes' && (
+             crushes.length === 0 ? (
+               <div className="text-center py-12 border border-dashed border-rose-500/20 rounded-3xl bg-rose-500/5">
+                 <div className="text-4xl mb-4">💌</div>
+                 <h3 className="text-white font-bold mb-2">No Secret Crushes yet</h3>
+                 <p className="text-zinc-500 text-sm">Post your link on Instagram to get some!</p>
+               </div>
+             ) : (
+               <div className="space-y-3">
+                 {crushes.map((crush, idx) => {
+                   return (
+                     <motion.div
+                      key={crush.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: idx * 0.05 }}
+                      className="bg-zinc-900 border border-white/5 p-5 rounded-3xl relative overflow-hidden"
+                     >
+                       <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-[50px] pointer-events-none" />
+                       <div className="flex items-center gap-3 mb-3">
+                         <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-xl shadow-inner">
+                           🤫
+                         </div>
+                         <div>
+                           <h4 className="text-rose-400 font-bold text-sm tracking-widest uppercase">Secret Admirer</h4>
+                           <span className="text-[10px] text-zinc-500">
+                             {crush.timestamp ? new Date(crush.timestamp.toMillis()).toLocaleDateString() : 'Just now'}
+                           </span>
+                         </div>
+                       </div>
+                       <p className="text-white font-medium italic text-lg leading-snug">&quot;{crush.message}&quot;</p>
+                     </motion.div>
+                   );
+                 })}
+               </div>
+             )
           )}
         </div>
       </main>

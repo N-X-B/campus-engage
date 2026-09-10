@@ -399,6 +399,25 @@ export default function ProfilePage() {
              </div>
           </div>
 
+          <div className="mb-8">
+            <button 
+              onClick={() => {
+                const link = `${window.location.origin}/crush/${user?.uid}`;
+                navigator.clipboard.writeText(link);
+                if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([30, 50, 30]);
+                alert("Crush Link copied! Paste this on your Instagram Story or WhatsApp Status to get anonymous messages.");
+              }}
+              className="w-full relative overflow-hidden bg-gradient-to-r from-rose-500 to-pink-600 p-[2px] rounded-3xl group"
+            >
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="bg-black/80 backdrop-blur-md w-full h-full rounded-[22px] p-5 flex flex-col items-center justify-center relative z-10 transition-colors group-hover:bg-black/60">
+                <span className="text-3xl mb-2">📸</span>
+                <span className="text-white font-bold tracking-tight text-lg mb-1">Get Anonymous Messages</span>
+                <span className="text-rose-400 text-xs font-bold uppercase tracking-widest">Copy Instagram Story Link</span>
+              </div>
+            </button>
+          </div>
+
           {/* Praises UI */}
           {praises.length > 0 && (
             <div className="bg-black/50 border border-indigo-500/20 p-6 rounded-3xl mb-6 relative overflow-hidden">

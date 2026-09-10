@@ -81,6 +81,32 @@ function RegisterForm() {
         }
       }
 
+      // Off-Platform Viral Hook: Send Pending Crush Message
+      const pendingCrushMsg = sessionStorage.getItem('pendingCrushMsg');
+      const pendingCrushTarget = sessionStorage.getItem('pendingCrushTarget');
+      
+      if (pendingCrushMsg && pendingCrushTarget) {
+        try {
+          // Import collection and addDoc are needed, we can just use setDoc with a new doc if needed or dynamic import,
+          // but we already have updateDoc etc. Let's use standard Firebase. Wait, is addDoc imported?
+          // I will use fetch or directly dynamic import if addDoc isn't available. 
+          // Let's check imports first... Actually, it's safer to just import addDoc at the top.
+          const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+          await addDoc(collection(db, 'secret_crushes'), {
+            receiverId: pendingCrushTarget,
+            senderId: user.uid,
+            message: pendingCrushMsg,
+            timestamp: serverTimestamp(),
+            isRead: false
+          });
+          sessionStorage.removeItem('pendingCrushMsg');
+          sessionStorage.removeItem('pendingCrushTarget');
+          console.log("[REGISTER] Pending crush sent!");
+        } catch (crushErr) {
+          console.error("[REGISTER] Failed to send pending crush", crushErr);
+        }
+      }
+
       console.log("[REGISTER] Routing to /onboarding...");
       window.location.href = '/onboarding';
     } catch (err: any) {
@@ -97,7 +123,13 @@ function RegisterForm() {
           CampusEngage.
         </Link>
         <h1 className="text-2xl font-bold text-white mt-4">Initialize Profile</h1>
-        <p className="text-zinc-400 mt-2">Create an account to join the network.</p>
+        
+        {searchParams.get('intent') === 'crush' ? (
+          <p className="text-rose-400 mt-2 font-medium">Verify your student email to send your secret message. 💌</p>
+        ) : (
+          <p className="text-zinc-400 mt-2">Create an account to join the network.</p>
+        )}
+        
         {referralId && (
            <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
              <p className="text-indigo-400 text-sm font-bold">🎉 You were invited by a friend!</p>
