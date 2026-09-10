@@ -178,13 +178,13 @@ export default function Home() {
           {/* Cyber Scramble + Kinetic Stretch */}
           <motion.h1 
             style={{ letterSpacing: letterStretch }}
-            className="text-2xl md:text-4xl lg:text-5xl font-black leading-tight tracking-widest sm:tracking-[0.2em] mb-6 flex justify-center flex-wrap sm:flex-nowrap w-full"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-[8rem] font-black leading-none tracking-widest sm:tracking-[0.1em] mb-6 flex justify-center flex-wrap sm:flex-nowrap w-full px-4 md:px-0"
           >
             <ScrambleText text="MEET YOUR CAMPUS." />
           </motion.h1>
           
           <motion.p 
-            className="text-sm md:text-base text-zinc-400 font-medium max-w-xl mx-auto mb-10 drop-shadow-xl"
+            className="text-base md:text-xl lg:text-2xl text-zinc-400 font-medium max-w-3xl mx-auto mb-12 drop-shadow-xl"
             initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 1.5, delay: 1 }}
@@ -227,21 +227,22 @@ export default function Home() {
 
       {/* Feature 1: The Feed */}
       <section className="py-16 md:py-32 px-4 relative">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 md:gap-20 items-center justify-between">
           <motion.div 
+            className="flex-1"
             initial={{ opacity: 0, x: -100, filter: "blur(20px)" }}
             whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-4 leading-tight">Stop Swiping.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Start scrolling.</span></h2>
-            <p className="text-sm md:text-base text-zinc-400 mb-8 leading-relaxed">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mb-6 leading-[1.1]">Stop Swiping.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Start scrolling.</span></h2>
+            <p className="text-base md:text-xl lg:text-2xl text-zinc-400 mb-8 leading-relaxed max-w-lg">
               We scrapped the boring swiping mechanics. Experience a premium, immersive vertical feed that feels more like a modern social network than a corporate directory.
             </p>
           </motion.div>
 
           <motion.div 
-            className="relative h-[600px] w-full max-w-sm mx-auto perspective-1000"
+            className="relative w-[280px] h-[590px] md:w-[340px] md:h-[715px] lg:w-[400px] lg:h-[844px] mx-auto perspective-1000 shrink-0"
             initial={{ opacity: 0, y: 150, rotateY: 30, rotateZ: -10, filter: "blur(30px) brightness(1.5)" }}
             whileInView={{ opacity: 1, y: 0, rotateY: 0, rotateZ: 0, filter: "blur(0px) brightness(1)" }}
             viewport={{ once: true, margin: "-100px" }}
@@ -308,39 +309,45 @@ export default function Home() {
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
             {/* Bento 1 */}
-            <motion.div whileHover={{ y: -5 }} className="md:col-span-2 bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 h-full flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-1">Semantic Hot Takes</h3>
-                  <p className="text-zinc-400 text-sm">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
-                </div>
-                <div className="mt-8 p-4 bg-zinc-900 rounded-2xl border border-white/5 relative overflow-hidden">
-                  <p className="text-zinc-500 font-mono text-xs tracking-tighter overflow-hidden">
-                    [0.82, -0.14, 0.55, 0.91, -0.22, 0.34, 0.77, -0.05, 0.12, 0.88, ...]<br/>
-                    <span className="text-indigo-400">&gt; Match Found: "Dining hall sushi is a scam"</span>
-                  </p>
+            <TiltCard className="md:col-span-2">
+              <div className="w-full h-full bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 h-full flex flex-col justify-between" style={{ transform: "translateZ(30px)" }}>
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-1">Semantic Hot Takes</h3>
+                    <p className="text-zinc-400 text-sm">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
+                  </div>
+                  <div className="mt-8 p-4 bg-zinc-900 rounded-2xl border border-white/5 relative overflow-hidden" style={{ transform: "translateZ(20px)" }}>
+                    <p className="text-zinc-500 font-mono text-xs tracking-tighter overflow-hidden">
+                      [0.82, -0.14, 0.55, 0.91, -0.22, 0.34, 0.77, -0.05, 0.12, 0.88, ...]<br/>
+                      <span className="text-indigo-400">&gt; Match Found: "Dining hall sushi is a scam"</span>
+                    </p>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </TiltCard>
 
             {/* Bento 2 */}
-            <motion.div whileHover={{ y: -5 }} className="bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
-              <div className="relative z-10">
-                <h3 className="text-lg font-bold text-white mb-1 relative z-10">Study Energy</h3>
-                <p className="text-zinc-400 relative z-10 text-sm">Match with library rats or coffee shop regulars.</p>
+            <TiltCard>
+              <div className="w-full h-full bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+                <div className="relative z-10" style={{ transform: "translateZ(30px)" }}>
+                  <h3 className="text-lg font-bold text-white mb-1 relative z-10">Study Energy</h3>
+                  <p className="text-zinc-400 relative z-10 text-sm">Match with library rats or coffee shop regulars.</p>
+                </div>
+                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
               </div>
-              <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
-            </motion.div>
+            </TiltCard>
 
             {/* Bento 3 */}
-            <motion.div whileHover={{ y: -5 }} className="bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
-              <div className="relative z-10">
-                <h3 className="text-lg font-bold text-white mb-1 relative z-10">5-Cluster Matrix</h3>
-                <p className="text-zinc-400 relative z-10 text-sm">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
+            <TiltCard>
+              <div className="w-full h-full bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+                <div className="relative z-10" style={{ transform: "translateZ(30px)" }}>
+                  <h3 className="text-lg font-bold text-white mb-1 relative z-10">5-Cluster Matrix</h3>
+                  <p className="text-zinc-400 relative z-10 text-sm">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
+                </div>
+                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
               </div>
-              <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
-            </motion.div>
+            </TiltCard>
 
             {/* Bento 4 */}
             <TiltCard className="md:col-span-2">
