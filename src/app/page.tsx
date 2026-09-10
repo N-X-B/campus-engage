@@ -184,7 +184,7 @@ export default function Home() {
           </motion.h1>
           
           <motion.p 
-            className="text-base md:text-xl lg:text-2xl text-zinc-400 font-medium max-w-3xl mx-auto mb-12 drop-shadow-xl"
+            className="text-xl md:text-3xl lg:text-4xl text-zinc-400 font-medium max-w-5xl mx-auto mb-16 drop-shadow-xl leading-relaxed"
             initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 1.5, delay: 1 }}
@@ -201,7 +201,7 @@ export default function Home() {
             <MagneticButton>
               <Link href="/register" className="inline-block relative group cursor-none">
                  <div className="absolute -inset-2 bg-white opacity-10 blur-xl group-hover:opacity-30 transition duration-500 rounded-full"></div>
-                 <div className="relative bg-white text-black px-8 py-3 rounded-full font-bold text-sm transition-all duration-300 group-hover:scale-105 border border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                 <div className="relative bg-white text-black px-12 py-6 rounded-full font-black text-xl md:text-3xl transition-all duration-300 group-hover:scale-105 border border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
                    Join the Network
                  </div>
               </Link>
@@ -242,17 +242,18 @@ export default function Home() {
           </motion.div>
 
           <motion.div 
-            className="relative w-[320px] h-[675px] md:w-[450px] md:h-[950px] lg:w-[500px] lg:h-[1055px] mx-auto perspective-1000 shrink-0"
+            className="relative mx-auto perspective-1000 shrink-0"
+            style={{ width: "100%", maxWidth: "500px", aspectRatio: "9/19", minHeight: "600px" }}
             initial={{ opacity: 0, y: 150, rotateY: 30, rotateZ: -10, filter: "blur(30px) brightness(1.5)" }}
             whileInView={{ opacity: 1, y: 0, rotateY: 0, rotateZ: 0, filter: "blur(0px) brightness(1)" }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1.5, type: "spring", bounce: 0.2 }}
           >
-            <div className="absolute inset-0 bg-zinc-900 rounded-[3rem] p-2 shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/5 relative z-10">
-              <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative border border-white/5 flex flex-col justify-end p-6">
+            <div className="absolute inset-0 bg-zinc-900 rounded-[3rem] p-2 shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/5 relative z-10" style={{ width: "100%", height: "100%" }}>
+              <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative border border-white/5 flex flex-col justify-end p-6" style={{ position: "relative", width: "100%", height: "100%" }}>
                 
                 {/* Fake Profile Photo */}
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80" alt="App Mockup" className="absolute inset-0 object-cover w-full h-full opacity-80 transition-transform duration-1000 hover:scale-105" />
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80" alt="App Mockup" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} className="opacity-80 transition-transform duration-1000 hover:scale-105" />
                 <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,transparent,rgba(0,0,0,0.9))] z-0 pointer-events-none" />
                 
                 <div className="relative z-10 w-full space-y-4">
