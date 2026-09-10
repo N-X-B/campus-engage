@@ -16,7 +16,7 @@ const INTEREST_GROUPS = {
 import { isDemoMode, demoAuth } from '@/lib/demo-backend';
 import { auth } from '@/lib/firebase';
 import { signOut, deleteUser } from 'firebase/auth';
-import { doc, deleteDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, deleteDoc, getDoc, updateDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,6 +26,8 @@ export default function ProfilePage() {
   const [userData, setUserData] = useState<any>(null);
   const [editingInterests, setEditingInterests] = useState(false);
   const [interestError, setInterestError] = useState("");
+  const [appVotes, setAppVotes] = useState<string[]>([]);
+  const [isVoting, setIsVoting] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isIncognito, setIsIncognito] = useState(false);
   const [showEditAnswersModal, setShowEditAnswersModal] = useState(false);
@@ -67,6 +69,39 @@ export default function ProfilePage() {
     }
   }, [userData]);
   
+  useEffect(() => {
+    const fetchPoll = async () => {
+      try {
+        const pollDoc = await getDoc(doc(db, 'polls', 'app_demand'));
+        if (pollDoc.exists()) {
+           setAppVotes(pollDoc.data().voted_uids || []);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchPoll();
+  }, []);
+
+  const handleVoteApp = async () => {
+    if (!user || appVotes.includes(user.uid)) return;
+    setIsVoting(true);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([30, 60, 40]);
+    try {
+      const pollRef = doc(db, 'polls', 'app_demand');
+      const pollDoc = await getDoc(pollRef);
+      if (!pollDoc.exists()) {
+        await setDoc(pollRef, { voted_uids: [user.uid] });
+      } else {
+        await updateDoc(pollRef, { voted_uids: arrayUnion(user.uid) });
+      }
+      setAppVotes(prev => [...prev, user.uid]);
+    } catch (e) {
+      console.error(e);
+    }
+    setIsVoting(false);
+  };
+
   const handleToggleInterest = (interest: string) => {
     setInterestError("");
     if (selectedInterests.includes(interest)) {
