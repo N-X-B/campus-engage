@@ -202,8 +202,8 @@ export default function ProfilePage() {
         
         <div className="flex justify-between items-end mb-10">
           <div>
-            <h1 className="text-4xl font-black text-white tracking-tight">Profile</h1>
-            <p className="text-zinc-500 mt-1 text-lg">Manage your identity.</p>
+            <h1 className="text-3xl font-black text-white tracking-tight">Profile</h1>
+            <p className="text-zinc-500 mt-1 text-sm">Manage your identity.</p>
           </div>
           <button 
             onClick={handleLogout}
@@ -226,7 +226,7 @@ export default function ProfilePage() {
                👤
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-white">{user.displayName || "Anonymous Student"}</h2>
+              <h2 className="text-2xl font-bold text-white tracking-tight">{user.displayName || "Anonymous Student"}</h2>
               <p className="text-zinc-400 font-medium">{user.email || "No email provided"}</p>
             </div>
           </div>
@@ -250,7 +250,7 @@ export default function ProfilePage() {
           {/* Referral Progress UI */}
           <div className="bg-black/50 border border-white/5 p-6 rounded-3xl mb-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-[50px] -z-10" />
-            <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+            <h3 className="text-white font-bold text-base mb-4 flex items-center gap-2">
               🏆 Network Expansion
               {((userData?.referredUsers?.length || userData?.referralCount || 0)) >= 5 && <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full uppercase tracking-widest font-black ml-auto">UNLOCKED</span>}
             </h3>
@@ -268,7 +268,7 @@ export default function ProfilePage() {
 
             <button 
                onClick={copyInviteLink}
-               className="w-full bg-white text-black py-4 rounded-2xl font-bold text-lg hover:scale-[1.02] transition-transform shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2"
+               className="w-full bg-white text-black py-3.5 rounded-2xl font-bold text-base hover:scale-[1.02] transition-transform shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2"
             >
                🔗 Copy Invite Link
             </button>
@@ -285,7 +285,7 @@ export default function ProfilePage() {
           className="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 mb-8"
         >
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-white font-bold text-xl">My Campus Groups</h3>
+            <h3 className="text-white font-bold text-lg">My Campus Groups</h3>
             <button 
                onClick={() => editingInterests ? saveInterests() : setEditingInterests(true)}
                className="text-sm font-bold text-indigo-400 hover:text-indigo-300"
@@ -344,7 +344,7 @@ export default function ProfilePage() {
         >
            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
            <div className="relative z-10">
-             <h2 className="text-xl font-bold text-white mb-2">Want a Native App? 📱</h2>
+             <h2 className="text-lg font-bold text-white mb-2">Want a Native App? 📱</h2>
              <p className="text-zinc-400 text-sm mb-4 leading-relaxed">
                We are currently running on the web. If you want us to build an official iOS and Android app, cast your vote below!
              </p>
@@ -396,7 +396,7 @@ export default function ProfilePage() {
               </motion.div>
             )}
           </AnimatePresence>
-          <h3 className="text-white font-bold text-xl mb-6">Account Settings</h3>
+          <h3 className="text-white font-bold text-lg mb-6">Account Settings</h3>
 
           <div className="space-y-4">
              <button 
@@ -438,7 +438,7 @@ export default function ProfilePage() {
           <div className="absolute top-0 left-0 w-full h-full bg-indigo-500/5 -z-10" />
           <div className="text-center">
              <div className="text-4xl mb-4">☕️</div>
-             <h3 className="text-white font-bold text-xl mb-2">Support the Developers</h3>
+             <h3 className="text-white font-bold text-lg mb-2">Support the Developers</h3>
              <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
                CampusEngage is built and maintained by students. If you found your perfect match or just love the vibes, buy us a coffee to keep the servers running!
              </p>
@@ -446,7 +446,7 @@ export default function ProfilePage() {
                href="https://buymeacoffee.com/" 
                target="_blank" 
                rel="noopener noreferrer"
-               className="inline-block w-full bg-[#FFDD00] text-black py-4 rounded-2xl font-bold text-lg hover:scale-[1.02] transition-transform shadow-[0_0_30px_rgba(255,221,0,0.2)]"
+               className="inline-block w-full bg-[#FFDD00] text-black py-3.5 rounded-2xl font-bold text-base hover:scale-[1.02] transition-transform shadow-[0_0_30px_rgba(255,221,0,0.2)]"
              >
                 Buy me a coffee
              </a>
@@ -481,7 +481,7 @@ export default function ProfilePage() {
                 ✕
               </button>
 
-              <h2 className="text-2xl font-bold mb-6 text-white">Edit Vibe Check</h2>
+              <h2 className="text-xl font-bold mb-6 text-white tracking-tight">Edit Vibe Check</h2>
               
               <div className="space-y-6">
                 <div>
