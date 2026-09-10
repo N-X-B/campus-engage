@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
@@ -91,6 +91,8 @@ export default function OnboardingWizard() {
   const [nsfwModel, setNsfwModel] = useState<nsfwjs.NSFWJS | null>(null);
   const [isScanningImage, setIsScanningImage] = useState(false);
 
+  const [isRestoring, setIsRestoring] = useState(true);
+
   useEffect(() => {
     // Silently preload the NSFW classification model in the background
     nsfwjs.load().then(model => {
@@ -101,6 +103,65 @@ export default function OnboardingWizard() {
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
+      return;
+    }
+
+    if (user && !isDemoMode) {
+      const fetchDraft = async () => {
+        try {
+          const docSnap = await getDoc(doc(db, 'users', user.uid));
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            
+            // If they are already fully onboarded, kick them to feed
+            if (data.onboarded || data.onboardingComplete) {
+              router.push('/feed');
+              return;
+            }
+
+            // Restore text fields
+            if (data.bio) setBio(data.bio);
+            if (data.course) setCourse(data.course);
+            if (data.year) setYear(data.year);
+            if (data.branch) setBranch(data.branch);
+            if (data.gender) setGender(data.gender);
+            if (data.studyVibe) setStudyVibe(data.studyVibe);
+            if (data.weekendVibe) setWeekendVibe(data.weekendVibe);
+            if (data.skipClass) setSkipClass(data.skipClass);
+            if (data.stressLevel) setStressLevel(data.stressLevel);
+            if (data.hotTake) setHotTake(data.hotTake);
+            
+            // Restore photos if they uploaded some previously (we map existing URLs to previews)
+            if (data.photos && Array.isArray(data.photos) && data.photos.length > 0) {
+               const newPreviews = [null, null, null] as (string | null)[];
+               data.photos.forEach((url: string, i: number) => {
+                 if (i < 3) newPreviews[i] = url;
+               });
+               setPreviews(newPreviews);
+            }
+
+            // Determine which step to put them on based on what's missing
+            if (data.bio && data.photos?.length > 0) {
+              if (data.course && data.branch && data.year && data.gender) {
+                if (data.studyVibe && data.weekendVibe) {
+                  setStep(4);
+                } else {
+                  setStep(3);
+                }
+              } else {
+                setStep(2);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Failed to restore draft", err);
+        } finally {
+          setIsRestoring(false);
+        }
+      };
+      fetchDraft();
+    } else {
+      setIsRestoring(false);
     }
   }, [user, authLoading, router]);
 
@@ -141,7 +202,7 @@ export default function OnboardingWizard() {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     setError('');
     
     // Step validation
@@ -149,13 +210,36 @@ export default function OnboardingWizard() {
        const hasPhoto = files.some(f => f !== null) || previews.some(p => p !== null);
        if (!hasPhoto) { setError("Please upload at least one photo."); return; }
        if (!bio.trim()) { setError("Please add a short bio."); return; }
+       if (user && !isDemoMode) {
+         try {
+           const finalPhotos: string[] = [];
+           for (let i = 0; i < 3; i++) {
+             if (files[i]) {
+               finalPhotos.push(await compressImageToBase64(files[i]!));
+             } else if (previews[i] && !previews[i]?.startsWith('blob:')) {
+               finalPhotos.push(previews[i]!);
+             }
+           }
+           await updateDoc(doc(db, 'users', user.uid), { bio, photos: finalPhotos });
+         } catch(err) {
+           console.error("Failed to save draft", err);
+         }
+       }
     } else if (step === 2) {
        if (!course || !year || !branch.trim() || !gender) {
           setError("Please fill out all academic fields."); return;
        }
+       
+       if (user && !isDemoMode) {
+         updateDoc(doc(db, 'users', user.uid), { course, year, branch, gender }).catch(console.error);
+       }
     } else if (step === 3) {
        if (!studyVibe || !weekendVibe || !skipClass) {
           setError("Please answer all vibe checks."); return;
+       }
+       
+       if (user && !isDemoMode) {
+         updateDoc(doc(db, 'users', user.uid), { studyVibe, weekendVibe, skipClass }).catch(console.error);
        }
     }
     
@@ -228,19 +312,21 @@ export default function OnboardingWizard() {
       
       
 
-      const validFiles = files.filter(f => f !== null) as File[];
-      const photoUrls: string[] = [];
+      const finalPhotos: string[] = [];
       
-      for (let i = 0; i < validFiles.length; i++) {
-        const file = validFiles[i];
-        try {
-          const base64String = await compressImageToBase64(file);
-          photoUrls.push(base64String);
-        } catch (e) {
-          console.error("Failed to compress image", e);
+      for (let i = 0; i < 3; i++) {
+        if (files[i]) {
+          try {
+            const base64String = await compressImageToBase64(files[i]!);
+            finalPhotos.push(base64String);
+          } catch (e) {
+            console.error("Failed to compress image", e);
+          }
+        } else if (previews[i] && !previews[i]?.startsWith('blob:')) {
+          // Keep previously uploaded/restored photo
+          finalPhotos.push(previews[i]!);
         }
       }
-
       
       console.log("[ONBOARDING] Saving profile directly to Firestore...");
       try {
@@ -252,7 +338,7 @@ export default function OnboardingWizard() {
           gender,
           bio,
           answers,
-          photos: photoUrls,
+          photos: finalPhotos,
           auraScore: 20,
           onboarded: true
         }, { merge: true });
@@ -276,7 +362,7 @@ export default function OnboardingWizard() {
     }
   };
 
-  if (authLoading) return <LoadingScreen />;
+  if (authLoading || isRestoring) return <LoadingScreen />;
 
   const slideVariants = {
     initial: { opacity: 0, x: 20 },
