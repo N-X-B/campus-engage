@@ -178,7 +178,7 @@ export default function Home() {
           {/* Cyber Scramble + Kinetic Stretch */}
           <motion.h1 
             style={{ letterSpacing: letterStretch }}
-            className="text-4xl md:text-7xl lg:text-[8rem] font-black leading-none tracking-widest sm:tracking-[0.1em] mb-6 flex justify-center flex-wrap sm:flex-nowrap w-full"
+            className="text-3xl sm:text-4xl md:text-7xl lg:text-[8rem] font-black leading-none tracking-widest sm:tracking-[0.1em] mb-6 flex justify-center flex-wrap sm:flex-nowrap w-full px-4 md:px-0"
           >
             <ScrambleText text="MEET YOUR CAMPUS." />
           </motion.h1>
@@ -250,12 +250,9 @@ export default function Home() {
             <div className="absolute inset-0 bg-zinc-900 rounded-[3rem] p-2 shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/5 relative z-10">
               <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative border border-white/5 flex flex-col justify-end p-6">
                 
-                {/* Static Placeholder (Replaced infinite spinner so it doesn't look like a broken image) */}
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/40 via-purple-500/20 to-black z-0" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                  <span className="text-[8rem] filter grayscale blur-[1px]">👤</span>
-                </div>
-                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.9))] z-0" />
+                {/* Fake Profile Photo */}
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80" alt="App Mockup" className="absolute inset-0 object-cover w-full h-full opacity-80 transition-transform duration-1000 hover:scale-105" />
+                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,transparent,rgba(0,0,0,0.9))] z-0 pointer-events-none" />
                 
                 <div className="relative z-10 w-full space-y-4">
                   <div className="h-6 w-3/4 bg-white/20 rounded-full" />
