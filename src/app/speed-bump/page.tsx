@@ -12,16 +12,18 @@ import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 
 const SUPERLATIVES = [
-  "Most likely to become a CEO? 💼",
-  "Who has the best smile? 😊",
-  "Most likely to survive a zombie apocalypse? 🧟",
+  "Definitely has a secret admirer right now 💌",
+  "Who are you double-taking in the hallway? 👀",
+  "Has the most unspoken rizz on campus 🤫",
+  "Most likely to break a heart this semester 💔",
   "Main Character Energy ✨",
-  "Most likely to sleep through a final exam 😴",
+  "Who makes your heart skip a beat? 💓",
+  "Intimidatingly good looking 🧿",
   "Best dressed on campus 👗",
-  "Always knows the campus gossip ☕",
-  "Most likely to go viral on TikTok 📱",
-  "Who carries the group project? 📚",
-  "Who would you want to be stranded on an island with? 🏝️"
+  "Most likely to steal your hoodie and never return it 🧥",
+  "Who would you secretly want to match with? 🎯",
+  "Has the best smile on campus 😊",
+  "Most likely to leave you on delivered for 3 days 📱"
 ];
 
 export default function SpeedBumpPage() {
@@ -74,7 +76,7 @@ export default function SpeedBumpPage() {
   }, [user]);
 
   const generatePoll = (pool: any[]) => {
-    if (votesCast >= 5) {
+    if (votesCast >= 12) {
       setIsDone(true);
       return;
     }
@@ -158,7 +160,10 @@ export default function SpeedBumpPage() {
               className="w-full flex flex-col items-center"
             >
               <div className="text-center mb-10 w-full">
-                <span className="text-indigo-500 font-bold tracking-widest text-xs uppercase mb-2 block">Speed Bump {votesCast + 1} / 5</span>
+                <span className="text-indigo-500 font-bold tracking-widest text-xs uppercase mb-2 block flex items-center justify-center gap-2">
+                  <span>Speed Bump {votesCast + 1} / 12</span>
+                  <span className="bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">💰 {votesCast * 10} Coins</span>
+                </span>
                 <h1 className="text-2xl sm:text-3xl font-extrabold leading-tight">{currentPrompt}</h1>
               </div>
 
@@ -184,10 +189,26 @@ export default function SpeedBumpPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     
-                    <div className="absolute bottom-4 left-4 right-4 text-left">
-                      <p className="font-bold text-white text-lg drop-shadow-md">{opt.name?.split(' ')[0]}</p>
-                      <p className="text-xs font-medium text-white/70 drop-shadow-md">{opt.branch}</p>
+                    <div className="absolute bottom-4 left-4 text-left">
+                      <p className="font-bold text-white text-lg tracking-tight">{opt.name}</p>
+                      <p className="text-zinc-300 text-xs font-medium">{opt.year ? `Year ${opt.year}` : 'Student'}</p>
                     </div>
+
+                    {/* Floating Reward Animation */}
+                    <AnimatePresence>
+                      {selectedId === opt.id && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                          animate={{ opacity: 1, y: -40, scale: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        >
+                          <span className="bg-indigo-500 text-white font-black text-2xl px-4 py-2 rounded-full shadow-2xl border-2 border-white/20">
+                            +10 💰
+                          </span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     {selectedId === opt.id && (
                       <motion.div 
