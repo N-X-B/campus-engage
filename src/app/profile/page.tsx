@@ -315,10 +315,14 @@ export default function ProfilePage() {
 
 
   const copyInviteLink = () => {
-    const link = `https://campusengage.vercel.app/register?ref=${user.uid}`;
+    const link = `https://campusengage.vercel.app/register?ref=${user?.uid}`;
     navigator.clipboard.writeText(link);
     alert("Invite link copied to clipboard! Share it with 5 friends to unlock full chat features.");
   };
+
+  if (loading || !user || !userData) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-black pb-24 md:pb-0 font-sans selection:bg-white/20">
