@@ -178,13 +178,13 @@ export default function Home() {
           {/* Cyber Scramble + Kinetic Stretch */}
           <motion.h1 
             style={{ letterSpacing: letterStretch }}
-            className="text-[1.7rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight tracking-widest sm:tracking-[0.2em] mb-8 flex justify-center flex-wrap sm:flex-nowrap w-full"
+            className="text-2xl md:text-4xl lg:text-5xl font-black leading-tight tracking-widest sm:tracking-[0.2em] mb-6 flex justify-center flex-wrap sm:flex-nowrap w-full"
           >
             <ScrambleText text="MEET YOUR CAMPUS." />
           </motion.h1>
           
           <motion.p 
-            className="text-lg md:text-2xl text-zinc-300 font-medium max-w-2xl mx-auto mb-12 drop-shadow-xl"
+            className="text-sm md:text-base text-zinc-400 font-medium max-w-xl mx-auto mb-10 drop-shadow-xl"
             initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 1.5, delay: 1 }}
@@ -201,7 +201,7 @@ export default function Home() {
             <MagneticButton>
               <Link href="/register" className="inline-block relative group cursor-none">
                  <div className="absolute -inset-2 bg-white opacity-10 blur-xl group-hover:opacity-30 transition duration-500 rounded-full"></div>
-                 <div className="relative bg-white text-black px-12 py-5 rounded-full font-bold text-lg transition-all duration-300 group-hover:scale-105 border border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                 <div className="relative bg-white text-black px-8 py-3 rounded-full font-bold text-sm transition-all duration-300 group-hover:scale-105 border border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
                    Join the Network
                  </div>
               </Link>
@@ -234,8 +234,8 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 leading-tight">Stop Swiping.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Start scrolling.</span></h2>
-            <p className="text-xl text-zinc-400 mb-8 leading-relaxed">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-4 leading-tight">Stop Swiping.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Start scrolling.</span></h2>
+            <p className="text-sm md:text-base text-zinc-400 mb-8 leading-relaxed">
               We scrapped the boring swiping mechanics. Experience a premium, immersive vertical feed that feels more like a modern social network than a corporate directory.
             </p>
           </motion.div>
@@ -252,8 +252,8 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80" alt="App Mockup" className="object-cover w-full h-full opacity-60 grayscale transition-transform duration-1000 hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 <div className="absolute bottom-10 left-6 right-6">
-                  <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">Emma, 1st Year</h3>
-                  <div className="w-full h-14 bg-white/5 backdrop-blur-2xl rounded-2xl flex items-center justify-center text-white font-bold border border-white/10 shadow-xl overflow-hidden relative group cursor-none">
+                  <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Emma, 1st Year</h3>
+                  <div className="w-full h-10 bg-white/5 backdrop-blur-2xl rounded-2xl flex items-center justify-center text-white text-sm font-bold border border-white/10 shadow-xl overflow-hidden relative group cursor-none">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     Break the Ice 🧊
                   </div>
@@ -288,60 +288,64 @@ export default function Home() {
 
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 50, filter: "blur(15px)" }}
+            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1 }}
+            className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-4">The Mathematics of Vibes.</h2>
-            <p className="text-xl text-zinc-400 max-w-2xl mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
+            <div className="inline-block border border-white/10 rounded-full px-4 py-1.5 mb-6 bg-white/5 backdrop-blur-md">
+              <span className="text-zinc-400 font-bold text-xs uppercase tracking-widest">Powered by AI</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tighter mb-2">The Mathematics of Vibes.</h2>
+            <p className="text-sm md:text-base text-zinc-400 max-w-lg mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <TiltCard className="md:col-span-2">
-              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative">
-                <div className="relative z-10" style={{ transform: "translateZ(40px)" }}>
-                  <h3 className="text-2xl font-bold text-white mb-2">Semantic Hot Takes</h3>
-                  <p className="text-zinc-400 text-base">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+            {/* Bento 1 */}
+            <motion.div whileHover={{ y: -5 }} className="md:col-span-2 bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-1">Semantic Hot Takes</h3>
+                  <p className="text-zinc-400 text-sm">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
                 </div>
-                <div className="mt-8 p-5 bg-zinc-950/80 rounded-2xl border border-white/10 relative z-10 shadow-inner" style={{ transform: "translateZ(20px)" }}>
-                  <p className="text-zinc-500 font-mono text-sm tracking-tighter overflow-hidden">
-                    <ScrambleText text="similarity_score = dot_product(v1, v2) > 0.85" />
+                <div className="mt-8 p-4 bg-zinc-900 rounded-2xl border border-white/5 relative overflow-hidden">
+                  <p className="text-zinc-500 font-mono text-xs tracking-tighter overflow-hidden">
+                    [0.82, -0.14, 0.55, 0.91, -0.22, 0.34, 0.77, -0.05, 0.12, 0.88, ...]<br/>
+                    <span className="text-indigo-400">&gt; Match Found: "Dining hall sushi is a scam"</span>
                   </p>
                 </div>
               </div>
-            </TiltCard>
+            </motion.div>
 
-            <TiltCard>
-              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative group">
-                <div style={{ transform: "translateZ(40px)" }}>
-                  <h3 className="text-2xl font-bold text-white mb-2 relative z-10">Study Energy</h3>
-                  <p className="text-zinc-400 relative z-10 text-base">Match with library rats or coffee shop regulars.</p>
-                </div>
-                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-6xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
+            {/* Bento 2 */}
+            <motion.div whileHover={{ y: -5 }} className="bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+              <div className="relative z-10">
+                <h3 className="text-lg font-bold text-white mb-1 relative z-10">Study Energy</h3>
+                <p className="text-zinc-400 relative z-10 text-sm">Match with library rats or coffee shop regulars.</p>
               </div>
-            </TiltCard>
-          </div>
+              <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
+            </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TiltCard>
-              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative group">
-                <div style={{ transform: "translateZ(40px)" }}>
-                  <h3 className="text-2xl font-bold text-white mb-2 relative z-10">5-Cluster Matrix</h3>
-                  <p className="text-zinc-400 relative z-10 text-base">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
-                </div>
-                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-6xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
+            {/* Bento 3 */}
+            <motion.div whileHover={{ y: -5 }} className="bg-black rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
+              <div className="relative z-10">
+                <h3 className="text-lg font-bold text-white mb-1 relative z-10">5-Cluster Matrix</h3>
+                <p className="text-zinc-400 relative z-10 text-sm">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
               </div>
-            </TiltCard>
-            <TiltCard>
+              <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-5xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
+            </motion.div>
+
+            {/* Bento 4 */}
+            <TiltCard className="md:col-span-2">
               <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-indigo-500/20 flex flex-col justify-between hover:border-indigo-400/40 transition-colors shadow-2xl overflow-hidden relative group">
                 <div style={{ transform: "translateZ(40px)" }}>
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-2xl font-bold text-white relative z-10">Aura Score</h3>
+                    <h3 className="text-xl md:text-2xl font-bold text-white relative z-10">Aura Score</h3>
                     <span className="bg-indigo-500/20 text-indigo-400 text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded-full border border-indigo-500/30">Beta</span>
                   </div>
-                  <p className="text-zinc-400 relative z-10 text-base">A dynamic trust rating based on your campus interactions. Higher vibes, better connections. Think of it as a CIBIL score for your dating profile.</p>
+                  <p className="text-sm md:text-base text-zinc-400 relative z-10">A dynamic trust rating based on your campus interactions. Higher vibes, better connections. Think of it as a CIBIL score for your dating profile.</p>
                 </div>
                 <div className="mt-8 p-5 bg-zinc-950/80 rounded-2xl border border-indigo-500/10 relative z-10 shadow-inner" style={{ transform: "translateZ(20px)" }}>
                   <div className="flex items-end gap-2">
@@ -377,67 +381,57 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 1 }}
           >
-            <h2 className="text-6xl font-bold tracking-tighter mb-6">System Architecture.</h2>
-            <p className="text-2xl text-zinc-500">Three simple steps to build your network on campus.</p>
           </motion.div>
+          <div className="text-center mb-24">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-4">System Architecture.</h2>
+            <p className="text-sm md:text-base text-zinc-500">Three simple steps to build your network on campus.</p>
+          </div>
 
-          <div className="space-y-32">
-            <motion.div 
-              className="flex flex-col md:flex-row items-center gap-12 group"
-              initial={{ opacity: 0, x: -100, filter: "blur(20px)" }} whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="text-[10rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-40 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">01</div>
+          <div className="max-w-5xl mx-auto space-y-24">
+            {/* Step 1 */}
+            <div className="flex flex-col md:flex-row items-center gap-12 group cursor-none">
+              <div className="text-[6rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-40 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">01</div>
               <div>
-                <h3 className="text-4xl font-bold mb-4 tracking-tight">Onboard in 60s</h3>
-                <p className="text-zinc-400 text-xl leading-relaxed">Fill out the quick, 4-step Vibe Check wizard. We ask you rapid-fire questions about your campus habits—like whether you write essays a week early or 12 hours before the deadline.</p>
+                <h3 className="text-xl font-bold mb-2 tracking-tight">Onboard in 60s</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed max-w-xl">Fill out the quick, 4-step Vibe Check wizard. We ask you rapid-fire questions about your campus habits—like whether you write essays a week early or 12 hours before the deadline.</p>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              className="flex flex-col md:flex-row items-center gap-12 group"
-              initial={{ opacity: 0, x: 100, filter: "blur(20px)" }} whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="text-[10rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-40 flex-shrink-0 md:order-last text-right leading-none group-hover:from-zinc-600 transition-all duration-700">02</div>
+            {/* Step 2 */}
+            <div className="flex flex-col md:flex-row items-center gap-12 group cursor-none">
+              <div className="text-[6rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-40 flex-shrink-0 md:order-last text-right leading-none group-hover:from-zinc-600 transition-all duration-700">02</div>
               <div className="md:text-right">
-                <h3 className="text-4xl font-bold mb-4 tracking-tight">Algorithmic Pairing</h3>
-                <p className="text-zinc-400 text-xl leading-relaxed">Our system computes a precise Matchability Factor™ out of 100% by comparing your answers to everyone else in your university. The highest matches are instantly pushed to the top of your feed.</p>
+                <h3 className="text-xl font-bold mb-2 tracking-tight">Algorithmic Pairing</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed max-w-xl ml-auto">Our system computes a precise Matchability Factor™ out of 100% by comparing your answers to everyone else in your university. The highest matches are instantly pushed to the top of your feed.</p>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              className="flex flex-col md:flex-row items-center gap-12 group"
-              initial={{ opacity: 0, x: -100, filter: "blur(20px)" }} whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="text-[10rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-40 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">03</div>
+            {/* Step 3 */}
+            <div className="flex flex-col md:flex-row items-center gap-12 group cursor-none">
+              <div className="text-[6rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-40 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">03</div>
               <div>
-                <h3 className="text-4xl font-bold mb-4 tracking-tight">Break the Ice</h3>
-                <p className="text-zinc-400 text-xl leading-relaxed">Click on a profile to view their brief. If the vibe is right, tap the Icebreaker button. We'll automatically generate a highly contextual conversation starter and drop you directly into a private chat.</p>
+                <h3 className="text-xl font-bold mb-2 tracking-tight">Break the Ice</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed max-w-xl">Click on a profile to view their brief. If the vibe is right, tap the Icebreaker button. We'll automatically generate a highly contextual conversation starter and drop you directly into a private chat.</p>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-48 px-4 text-center relative overflow-hidden bg-black border-t border-white/5">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, filter: "blur(20px)" }}
-          whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10"
-        >
-          <h2 className="text-6xl md:text-9xl font-black tracking-tighter mb-12 text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600">READY?</h2>
-          
-          <MagneticButton>
-            <Link href="/register" className="inline-block relative group cursor-none">
-               <div className="absolute -inset-2 bg-white opacity-10 blur-2xl group-hover:opacity-40 transition duration-700 rounded-full"></div>
-               <div className="relative bg-white text-black px-14 py-7 rounded-full font-bold text-2xl transition-all duration-500 group-hover:scale-110 shadow-[0_0_50px_rgba(255,255,255,0.15)]">
-                 Initialize Profile
+      {/* CTA Section */}
+      <section className="py-32 px-4 text-center relative overflow-hidden bg-black border-t border-white/5">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/20 via-black to-black pointer-events-none" />
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600">READY?</h2>
+          <motion.div whileHover={{ scale: 1.05 }} className="inline-block">
+             <Link href="/register" className="relative group cursor-none inline-block">
+               <div className="absolute -inset-4 bg-indigo-500/20 blur-xl group-hover:bg-indigo-500/40 transition duration-500 rounded-full"></div>
+               <div className="relative bg-white text-black px-8 py-3 rounded-full font-bold text-sm transition-all duration-500 group-hover:scale-110 shadow-[0_0_50px_rgba(255,255,255,0.15)]">
+                 Create Profile
                </div>
-            </Link>
-          </MagneticButton>
-        </motion.div>
+             </Link>
+          </motion.div>
+        </div>
       </section>
       
 
