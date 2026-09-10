@@ -248,12 +248,19 @@ export default function Home() {
             transition={{ duration: 1.5, type: "spring", bounce: 0.2 }}
           >
             <div className="absolute inset-0 bg-zinc-900 rounded-[3rem] p-2 shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/5 relative z-10">
-              <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative border border-white/5">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80" alt="App Mockup" className="object-cover w-full h-full opacity-60 grayscale transition-transform duration-1000 hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                <div className="absolute bottom-10 left-6 right-6">
-                  <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Emma, 1st Year</h3>
-                  <div className="w-full h-10 bg-white/5 backdrop-blur-2xl rounded-2xl flex items-center justify-center text-white text-sm font-bold border border-white/10 shadow-xl overflow-hidden relative group cursor-none">
+              <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative border border-white/5 flex flex-col justify-end p-6">
+                
+                {/* Abstract UI Elements instead of Fake Profile */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.8))] z-0" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-20">
+                  <div className="w-32 h-32 rounded-full border-[10px] border-indigo-500 border-t-transparent animate-spin" />
+                </div>
+                
+                <div className="relative z-10 w-full space-y-4">
+                  <div className="h-6 w-3/4 bg-white/10 rounded-full animate-pulse" />
+                  <div className="h-4 w-1/2 bg-white/5 rounded-full animate-pulse" />
+                  
+                  <div className="w-full h-10 mt-6 bg-white/10 backdrop-blur-2xl rounded-2xl flex items-center justify-center text-white text-sm font-bold border border-white/10 shadow-xl overflow-hidden relative group cursor-none">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     Break the Ice 🧊
                   </div>
@@ -266,7 +273,7 @@ export default function Home() {
               animate={{ y: [0, -20, 0] }}
               transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
             >
-              🔥 92% Match
+              🔥 99% Match
             </motion.div>
           </motion.div>
         </div>
