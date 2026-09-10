@@ -154,7 +154,7 @@ export default function Home() {
       </nav>
 
       {/* Futuristic Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+      <section className="relative min-h-[85dvh] md:min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
         
         {/* Animated Grid Background */}
         <div className="absolute inset-0 z-0 opacity-30 pointer-events-none" 
@@ -226,9 +226,10 @@ export default function Home() {
       </section>
 
       {/* Feature 1: The Feed */}
-      <section className="py-16 md:py-16 md:py-32 px-4 relative">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
+      <section className="py-12 md:py-32 px-4 relative">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 md:gap-20 items-center justify-between">
           <motion.div 
+            className="flex-1"
             initial={{ opacity: 0, x: -100, filter: "blur(20px)" }}
             whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-100px" }}
@@ -241,7 +242,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div 
-            className="relative h-[600px] w-full max-w-sm mx-auto perspective-1000"
+            className="relative w-[280px] h-[590px] md:w-[320px] md:h-[675px] lg:w-[360px] lg:h-[760px] mx-auto perspective-1000 shrink-0"
             initial={{ opacity: 0, y: 150, rotateY: 30, rotateZ: -10, filter: "blur(30px) brightness(1.5)" }}
             whileInView={{ opacity: 1, y: 0, rotateY: 0, rotateZ: 0, filter: "blur(0px) brightness(1)" }}
             viewport={{ once: true, margin: "-100px" }}
