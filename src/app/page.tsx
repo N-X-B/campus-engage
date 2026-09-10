@@ -300,12 +300,12 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <TiltCard className="md:col-span-2">
-              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-10 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative">
+              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative">
                 <div className="relative z-10" style={{ transform: "translateZ(40px)" }}>
-                  <h3 className="text-3xl font-bold text-white mb-3">Semantic Hot Takes</h3>
-                  <p className="text-zinc-400 text-lg">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">Semantic Hot Takes</h3>
+                  <p className="text-zinc-400 text-base">We analyze your campus hot takes using vector embeddings to find students with the exact same sense of humor.</p>
                 </div>
-                <div className="mt-12 p-6 bg-zinc-950/80 rounded-2xl border border-white/10 relative z-10 shadow-inner" style={{ transform: "translateZ(20px)" }}>
+                <div className="mt-8 p-5 bg-zinc-950/80 rounded-2xl border border-white/10 relative z-10 shadow-inner" style={{ transform: "translateZ(20px)" }}>
                   <p className="text-zinc-500 font-mono text-sm tracking-tighter overflow-hidden">
                     <ScrambleText text="similarity_score = dot_product(v1, v2) > 0.85" />
                   </p>
@@ -314,38 +314,38 @@ export default function Home() {
             </TiltCard>
 
             <TiltCard>
-              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-10 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative group">
+              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative group">
                 <div style={{ transform: "translateZ(40px)" }}>
-                  <h3 className="text-3xl font-bold text-white mb-3 relative z-10">Study Energy</h3>
-                  <p className="text-zinc-400 relative z-10 text-lg">Match with library rats or coffee shop regulars.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2 relative z-10">Study Energy</h3>
+                  <p className="text-zinc-400 relative z-10 text-base">Match with library rats or coffee shop regulars.</p>
                 </div>
-                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-8 text-7xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
+                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-6xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>🎧</motion.div>
               </div>
             </TiltCard>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TiltCard>
-              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-10 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative group">
+              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 flex flex-col justify-between hover:border-white/30 transition-colors shadow-2xl overflow-hidden relative group">
                 <div style={{ transform: "translateZ(40px)" }}>
-                  <h3 className="text-3xl font-bold text-white mb-3 relative z-10">5-Cluster Matrix</h3>
-                  <p className="text-zinc-400 relative z-10 text-lg">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2 relative z-10">5-Cluster Matrix</h3>
+                  <p className="text-zinc-400 relative z-10 text-base">Our advanced algorithm mathematically maps your Academic Year, Branch, Routine, Vibe, and Demographics for hyper-accurate matchmaking.</p>
                 </div>
-                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-8 text-7xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
+                <motion.div style={{ transform: "translateZ(60px)" }} className="mt-6 text-6xl opacity-40 grayscale absolute -bottom-6 -right-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">🧬</motion.div>
               </div>
             </TiltCard>
             <TiltCard>
-              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-10 rounded-[2rem] border border-indigo-500/20 flex flex-col justify-between hover:border-indigo-400/40 transition-colors shadow-2xl overflow-hidden relative group">
+              <div className="w-full h-full bg-black/50 backdrop-blur-xl p-8 rounded-[2rem] border border-indigo-500/20 flex flex-col justify-between hover:border-indigo-400/40 transition-colors shadow-2xl overflow-hidden relative group">
                 <div style={{ transform: "translateZ(40px)" }}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-3xl font-bold text-white relative z-10">Aura Score</h3>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-2xl font-bold text-white relative z-10">Aura Score</h3>
                     <span className="bg-indigo-500/20 text-indigo-400 text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded-full border border-indigo-500/30">Beta</span>
                   </div>
-                  <p className="text-zinc-400 relative z-10 text-lg">A dynamic trust rating based on your campus interactions. Higher vibes, better connections. Think of it as a CIBIL score for your dating profile.</p>
+                  <p className="text-zinc-400 relative z-10 text-base">A dynamic trust rating based on your campus interactions. Higher vibes, better connections. Think of it as a CIBIL score for your dating profile.</p>
                 </div>
-                <div className="mt-12 p-6 bg-zinc-950/80 rounded-2xl border border-indigo-500/10 relative z-10 shadow-inner" style={{ transform: "translateZ(20px)" }}>
+                <div className="mt-8 p-5 bg-zinc-950/80 rounded-2xl border border-indigo-500/10 relative z-10 shadow-inner" style={{ transform: "translateZ(20px)" }}>
                   <div className="flex items-end gap-2">
-                    <span className="text-4xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">784</span>
+                    <span className="text-3xl font-black text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">784</span>
                     <span className="text-zinc-500 font-bold mb-1 uppercase text-xs tracking-widest">/ 850 (Exceptional)</span>
                   </div>
                   <div className="w-full h-2 bg-zinc-900 rounded-full mt-4 overflow-hidden">
