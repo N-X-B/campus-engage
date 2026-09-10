@@ -242,7 +242,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div 
-            className="relative w-[280px] h-[590px] md:w-[340px] md:h-[715px] lg:w-[400px] lg:h-[844px] mx-auto perspective-1000 shrink-0"
+            className="relative w-[320px] h-[675px] md:w-[450px] md:h-[950px] lg:w-[500px] lg:h-[1055px] mx-auto perspective-1000 shrink-0"
             initial={{ opacity: 0, y: 150, rotateY: 30, rotateZ: -10, filter: "blur(30px) brightness(1.5)" }}
             whileInView={{ opacity: 1, y: 0, rotateY: 0, rotateZ: 0, filter: "blur(0px) brightness(1)" }}
             viewport={{ once: true, margin: "-100px" }}
@@ -303,8 +303,8 @@ export default function Home() {
             <div className="inline-block border border-white/10 rounded-full px-4 py-1.5 mb-6 bg-white/5 backdrop-blur-md">
               <span className="text-zinc-400 font-bold text-xs uppercase tracking-widest">Powered by AI</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-4 leading-tight">The Mathematics of Vibes.</h2>
-            <p className="text-base md:text-lg text-zinc-400 max-w-xl mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
+            <h2 className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tighter mb-6 leading-tight">The Mathematics of Vibes.</h2>
+            <p className="text-base md:text-xl lg:text-2xl text-zinc-400 max-w-2xl mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
           </motion.div>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
