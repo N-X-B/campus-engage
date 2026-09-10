@@ -284,10 +284,9 @@ export default function InboxPage() {
                          <div className="flex gap-2">
                            <button 
                              onClick={() => handleReject(chat.id, chat.senderId)}
-                             className="bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white px-4 py-2 rounded-full font-bold text-sm transition-colors border border-rose-500/20"
-                             title="Report & Block"
+                             className="text-xs font-medium text-zinc-500 hover:text-rose-500 transition-colors uppercase tracking-wider px-2 flex items-center"
                            >
-                             🚩 Block
+                             Block
                            </button>
                            <button 
                              onClick={() => handleAccept(chat.id, chat.icebreakerPrompt || 'Hey!', chat.senderId)}

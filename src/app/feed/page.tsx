@@ -406,12 +406,11 @@ export default function FeedPage() {
                          e.stopPropagation();
                        }
                      }}
-                     className="w-10 h-10 bg-black/40 hover:bg-rose-500/80 backdrop-blur-md text-white/70 hover:text-white rounded-full flex items-center justify-center transition-all border border-white/10 shadow-lg"
-                     title="Report & Block"
+                     className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-wider px-2"
                    >
-                     🚩
+                     Report
                    </button>
-                   <button onClick={() => setSelectedProfileForBrief(null)} className="w-10 h-10 bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10">
+                   <button onClick={() => setSelectedProfileForBrief(null)} className="w-10 h-10 bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10 ml-2">
                      ✕
                    </button>
                  </div>
@@ -605,16 +604,15 @@ export default function FeedPage() {
                   {/* Block / Report Flag */}
                   <button 
                     onClick={(e) => {
-                      if (window.confirm(`Are you sure you want to report and block ${p.name}? This will drop their Aura score and remove them from your feed.`)) {
+                      if (window.confirm(`Are you sure you want to report and block ${p.name}?`)) {
                         handleBlockUser(e, p);
                       } else {
                         e.stopPropagation();
                       }
                     }}
-                    className="w-10 h-10 bg-black/40 hover:bg-rose-500/80 backdrop-blur-md rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all shadow-lg border border-white/10 z-20 pointer-events-auto"
-                    title="Report & Block"
+                    className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-wider px-4 py-2 z-20 pointer-events-auto absolute top-4 right-4"
                   >
-                    🚩
+                    Report
                   </button>
                 </div>
                 
