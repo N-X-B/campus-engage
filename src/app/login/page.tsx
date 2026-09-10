@@ -22,11 +22,13 @@ export default function LoginPage() {
   const [resetMessage, setResetMessage] = useState('');
   
   const [loginState, setLoginState] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [isResetMode, setIsResetMode] = useState(false);
   const router = useRouter();
 
-    const handleResetPassword = async () => {
+    const handleResetPassword = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!email) {
-      setError('Please enter your university email first to reset your password.');
+      setError('Please enter your university email first.');
       setResetMessage('');
       return;
     }
@@ -34,10 +36,12 @@ export default function LoginPage() {
       setError('Cannot reset passwords in Demo Mode.');
       return;
     }
+    setLoginState('loading');
     try {
       await sendPasswordResetEmail(auth, email);
-      setResetMessage('Password reset link sent! Check your email inbox to create a new password.');
+      setResetMessage('Password reset link sent! Check your inbox.');
       setError('');
+      setIsResetMode(false); // Switch back to login view but keep the success message
     } catch (err: any) {
       if (err.code === 'auth/user-not-found') {
         setError('No account found with this email.');
@@ -45,6 +49,8 @@ export default function LoginPage() {
         setError('Failed to send reset email. Please try again.');
       }
       setResetMessage('');
+    } finally {
+      setLoginState('idle');
     }
   };
 
@@ -110,8 +116,10 @@ export default function LoginPage() {
               <Link href="/" className="text-xl font-bold tracking-tight text-white mb-2 inline-block">
                 CampusEngage.
               </Link>
-              <h1 className="text-2xl font-semibold text-white mt-4">Welcome back</h1>
-              <p className="text-sm text-zinc-400 mt-2">Sign in to your account to continue</p>
+              <h1 className="text-2xl font-semibold text-white mt-4">{isResetMode ? "Reset Password" : "Welcome back"}</h1>
+              <p className="text-sm text-zinc-400 mt-2">
+                {isResetMode ? "Enter your SRM AP email to receive a secure reset link." : "Sign in to your account to continue"}
+              </p>
             </div>
 
             {error && (
@@ -125,10 +133,10 @@ export default function LoginPage() {
               </motion.div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={isResetMode ? handleResetPassword : handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1" htmlFor="email">
-                  University Email
+                  SRM AP Email
                 </label>
                 <input
                   id="email"
@@ -137,35 +145,37 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loginState === 'loading'}
-                  placeholder="you@university.edu"
+                  placeholder="lastname_firstname@srmap.edu.in"
                   className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 backdrop-blur-md transition-all disabled:opacity-50"
                 />
               </div>
               
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-sm font-medium text-zinc-300" htmlFor="password">
-                    Password
-                  </label>
-                  <button 
-                    type="button" 
-                    onClick={handleResetPassword}
-                    className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loginState === 'loading'}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 backdrop-blur-md transition-all disabled:opacity-50"
-                />
-              </div>
+              {!isResetMode && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-sm font-medium text-zinc-300" htmlFor="password">
+                      Password
+                    </label>
+                    <button 
+                      type="button" 
+                      onClick={() => { setIsResetMode(true); setError(''); setResetMessage(''); }}
+                      className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+                  <input
+                    id="password"
+                    type="password"
+                    required={!isResetMode}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loginState === 'loading'}
+                    placeholder="••••••••"
+                    className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 backdrop-blur-md transition-all disabled:opacity-50"
+                  />
+                </motion.div>
+              )}
 
               <Button 
                 type="submit" 
@@ -174,8 +184,20 @@ export default function LoginPage() {
               >
                 {loginState === 'loading' ? (
                   <div className="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
-                ) : 'Sign In'}
+                ) : isResetMode ? 'Send Reset Link' : 'Sign In'}
               </Button>
+              
+              {isResetMode && (
+                 <div className="text-center mt-4">
+                   <button 
+                     type="button" 
+                     onClick={() => setIsResetMode(false)}
+                     className="text-sm font-bold text-zinc-400 hover:text-white transition-colors"
+                   >
+                     ← Back to Login
+                   </button>
+                 </div>
+              )}
             </form>
           </motion.div>
         ) : (
