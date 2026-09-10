@@ -524,7 +524,7 @@ export default function FeedPage() {
                 whileInView={{ opacity: 1, y: 0, filter: "blur(0px) brightness(1)" }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/5] flex flex-col group"
+                className="relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/5] flex flex-col group hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 cursor-pointer z-10"
               >
                 {/* Background Image */}
                 <div className="absolute inset-0 cursor-pointer" onClick={() => setSelectedProfileForBrief(p)}>

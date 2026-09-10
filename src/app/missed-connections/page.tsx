@@ -39,10 +39,18 @@ export default function MissedConnectionsPage() {
         </div>
         
         <div className="space-y-4">
-           <div className="text-center py-32 border border-dashed border-white/10 rounded-3xl bg-zinc-900/20">
-             <div className="text-4xl mb-4">🚧</div>
-             <h3 className="text-xl font-bold text-white mb-2">Undergoing Renovations</h3>
-             <p className="text-zinc-500 text-sm px-4">The {isIncognito ? 'confessions' : 'spotted'} section and posting have been temporarily disabled for a major upgrade.</p>
+           <div className="relative group cursor-default">
+             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 rounded-[2rem] blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50"></div>
+             <div className="relative w-full bg-black/50 backdrop-blur-xl p-10 rounded-[2rem] border border-white/10 flex flex-col items-center justify-center text-center shadow-2xl overflow-hidden group-hover:border-white/20 transition-all duration-300 min-h-[300px]">
+               <div className="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500/20 rounded-full blur-[50px] pointer-events-none"></div>
+               <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-[50px] pointer-events-none"></div>
+               
+               <div className="text-6xl mb-6 relative z-10 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">🚧</div>
+               <h3 className="text-2xl font-bold text-white mb-3 relative z-10">Undergoing Renovations</h3>
+               <p className="text-zinc-400 text-base max-w-sm relative z-10 leading-relaxed">
+                 The {isIncognito ? 'confessions' : 'spotted'} section is temporarily disabled for a major <span className="text-indigo-400 font-bold">Aura Engine</span> upgrade. We'll be back shortly.
+               </p>
+             </div>
            </div>
         </div>
       </main>

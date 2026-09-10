@@ -164,13 +164,13 @@ export default function InboxPage() {
                  const otherUser = allUsers.find(u => u.id === chat.otherUserId);
                  return (
                    <motion.div
-                     key={chat.id}
-                     initial={{ opacity: 0, y: 10 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     transition={{ duration: 0.2, delay: idx * 0.05 }}
-                   >
-                     <Link href={`/chat/${chat.id}`} className="flex items-center gap-4 p-4 rounded-3xl hover:bg-zinc-900/50 transition-colors border border-transparent hover:border-white/5">
-                       <div className="relative">
+                    key={chat.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: idx * 0.05 }}
+                  >
+                    <Link href={`/chat/${chat.id}`} className="flex items-center gap-4 p-4 rounded-3xl hover:bg-zinc-900/50 transition-all hover:scale-[1.02] hover:shadow-2xl border border-transparent hover:border-white/10 z-10 relative">
+                      <div className="relative">
                          <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-800 border border-white/10">
                            {otherUser?.photos?.[0] ? (
                              <img src={otherUser.photos[0]} alt="Profile" className="w-full h-full object-cover" />
