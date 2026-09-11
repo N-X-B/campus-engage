@@ -358,30 +358,50 @@ export default function InboxPage() {
                    <div className="flex items-center justify-between mb-3">
                      <div className="flex items-center gap-3">
                        <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-xl shadow-inner">
-                         🤫
+                         {unlockedCrushes['teaser'] ? '👀' : '🤫'}
                        </div>
                        <div>
                          <h4 className="text-rose-400 font-bold text-sm tracking-widest uppercase">Secret Admirer</h4>
                          <span className="text-[10px] text-zinc-500">Just now</span>
                        </div>
                      </div>
-                     <button 
-                       onClick={() => alert("Not enough Reveal Tokens! Go to the Feed and vote in Speed Bumps to earn them.")}
-                       className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/30 text-rose-500 hover:bg-rose-500 hover:text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-[0_0_10px_rgba(244,63,94,0.1)]"
-                     >
-                       <span>Unlock</span>
-                       <span className="opacity-75">(-1 🪙)</span>
-                     </button>
+                     {!unlockedCrushes['teaser'] && (
+                       <button 
+                         onClick={() => {
+                           if (tokens >= 1) {
+                             const newTokens = tokens - 1;
+                             localStorage.setItem('revealTokens', newTokens.toString());
+                             window.dispatchEvent(new Event('tokensUpdated'));
+                             
+                             const newUnlocked = { ...unlockedCrushes, ['teaser']: true };
+                             localStorage.setItem('unlockedCrushes', JSON.stringify(newUnlocked));
+                             setUnlockedCrushes(newUnlocked);
+                           } else {
+                             alert("Not enough Reveal Tokens! Go to the Feed and vote in Speed Bumps to earn them.");
+                           }
+                         }}
+                         className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/30 text-rose-500 hover:bg-rose-500 hover:text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-[0_0_10px_rgba(244,63,94,0.1)]"
+                       >
+                         <span>Unlock</span>
+                         <span className="opacity-75">(-1 🪙)</span>
+                       </button>
+                     )}
                    </div>
                    
-                   <div className="relative">
-                     <p className="text-white font-medium italic text-lg leading-snug blur-md select-none opacity-50">&quot;xxxxxx xx xxxx xxxx xx xxxx xxxx.&quot;</p>
-                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                       <div className="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 text-xs font-bold tracking-widest uppercase text-white shadow-xl flex items-center gap-2">
-                         <span>🔒</span> Locked Message
+                   {unlockedCrushes['teaser'] ? (
+                     <div className="text-white font-medium italic text-lg leading-snug">
+                       &quot;<ScrambleText text="Someone in your cs class thinks you have great vibes." />&quot;
+                     </div>
+                   ) : (
+                     <div className="relative">
+                       <p className="text-white font-medium italic text-lg leading-snug blur-md select-none opacity-50">&quot;xxxxxxx xx xxxx xx xxxxx xxxxxx xxx xxxx xxxxx xxxxx.&quot;</p>
+                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                         <div className="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 text-xs font-bold tracking-widest uppercase text-white shadow-xl flex items-center gap-2">
+                           <span>🔒</span> Locked Message
+                         </div>
                        </div>
                      </div>
-                   </div>
+                   )}
                  </motion.div>
 
                  <div className="text-center py-12 border border-dashed border-white/10 rounded-3xl mt-6">
