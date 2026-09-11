@@ -10,6 +10,7 @@ import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { collection, query, where, onSnapshot, getDocs, getDoc, updateDoc, doc, addDoc, deleteDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { ScrambleText } from '@/components/ScrambleText';
 
 export default function InboxPage() {
   const { user, loading } = useAuth();
@@ -17,6 +18,22 @@ export default function InboxPage() {
   const [conversations, setConversations] = useState<any[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [crushes, setCrushes] = useState<any[]>([]);
+  
+  // Dopamine Loop State
+  const [tokens, setTokens] = useState(0);
+  const [unlockedCrushes, setUnlockedCrushes] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    setTokens(parseInt(localStorage.getItem('revealTokens') || '0', 10));
+    setUnlockedCrushes(JSON.parse(localStorage.getItem('unlockedCrushes') || '{}'));
+    
+    const handleTokenUpdate = () => {
+      setTokens(parseInt(localStorage.getItem('revealTokens') || '0', 10));
+    };
+    window.addEventListener('tokensUpdated', handleTokenUpdate);
+    return () => window.removeEventListener('tokensUpdated', handleTokenUpdate);
+  }, []);
+
   const [view, setView] = useState<'messages' | 'invitations' | 'crushes'>('messages');
   const [isWiping, setIsWiping] = useState(false);
 
@@ -162,9 +179,15 @@ export default function InboxPage() {
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-8">
         <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2">Inbox</h1>
-            <p className="text-zinc-500 font-medium">Your campus connections.</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2">Inbox</h1>
+              <p className="text-zinc-500 font-medium">Your campus connections.</p>
+            </div>
+            <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)] ml-auto md:ml-4">
+              <span className="text-amber-500 font-black text-sm">{tokens}</span>
+              <span className="text-lg leading-none">🪙</span>
+            </div>
           </div>
           <div className="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">
             <button onClick={wipeAllChats} disabled={isWiping} className="text-[10px] bg-rose-500/20 text-rose-500 px-2 py-1 rounded border border-rose-500/30 uppercase tracking-widest font-bold hover:bg-rose-500/40">
@@ -325,14 +348,52 @@ export default function InboxPage() {
 
           {view === 'crushes' && (
              crushes.length === 0 ? (
-               <div className="text-center py-12 border border-dashed border-rose-500/20 rounded-3xl bg-rose-500/5">
-                 <div className="text-4xl mb-4">💌</div>
-                 <h3 className="text-white font-bold mb-2">No Secret Crushes yet</h3>
-                 <p className="text-zinc-500 text-sm">Post your link on Instagram to get some!</p>
+               <div className="space-y-3">
+                 <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-zinc-900 border border-white/5 p-5 rounded-3xl relative overflow-hidden"
+                 >
+                   <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-[50px] pointer-events-none" />
+                   <div className="flex items-center justify-between mb-3">
+                     <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-xl shadow-inner">
+                         🤫
+                       </div>
+                       <div>
+                         <h4 className="text-rose-400 font-bold text-sm tracking-widest uppercase">Secret Admirer</h4>
+                         <span className="text-[10px] text-zinc-500">Just now</span>
+                       </div>
+                     </div>
+                     <button 
+                       onClick={() => alert("Not enough Reveal Tokens! Go to the Feed and vote in Speed Bumps to earn them.")}
+                       className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/30 text-rose-500 hover:bg-rose-500 hover:text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-[0_0_10px_rgba(244,63,94,0.1)]"
+                     >
+                       <span>Unlock</span>
+                       <span className="opacity-75">(-1 🪙)</span>
+                     </button>
+                   </div>
+                   
+                   <div className="relative">
+                     <p className="text-white font-medium italic text-lg leading-snug blur-md select-none opacity-50">&quot;xxxxxx xx xxxx xxxx xx xxxx xxxx.&quot;</p>
+                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                       <div className="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 text-xs font-bold tracking-widest uppercase text-white shadow-xl flex items-center gap-2">
+                         <span>🔒</span> Locked Message
+                       </div>
+                     </div>
+                   </div>
+                 </motion.div>
+
+                 <div className="text-center py-12 border border-dashed border-white/10 rounded-3xl mt-6">
+                   <div className="text-4xl mb-4">🔗</div>
+                   <h3 className="text-white font-bold mb-2">Want more Secret Crushes?</h3>
+                   <p className="text-zinc-500 text-sm">Post your link on Instagram to get real ones!</p>
+                 </div>
                </div>
              ) : (
                <div className="space-y-3">
                  {crushes.map((crush, idx) => {
+                   const isUnlocked = unlockedCrushes[crush.id];
                    return (
                      <motion.div
                       key={crush.id}
@@ -342,18 +403,55 @@ export default function InboxPage() {
                       className="bg-zinc-900 border border-white/5 p-5 rounded-3xl relative overflow-hidden"
                      >
                        <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-[50px] pointer-events-none" />
-                       <div className="flex items-center gap-3 mb-3">
-                         <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-xl shadow-inner">
-                           🤫
+                       <div className="flex items-center justify-between mb-3">
+                         <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-xl shadow-inner">
+                             {isUnlocked ? '👀' : '🤫'}
+                           </div>
+                           <div>
+                             <h4 className="text-rose-400 font-bold text-sm tracking-widest uppercase">Secret Admirer</h4>
+                             <span className="text-[10px] text-zinc-500">
+                               {crush.timestamp ? new Date(crush.timestamp.toMillis()).toLocaleDateString() : 'Just now'}
+                             </span>
+                           </div>
                          </div>
-                         <div>
-                           <h4 className="text-rose-400 font-bold text-sm tracking-widest uppercase">Secret Admirer</h4>
-                           <span className="text-[10px] text-zinc-500">
-                             {crush.timestamp ? new Date(crush.timestamp.toMillis()).toLocaleDateString() : 'Just now'}
-                           </span>
-                         </div>
+                         {!isUnlocked && (
+                           <button 
+                             onClick={() => {
+                               if (tokens >= 1) {
+                                 const newTokens = tokens - 1;
+                                 localStorage.setItem('revealTokens', newTokens.toString());
+                                 window.dispatchEvent(new Event('tokensUpdated'));
+                                 
+                                 const newUnlocked = { ...unlockedCrushes, [crush.id]: true };
+                                 localStorage.setItem('unlockedCrushes', JSON.stringify(newUnlocked));
+                                 setUnlockedCrushes(newUnlocked);
+                               } else {
+                                 alert("Not enough Reveal Tokens! Go to the Feed and vote in Speed Bumps to earn them.");
+                               }
+                             }}
+                             className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/30 text-rose-500 hover:bg-rose-500 hover:text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-[0_0_10px_rgba(244,63,94,0.1)]"
+                           >
+                             <span>Unlock</span>
+                             <span className="opacity-75">(-1 🪙)</span>
+                           </button>
+                         )}
                        </div>
-                       <p className="text-white font-medium italic text-lg leading-snug">&quot;{crush.message}&quot;</p>
+                       
+                       {isUnlocked ? (
+                         <div className="text-white font-medium italic text-lg leading-snug">
+                           &quot;<ScrambleText text={crush.message} />&quot;
+                         </div>
+                       ) : (
+                         <div className="relative">
+                           <p className="text-white font-medium italic text-lg leading-snug blur-md select-none opacity-50">&quot;{crush.message.replace(/[a-zA-Z]/g, 'x')}&quot;</p>
+                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                             <div className="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 text-xs font-bold tracking-widest uppercase text-white shadow-xl flex items-center gap-2">
+                               <span>🔒</span> Locked Message
+                             </div>
+                           </div>
+                         </div>
+                       )}
                      </motion.div>
                    );
                  })}

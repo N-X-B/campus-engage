@@ -13,6 +13,8 @@ import { calculateMatchScore } from '@/lib/matchAlgorithm';
 import { getTopMatches } from '@/app/actions/matchmaking';
 import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import SpeedBumpModal from '@/components/SpeedBumpModal';
+import VibeMatchScreen from '@/components/VibeMatchScreen';
 
 
 const INTEREST_GROUPS = {
@@ -59,7 +61,24 @@ export default function FeedPage() {
   const [shatterPos, setShatterPos] = useState<{x: number, y: number, width: number} | null>(null);
   const [selectedProfileForBrief, setSelectedProfileForBrief] = useState<any | null>(null);
 
+  // Dopamine Loop State
+  const [tokens, setTokens] = useState(0);
+  const [speedBumpOpen, setSpeedBumpOpen] = useState(false);
+  const [speedBumpProfiles, setSpeedBumpProfiles] = useState<any[]>([]);
+  const [vibeMatchOpen, setVibeMatchOpen] = useState(false);
+  const [vibeMatchData, setVibeMatchData] = useState<any>(null);
+
   useEffect(() => {
+    // Load initial tokens
+    setTokens(parseInt(localStorage.getItem('revealTokens') || '0', 10));
+    
+    // Listen for token updates
+    const handleTokenUpdate = () => {
+      setTokens(parseInt(localStorage.getItem('revealTokens') || '0', 10));
+    };
+    window.addEventListener('tokensUpdated', handleTokenUpdate);
+    return () => window.removeEventListener('tokensUpdated', handleTokenUpdate);
+  }, []);  useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
@@ -263,6 +282,10 @@ export default function FeedPage() {
          setSendingPrompt(null);
          setSentSuccess(false);
          setProfiles(prev => prev.filter(p => p.id !== selectedUser.id));
+         
+         // Trigger Vibe Match Screen!
+         setVibeMatchData(selectedUser);
+         setVibeMatchOpen(true);
       }, 1000);
     }, 400); // Tiny fake delay to feel the button click
 
@@ -523,7 +546,13 @@ export default function FeedPage() {
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Your Daily Batch</h1>
             <p className="text-zinc-400 mt-1">Curated picks, refreshing at midnight.</p>
           </div>
-          {isDemoMode && <span className="text-xs bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold border border-orange-500/30">DEMO MODE</span>}
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+              <span className="text-amber-500 font-black text-sm">{tokens}</span>
+              <span className="text-lg leading-none">🪙</span>
+            </div>
+            {isDemoMode && <span className="text-xs bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold border border-orange-500/30">DEMO MODE</span>}
+          </div>
         </div>
 
         {/* Intent / Domain Selector */}
@@ -576,8 +605,34 @@ export default function FeedPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
-            {profiles.map((p, index) => (
-              <motion.div 
+            {profiles.map((p, index) => {
+              const isSpeedBumpIndex = index > 0 && index % 6 === 0;
+              return (
+                <div key={p.id} className="contents">
+                  {isSpeedBumpIndex && (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true, margin: "-100px" }}
+                      onClick={() => {
+                         setSpeedBumpProfiles([profiles[index-1], p]);
+                         setSpeedBumpOpen(true);
+                      }}
+                      className="relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[3/4] flex flex-col items-center justify-center group hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(244,63,94,0.3)] transition-all duration-500 cursor-pointer z-10 border border-rose-500/30"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/20 to-indigo-500/20 animate-pulse pointer-events-none" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/5 rounded-full blur-[40px] pointer-events-none" />
+                      
+                      <div className="text-[4rem] mb-2 animate-bounce">🪙</div>
+                      <h3 className="text-2xl font-black text-white tracking-tight uppercase italic mb-2 text-center px-4">Vibe Check</h3>
+                      <p className="text-zinc-400 font-bold text-sm text-center px-6">Earn 1 Reveal Token</p>
+                      
+                      <div className="absolute bottom-6 bg-white text-black px-6 py-2 rounded-full font-black uppercase text-xs tracking-widest shadow-xl group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                        Start
+                      </div>
+                    </motion.div>
+                  )}
+                  <motion.div 
                 key={p.id}
                 initial={{ opacity: 0, y: 100, filter: "blur(40px) brightness(2)" }}
                 whileInView={{ opacity: 1, y: 0, filter: "blur(0px) brightness(1)" }}
@@ -654,7 +709,9 @@ export default function FeedPage() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
       
@@ -705,6 +762,20 @@ export default function FeedPage() {
       </AnimatePresence>
       </main>
 
+      <SpeedBumpModal 
+        isOpen={speedBumpOpen} 
+        onComplete={() => setSpeedBumpOpen(false)} 
+        profileA={speedBumpProfiles[0]} 
+        profileB={speedBumpProfiles[1]} 
+        prompt="Who's more likely to start a billion-dollar startup?" 
+      />
+
+      <VibeMatchScreen 
+        isOpen={vibeMatchOpen}
+        onClose={() => setVibeMatchOpen(false)}
+        matchedName={vibeMatchData?.name || ''}
+        matchedPhoto={vibeMatchData?.photos?.[0] || ''}
+      />
     </div>
     </>
   );
