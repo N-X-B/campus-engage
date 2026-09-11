@@ -240,29 +240,54 @@ export default function FeedPage() {
   const handlePulseClick = (e: any) => {
     e.stopPropagation();
     const currentTokens = parseInt(localStorage.getItem('revealTokens') || '0', 10);
-    if (currentTokens < 5) {
-      alert("You need 5 Reveal Tokens to send a Pulse! Earn them by voting in Speed Bumps.");
+    if (currentTokens < 20) {
+      alert("You need 20 Reveal Tokens to send a Pulse! Earn them by voting in Speed Bumps.");
       return;
     }
     
-    // Deduct 5 tokens
-    localStorage.setItem('revealTokens', (currentTokens - 5).toString());
+    // Deduct 20 tokens
+    localStorage.setItem('revealTokens', (currentTokens - 20).toString());
     window.dispatchEvent(new Event('tokensUpdated'));
     
-    // Trigger intense haptics & CSS
+    // Trigger intense haptics (Mobile only)
     if (navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 500]);
     }
     
-    // Visual flash
+    // Desktop/Laptop Visual Haptics (Screen Shake) + Red Flash
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes severe-shake {
+        0% { transform: translate(2px, 1px) rotate(0deg); }
+        10% { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(3px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(3px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(1px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
+      }
+      .shake-effect { animation: severe-shake 0.1s infinite; }
+    `;
+    document.head.appendChild(style);
+    document.body.classList.add('shake-effect');
+
     const flash = document.createElement('div');
     flash.className = 'fixed inset-0 bg-red-600/40 z-[9999] pointer-events-none transition-opacity duration-1000 opacity-100 mix-blend-screen';
     document.body.appendChild(flash);
     
+    setTimeout(() => { 
+      document.body.classList.remove('shake-effect');
+      style.remove();
+    }, 500); // 500ms shake
+
     setTimeout(() => { flash.style.opacity = '0'; }, 100);
     setTimeout(() => { flash.remove(); }, 1100);
     
-    alert("Pulse Sent! 🫀 Their phone will physically vibrate when they open this.");
+    alert("Pulse Sent! 🫀 Their phone (or screen) will physically vibrate/shake when they open this.");
   };
 
   const handleBreakIceClick = (e: any, p: any, isModal: boolean = false) => {
@@ -524,7 +549,7 @@ export default function FeedPage() {
                          >
                            <div className="absolute inset-0 bg-gradient-to-t from-rose-500/20 to-transparent opacity-0 group-hover:opacity-100 transition" />
                            <span className="text-2xl group-hover:scale-125 transition">🫀</span>
-                           <span className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-70 group-hover:opacity-100">5 🪙</span>
+                           <span className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-70 group-hover:opacity-100">20 🪙</span>
                          </motion.button>
                        </>
                      )}
