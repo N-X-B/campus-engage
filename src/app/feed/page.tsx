@@ -15,6 +15,7 @@ import { Navigation } from '@/components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpeedBumpModal from '@/components/SpeedBumpModal';
 import VibeMatchScreen from '@/components/VibeMatchScreen';
+import { TokenBadge } from '@/components/TokenBadge';
 
 
 const INTEREST_GROUPS = {
@@ -234,6 +235,34 @@ export default function FeedPage() {
          console.error("Failed to block user", err);
       }
     }
+  };
+
+  const handlePulseClick = (e: any) => {
+    e.stopPropagation();
+    const currentTokens = parseInt(localStorage.getItem('revealTokens') || '0', 10);
+    if (currentTokens < 5) {
+      alert("You need 5 Reveal Tokens to send a Pulse! Earn them by voting in Speed Bumps.");
+      return;
+    }
+    
+    // Deduct 5 tokens
+    localStorage.setItem('revealTokens', (currentTokens - 5).toString());
+    window.dispatchEvent(new Event('tokensUpdated'));
+    
+    // Trigger intense haptics & CSS
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200, 100, 500]);
+    }
+    
+    // Visual flash
+    const flash = document.createElement('div');
+    flash.className = 'fixed inset-0 bg-red-600/40 z-[9999] pointer-events-none transition-opacity duration-1000 opacity-100 mix-blend-screen';
+    document.body.appendChild(flash);
+    
+    setTimeout(() => { flash.style.opacity = '0'; }, 100);
+    setTimeout(() => { flash.remove(); }, 1100);
+    
+    alert("Pulse Sent! 🫀 Their phone will physically vibrate when they open this.");
   };
 
   const handleBreakIceClick = (e: any, p: any, isModal: boolean = false) => {
@@ -484,19 +513,32 @@ export default function FeedPage() {
                    </div>
                  )}
 
-                 <div className="relative h-16 w-full mt-4">
+                 <div className="relative w-full mt-4 flex gap-2 h-16">
                    <AnimatePresence>
                      {breakingIceId === selectedProfileForBrief.id ? (
                         <div className="absolute inset-0 pointer-events-none" />
                      ) : (
-                       <motion.button 
-                         key="btn"
-                         exit={{ opacity: 0, scale: 1.1 }}
-                         onClick={(e) => handleBreakIceClick(e, selectedProfileForBrief, true)} 
-                         className="absolute inset-0 w-full bg-white text-black rounded-2xl py-4 font-bold text-lg hover:bg-zinc-200 transition shadow-lg hover:-translate-y-1 flex items-center justify-center gap-2"
-                       >
-                         Break the Ice 🧊
-                       </motion.button>
+                       <>
+                         <motion.button 
+                           key="btn-ice"
+                           exit={{ opacity: 0, scale: 1.1 }}
+                           onClick={(e) => handleBreakIceClick(e, selectedProfileForBrief, true)} 
+                           className="flex-1 bg-white text-black rounded-2xl py-4 font-bold text-lg hover:bg-zinc-200 transition shadow-lg hover:-translate-y-1 flex items-center justify-center gap-2"
+                         >
+                           Break the Ice 🧊
+                         </motion.button>
+                         
+                         <motion.button 
+                           key="btn-pulse"
+                           exit={{ opacity: 0, scale: 1.1 }}
+                           onClick={handlePulseClick} 
+                           className="w-20 bg-rose-500/10 text-rose-500 border border-rose-500/30 rounded-2xl flex flex-col items-center justify-center hover:bg-rose-500 hover:text-white transition group relative overflow-hidden"
+                         >
+                           <div className="absolute inset-0 bg-gradient-to-t from-rose-500/20 to-transparent opacity-0 group-hover:opacity-100 transition" />
+                           <span className="text-2xl group-hover:scale-125 transition">🫀</span>
+                           <span className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-70 group-hover:opacity-100">5 🪙</span>
+                         </motion.button>
+                       </>
                      )}
                    </AnimatePresence>
                  </div>
@@ -567,10 +609,7 @@ export default function FeedPage() {
             <p className="text-zinc-400 mt-1">Curated picks, refreshing at midnight.</p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-              <span className="text-amber-500 font-black text-sm">{tokens}</span>
-              <span className="text-lg leading-none">🪙</span>
-            </div>
+            <TokenBadge tokens={tokens} />
             {isDemoMode && <span className="text-xs bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-bold border border-orange-500/30">DEMO MODE</span>}
           </div>
         </div>
@@ -658,8 +697,13 @@ export default function FeedPage() {
                 whileInView={{ opacity: 1, y: 0, filter: "blur(0px) brightness(1)" }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[3/4] flex flex-col group hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 cursor-pointer z-10"
+                className={`relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[3/4] flex flex-col group hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 cursor-pointer z-10 ${index % 5 === 2 ? 'ring-2 ring-rose-500 shadow-[0_0_30px_rgba(244,63,94,0.3)]' : ''}`}
               >
+                {index % 5 === 2 && (
+                  <div className="absolute top-4 left-4 z-20 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg border border-white/20 flex items-center gap-1">
+                    <span className="animate-pulse">🔥</span> Synergy Active
+                  </div>
+                )}
                 {/* Background Image */}
                 <div className="absolute inset-0 cursor-pointer" onClick={() => setSelectedProfileForBrief(p)}>
                   {p.photos && p.photos.length > 0 ? (
@@ -711,19 +755,31 @@ export default function FeedPage() {
                     )}
                   </div>
                   
-                  <div className="pointer-events-auto relative h-12 w-full">
+                  <div className="pointer-events-auto relative w-full flex gap-2 h-12">
                     <AnimatePresence>
                       {breakingIceId === p.id ? (
                         <div className="absolute inset-0 pointer-events-none" />
                       ) : (
-                        <motion.button 
-                          key="btn"
-                          exit={{ opacity: 0, scale: 1.1 }}
-                          onClick={(e) => handleBreakIceClick(e, p)} 
-                          className="absolute inset-0 w-full bg-white/10 hover:bg-white/20 bg-zinc-800/80 backdrop-blur-md border border-white/20 text-white rounded-xl py-3 font-bold text-sm transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
-                        >
-                          Break the Ice 🧊
-                        </motion.button>
+                        <>
+                          <motion.button 
+                            key="btn-ice"
+                            exit={{ opacity: 0, scale: 1.1 }}
+                            onClick={(e) => handleBreakIceClick(e, p)} 
+                            className="flex-1 bg-white/10 hover:bg-white/20 bg-zinc-800/80 backdrop-blur-md border border-white/20 text-white rounded-xl py-3 font-bold text-sm transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
+                          >
+                            Break the Ice 🧊
+                          </motion.button>
+                          
+                          <motion.button 
+                            key="btn-pulse"
+                            exit={{ opacity: 0, scale: 1.1 }}
+                            onClick={handlePulseClick} 
+                            className="w-14 bg-rose-500/20 text-rose-500 border border-rose-500/40 rounded-xl flex flex-col items-center justify-center hover:bg-rose-500 hover:text-white transition group relative overflow-hidden backdrop-blur-md"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-t from-rose-500/20 to-transparent opacity-0 group-hover:opacity-100 transition" />
+                            <span className="text-xl group-hover:scale-125 transition">🫀</span>
+                          </motion.button>
+                        </>
                       )}
                     </AnimatePresence>
                   </div>

@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { collection, query, where, onSnapshot, getDocs, getDoc, updateDoc, doc, addDoc, deleteDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ScrambleText } from '@/components/ScrambleText';
+import { TokenBadge } from '@/components/TokenBadge';
 
 export default function InboxPage() {
   const { user, loading } = useAuth();
@@ -184,9 +185,8 @@ export default function InboxPage() {
               <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2">Inbox</h1>
               <p className="text-zinc-500 font-medium">Your campus connections.</p>
             </div>
-            <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)] ml-auto md:ml-4">
-              <span className="text-amber-500 font-black text-sm">{tokens}</span>
-              <span className="text-lg leading-none">🪙</span>
+            <div className="ml-auto md:ml-4">
+              <TokenBadge tokens={tokens} />
             </div>
           </div>
           <div className="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">

@@ -46,6 +46,7 @@ export default function SpeedBumpModal({ isOpen, onComplete, profileA, profileB,
     // Add token
     const currentTokens = parseInt(localStorage.getItem('revealTokens') || '0', 10);
     localStorage.setItem('revealTokens', (currentTokens + 1).toString());
+    localStorage.setItem('lastTokenEarned', Date.now().toString());
     
     // Dispatch event so other tabs/components can update
     window.dispatchEvent(new Event('tokensUpdated'));
