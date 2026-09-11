@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { haptic } from '@/lib/haptics';
 import { collection, addDoc, onSnapshot, query, orderBy, getDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { toxicWords } from "@/lib/toxicWords";
 import { TokenBadge } from '@/components/TokenBadge';
 
 export default function SpottedPage() {
@@ -102,11 +103,25 @@ export default function SpottedPage() {
       return;
     }
 
-    // Basic local filter (Simulation)
+    
+    // Basic local filter
     const lower = composeText.toLowerCase();
-    const toxicWords = ['bitch', 'fuck', 'slut', 'whore', 'ugly', 'die', 'kill', 'hate'];
-    if (toxicWords.some(w => lower.includes(w))) {
-      alert("🚨 Profile blocked: Your confession contains toxic language. Keep it positive or dramatic, not harmful.");
+    
+    // We check if the text contains any of the exact substrings. 
+    // For a confession app, blocking substrings like "mc" might flag "hamburger mc", 
+    // so we pad with spaces for short acronyms, but for safety we'll use regex word boundaries.
+    
+    const containsToxic = toxicWords.some(w => {
+      // For short acronyms like 'bc' or 'mc', ensure they are standalone words
+      if (w.length <= 3) {
+        const regex = new RegExp(`\\b${w}\\b`, 'i');
+        return regex.test(lower);
+      }
+      return lower.includes(w);
+    });
+
+    if (containsToxic) {
+      alert("🚨 Blocked: Your confession contains inappropriate or toxic language. Keep it positive or dramatic, not harmful.");
       return;
     }
 
