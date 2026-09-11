@@ -82,6 +82,8 @@ export default function OnboardingWizard() {
   const [skipClass, setSkipClass] = useState('');
   const [stressLevel, setStressLevel] = useState('');
   const [hotTake, setHotTake] = useState('');
+  const [groupProjectRole, setGroupProjectRole] = useState('');
+  const [dormEssential, setDormEssential] = useState('');
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -237,12 +239,12 @@ export default function OnboardingWizard() {
          updateDoc(doc(db, 'users', user.uid), { course, year, branch, gender }).catch(console.error);
        }
     } else if (step === 3) {
-       if (!studyVibe || !weekendVibe || !skipClass) {
+       if (!studyVibe || !weekendVibe || !skipClass || !groupProjectRole) {
           setError("Please answer all vibe checks."); return;
        }
        
        if (user && !isDemoMode) {
-         updateDoc(doc(db, 'users', user.uid), { studyVibe, weekendVibe, skipClass }).catch(console.error);
+         updateDoc(doc(db, 'users', user.uid), { studyVibe, weekendVibe, skipClass, groupProjectRole }).catch(console.error);
        }
     }
     
@@ -276,7 +278,7 @@ export default function OnboardingWizard() {
        return;
     }
 
-    if (!course || !year || !branch || !gender || !bio || !hotTake) {
+    if (!course || !year || !branch || !gender || !bio || !hotTake || !stressLevel || !dormEssential) {
        setError("⚠️ Please ensure all fields across all steps are fully filled out before completing your profile.");
        return;
     }
@@ -299,6 +301,8 @@ export default function OnboardingWizard() {
         weekendVibe: weekendVibe || "Downtown Bar", 
         skipClass: skipClass || "Cafe / Canteen",
         stressLevel: stressLevel || "12 hours before", 
+        groupProjectRole: groupProjectRole || "The CEO",
+        dormEssential: dormEssential || "Noise-cancelling headphones",
         hotTake: hotTake 
       };
       
@@ -612,6 +616,17 @@ export default function OnboardingWizard() {
                           ))}
                         </div>
                       </div>
+
+                      <div>
+                        <label className="block text-base font-semibold text-white mb-4">In a group project, you are...</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {["The CEO (Does Everything)", "The Ghost (MIA)", "The Hype Man"].map(opt => (
+                            <button key={opt} onClick={() => setGroupProjectRole(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${groupProjectRole === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -629,6 +644,17 @@ export default function OnboardingWizard() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {["A week early", "12 hours before"].map(opt => (
                             <button key={opt} onClick={() => setStressLevel(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${stressLevel === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-semibold text-white mb-4">Dorm survival essential?</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {["Noise-canceling headphones", "Mini-fridge", "LED Strip Lights"].map(opt => (
+                            <button key={opt} onClick={() => setDormEssential(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${dormEssential === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
                           ))}
