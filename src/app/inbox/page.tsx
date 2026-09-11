@@ -161,25 +161,25 @@ export default function InboxPage() {
       <Navigation />
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-8">
-        <div className="flex justify-between items-end mb-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2">Inbox</h1>
             <p className="text-zinc-500 font-medium">Your campus connections.</p>
           </div>
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">
             <button onClick={wipeAllChats} disabled={isWiping} className="text-[10px] bg-rose-500/20 text-rose-500 px-2 py-1 rounded border border-rose-500/30 uppercase tracking-widest font-bold hover:bg-rose-500/40">
               {isWiping ? 'Wiping...' : 'Wipe All Chats'}
             </button>
-            <div className="flex gap-2 bg-zinc-900/50 p-1 rounded-xl border border-white/5">
+            <div className="flex gap-2 bg-zinc-900/50 p-1 rounded-xl border border-white/5 overflow-x-auto w-full md:w-auto no-scrollbar">
               <button 
                 onClick={() => setView('messages')}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${view === 'messages' ? 'bg-indigo-500 text-white' : 'text-zinc-500 hover:text-white'}`}
+                className={`px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition-colors whitespace-nowrap ${view === 'messages' ? 'bg-indigo-500 text-white' : 'text-zinc-500 hover:text-white'}`}
               >
                 Messages
               </button>
               <button 
                 onClick={() => setView('invitations')}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors relative ${view === 'invitations' ? 'bg-indigo-500 text-white' : 'text-zinc-500 hover:text-white'}`}
+                className={`px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition-colors relative whitespace-nowrap ${view === 'invitations' ? 'bg-indigo-500 text-white' : 'text-zinc-500 hover:text-white'}`}
               >
                 Invitations
                 {pendingRequests.length > 0 && (
@@ -190,7 +190,7 @@ export default function InboxPage() {
               </button>
               <button 
                 onClick={() => setView('crushes')}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors relative ${view === 'crushes' ? 'bg-rose-500 text-white' : 'text-zinc-500 hover:text-white'}`}
+                className={`px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition-colors relative whitespace-nowrap ${view === 'crushes' ? 'bg-rose-500 text-white' : 'text-zinc-500 hover:text-white'}`}
               >
                 Crushes
                 {crushes.length > 0 && (

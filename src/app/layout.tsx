@@ -14,6 +14,12 @@ export const viewport = {
 export const metadata: Metadata = {
   title: "CampusEngage",
   description: "Meaningful connections start here.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Campus",
+  },
 };
 
 export default function RootLayout({
