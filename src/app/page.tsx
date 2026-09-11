@@ -184,7 +184,7 @@ export default function Home() {
           </motion.h1>
           
           <motion.p 
-            className="text-xl md:text-3xl lg:text-4xl text-zinc-400 font-medium max-w-5xl mx-auto mb-16 drop-shadow-xl leading-relaxed"
+            className="text-base md:text-xl lg:text-2xl text-zinc-400 font-medium max-w-3xl mx-auto mb-12 drop-shadow-xl leading-relaxed"
             initial={{ opacity: 0, filter: "blur(20px)", y: 20 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 1.5, delay: 1 }}
@@ -201,7 +201,7 @@ export default function Home() {
             <MagneticButton>
               <Link href="/register" className="inline-block relative group cursor-none">
                  <div className="absolute -inset-2 bg-white opacity-10 blur-xl group-hover:opacity-30 transition duration-500 rounded-full"></div>
-                 <div className="relative bg-white text-black px-12 py-6 rounded-full font-black text-xl md:text-3xl transition-all duration-300 group-hover:scale-105 border border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                 <div className="relative bg-white text-black px-8 py-4 rounded-full font-bold text-base md:text-lg transition-all duration-300 group-hover:scale-105 border border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
                    Join the Network
                  </div>
               </Link>
@@ -236,7 +236,7 @@ export default function Home() {
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           >
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mb-6 leading-[1.1]">Stop Swiping.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 to-zinc-700">Start scrolling.</span></h2>
-            <p className="text-base md:text-xl lg:text-2xl text-zinc-400 mb-8 leading-relaxed max-w-lg">
+            <p className="text-base md:text-lg lg:text-xl text-zinc-400 mb-8 leading-relaxed max-w-lg">
               We scrapped the boring swiping mechanics. Experience a premium, immersive vertical feed that feels more like a modern social network than a corporate directory.
             </p>
           </motion.div>
@@ -304,8 +304,8 @@ export default function Home() {
             <div className="inline-block border border-white/10 rounded-full px-4 py-1.5 mb-6 bg-white/5 backdrop-blur-md">
               <span className="text-zinc-400 font-bold text-xs uppercase tracking-widest">Powered by AI</span>
             </div>
-            <h2 className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tighter mb-6 leading-tight">The Mathematics of Vibes.</h2>
-            <p className="text-base md:text-xl lg:text-2xl text-zinc-400 max-w-2xl mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
+            <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter mb-6 leading-tight">The Mathematics of Vibes.</h2>
+            <p className="text-base md:text-lg lg:text-xl text-zinc-400 max-w-2xl mx-auto">Our matchmaking engine calculates compatibility using semantic embeddings and campus-specific parameters.</p>
           </motion.div>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
@@ -396,35 +396,35 @@ export default function Home() {
           >
           </motion.div>
           <div className="text-center mb-24">
-            <h2 className="text-4xl md:text-6xl lg:text-[7rem] font-bold tracking-tighter mb-8 leading-none">System Architecture.</h2>
-            <p className="text-lg md:text-2xl text-zinc-500">Three simple steps to build your network on campus.</p>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-6 leading-none">System Architecture.</h2>
+            <p className="text-base md:text-lg lg:text-xl text-zinc-500">Three simple steps to build your network on campus.</p>
           </div>
 
-          <div className="max-w-6xl mx-auto space-y-32">
+          <div className="max-w-5xl mx-auto space-y-24">
             {/* Step 1 */}
             <div className="flex flex-col md:flex-row items-center gap-12 group cursor-none">
-              <div className="text-[8rem] lg:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-64 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">01</div>
+              <div className="text-[6rem] lg:text-[8rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-48 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">01</div>
               <div>
-                <h3 className="text-2xl md:text-4xl font-bold mb-4 tracking-tight">Onboard in 60s</h3>
-                <p className="text-zinc-400 text-lg md:text-xl leading-relaxed max-w-2xl">Fill out the quick, 4-step Vibe Check wizard. We ask you rapid-fire questions about your campus habits—like whether you write essays a week early or 12 hours before the deadline.</p>
+                <h3 className="text-xl md:text-3xl font-bold mb-4 tracking-tight">Onboard in 60s</h3>
+                <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-xl">Fill out the quick, 4-step Vibe Check wizard. We ask you rapid-fire questions about your campus habits—like whether you write essays a week early or 12 hours before the deadline.</p>
               </div>
             </div>
 
             {/* Step 2 */}
             <div className="flex flex-col md:flex-row items-center gap-12 group cursor-none">
-              <div className="text-[8rem] lg:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-64 flex-shrink-0 md:order-last text-right leading-none group-hover:from-zinc-600 transition-all duration-700">02</div>
+              <div className="text-[6rem] lg:text-[8rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-48 flex-shrink-0 md:order-last text-right leading-none group-hover:from-zinc-600 transition-all duration-700">02</div>
               <div className="md:text-right">
-                <h3 className="text-2xl md:text-4xl font-bold mb-4 tracking-tight">Algorithmic Pairing</h3>
-                <p className="text-zinc-400 text-lg md:text-xl leading-relaxed max-w-2xl ml-auto">Our system computes a precise Matchability Factor™ out of 100% by comparing your answers to everyone else in your university. The highest matches are instantly pushed to the top of your feed.</p>
+                <h3 className="text-xl md:text-3xl font-bold mb-4 tracking-tight">Algorithmic Pairing</h3>
+                <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-xl ml-auto">Our system computes a precise Matchability Factor™ out of 100% by comparing your answers to everyone else in your university. The highest matches are instantly pushed to the top of your feed.</p>
               </div>
             </div>
 
             {/* Step 3 */}
             <div className="flex flex-col md:flex-row items-center gap-12 group cursor-none">
-              <div className="text-[8rem] lg:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-64 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">03</div>
+              <div className="text-[6rem] lg:text-[8rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-zinc-800 to-black w-48 flex-shrink-0 leading-none group-hover:from-zinc-600 transition-all duration-700">03</div>
               <div>
-                <h3 className="text-2xl md:text-4xl font-bold mb-4 tracking-tight">Break the Ice</h3>
-                <p className="text-zinc-400 text-lg md:text-xl leading-relaxed max-w-2xl">Click on a profile to view their brief. If the vibe is right, tap the Icebreaker button. We'll automatically generate a highly contextual conversation starter and drop you directly into a private chat.</p>
+                <h3 className="text-xl md:text-3xl font-bold mb-4 tracking-tight">Break the Ice</h3>
+                <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-xl">Click on a profile to view their brief. If the vibe is right, tap the Icebreaker button. We'll automatically generate a highly contextual conversation starter and drop you directly into a private chat.</p>
               </div>
             </div>
           </div>
@@ -435,11 +435,11 @@ export default function Home() {
       <section className="py-24 md:py-40 px-4 text-center relative overflow-hidden bg-black border-t border-white/5">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/20 via-black to-black pointer-events-none" />
         <div className="relative z-10 max-w-5xl mx-auto">
-          <h2 className="text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter mb-12 text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600">READY?</h2>
+          <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-10 text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600">READY?</h2>
           <motion.div whileHover={{ scale: 1.05 }} className="inline-block">
              <Link href="/register" className="relative group cursor-none inline-block">
                <div className="absolute -inset-4 bg-indigo-500/20 blur-xl group-hover:bg-indigo-500/40 transition duration-500 rounded-full"></div>
-               <div className="relative bg-white text-black px-12 py-6 rounded-full font-black text-2xl md:text-3xl transition-all duration-500 group-hover:scale-110 shadow-[0_0_50px_rgba(255,255,255,0.15)]">
+               <div className="relative bg-white text-black px-8 py-4 rounded-full font-bold text-base md:text-lg transition-all duration-500 group-hover:scale-110 shadow-[0_0_50px_rgba(255,255,255,0.15)]">
                  Create Profile
                </div>
              </Link>
