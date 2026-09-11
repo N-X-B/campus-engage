@@ -469,19 +469,7 @@ export default function FeedPage() {
                  )}
                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
                  
-                 <div className="absolute top-4 right-4 flex gap-2">
-                   <button 
-                     onClick={(e) => {
-                       if (window.confirm(`Are you sure you want to report and block ${selectedProfileForBrief.name}?`)) {
-                         handleBlockUser(e, selectedProfileForBrief);
-                       } else {
-                         e.stopPropagation();
-                       }
-                     }}
-                     className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-wider px-2"
-                   >
-                     Report
-                   </button>
+                 <div className="absolute top-4 right-4 z-20 flex items-center">
                    <button onClick={() => setSelectedProfileForBrief(null)} className="w-10 h-10 bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10 ml-2">
                      ✕
                    </button>
@@ -719,20 +707,6 @@ export default function FeedPage() {
                 <div className="absolute top-5 left-5 right-5 flex justify-between z-10">
                   {/* MATCH SCORE HIDDEN PER USER REQUEST */}
                   <div className="flex-1"></div>
-                  
-                  {/* Block / Report Flag */}
-                  <button 
-                    onClick={(e) => {
-                      if (window.confirm(`Are you sure you want to report and block ${p.name}?`)) {
-                        handleBlockUser(e, p);
-                      } else {
-                        e.stopPropagation();
-                      }
-                    }}
-                    className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-wider px-4 py-2 z-20 pointer-events-auto absolute top-4 right-4"
-                  >
-                    Report
-                  </button>
                 </div>
                 
                 {/* Content at Bottom */}
