@@ -1,7 +1,8 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, initializeFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getMessaging, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyD4uG7W2_m1bZgB18x26b9e8bjZnPKRSCQ",
@@ -16,12 +17,12 @@ let app;
 let auth: any;
 let db: any;
 let storage: any;
+let messaging: any;
 
 try {
   const apps = getApps();
   if (!apps.length) {
     app = initializeApp(firebaseConfig);
-    // Force Long Polling to completely bypass WebSocket/Firewall network drops
     db = getFirestore(app, "default");
   } else {
     app = getApp();
@@ -30,8 +31,16 @@ try {
   
   auth = getAuth(app);
   storage = getStorage(app);
+  
+  if (typeof window !== 'undefined') {
+    isSupported().then(supported => {
+      if (supported) {
+        messaging = getMessaging(app);
+      }
+    });
+  }
 } catch (e) {
   console.warn("Firebase initialization failed.", e);
 }
 
-export { app, auth, db, storage };
+export { app, auth, db, storage, messaging };
