@@ -25,35 +25,7 @@ export default function InboxPage() {
   const [tokens, setTokens] = useState(0);
   const [unlockedCrushes, setUnlockedCrushes] = useState<Record<string, boolean>>({});
   
-  // Push Notification State
-  const [pushStatus, setPushStatus] = useState<string>('default');
-  const [fcmToken, setFcmToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      setPushStatus(Notification.permission);
-    }
-  }, []);
-
-  const requestPushPermission = async () => {
-    try {
-      const permission = await Notification.requestPermission();
-      setPushStatus(permission);
-      if (permission === 'granted' && messaging) {
-        const token = await getToken(messaging, { vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY });
-        if (token) {
-          setFcmToken(token);
-          if (user) {
-            await updateDoc(doc(db, 'users', user.uid), { fcmToken: token });
-            alert("Notifications enabled! Your phone is ready.");
-          }
-        }
-      }
-    } catch (e) {
-      console.error("Push enable failed", e);
-      alert("Failed to enable push notifications.");
-    }
-  };
 
   useEffect(() => {
     setTokens(parseInt(localStorage.getItem('revealTokens') || '0', 10));
@@ -211,23 +183,7 @@ export default function InboxPage() {
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-8">
         
-        {pushStatus !== 'granted' && pushStatus !== 'denied' && (
-          <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-2xl p-4 mb-6 flex items-center justify-between shadow-[0_0_20px_rgba(99,102,241,0.15)]">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl animate-bounce">🔔</span>
-              <div>
-                <h3 className="text-indigo-400 font-bold text-sm tracking-wide">Never miss a crush</h3>
-                <p className="text-zinc-400 text-xs mt-0.5">Turn on notifications to know when someone messages you.</p>
-              </div>
-            </div>
-            <button 
-              onClick={requestPushPermission}
-              className="bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full transition-colors shrink-0"
-            >
-              Enable
-            </button>
-          </div>
-        )}
+
 
         <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-8">
           <div className="flex items-center gap-4">
