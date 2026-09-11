@@ -275,6 +275,13 @@ export default function OnboardingWizard() {
        return;
     }
 
+    const hasPhoto = files.some(f => f !== null) || previews.some(p => p !== null);
+    if (!hasPhoto) {
+       setError("⚠️ You must upload at least 1 photo to complete your profile.");
+       setStep(1);
+       return;
+    }
+
     if (!course || !year || !branch || !gender || !bio || !hotTake || !stressLevel) {
        setError("⚠️ Please ensure all fields across all steps are fully filled out before completing your profile.");
        return;
