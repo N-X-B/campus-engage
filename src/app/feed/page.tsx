@@ -239,6 +239,18 @@ export default function FeedPage() {
   const handleBreakIceClick = (e: any, p: any, isModal: boolean = false) => {
     e.stopPropagation();
     
+    // Male Limit Check
+    if (userData?.gender === 'male') {
+      const today = new Date().toISOString().split('T')[0];
+      const countKey = `icebreakersSent_${today}`;
+      const sentCount = parseInt(localStorage.getItem(countKey) || '0', 10);
+      
+      if (sentCount >= 7) {
+        alert(`🧊 Daily Limit Reached!\n\nBoys are limited to 7 Icebreakers per day to maintain quality matches. Check back tomorrow!`);
+        return;
+      }
+    }
+    
     // Aura Filter Check
     const myAura = userData?.auraScore ?? 20;
     const reqAura = p.minAuraRequired || 0;
@@ -273,6 +285,14 @@ export default function FeedPage() {
     // Optimistic UI updates
     setSendingPrompt(promptToSend);
     haptic.light();
+    
+    // Increment daily count for males
+    if (userData?.gender === 'male') {
+      const today = new Date().toISOString().split('T')[0];
+      const countKey = `icebreakersSent_${today}`;
+      const sentCount = parseInt(localStorage.getItem(countKey) || '0', 10);
+      localStorage.setItem(countKey, (sentCount + 1).toString());
+    }
     
     setTimeout(() => {
       setSentSuccess(true);
