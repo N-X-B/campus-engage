@@ -116,7 +116,8 @@ export default function FeedPage() {
                 window.location.href = '/confessions';
                 return;
              }
-             if (!currentUserData.onboarded) {
+             const hasPhoto = currentUserData.photos && Array.isArray(currentUserData.photos) && currentUserData.photos.length > 0;
+             if (!currentUserData.onboarded || !hasPhoto) {
                 window.location.href = '/onboarding';
                 return;
              }

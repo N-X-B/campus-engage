@@ -118,8 +118,17 @@ export default function InboxPage() {
 
     // Check incognito status
     getDoc(doc(db, 'users', user.uid)).then((docSnap: any) => {
-      if (docSnap.exists() && docSnap.data().incognito) {
-         window.location.href = '/missed-connections';
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.incognito) {
+           window.location.href = '/missed-connections';
+           return;
+        }
+        const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
+        if (!data.onboarded || !hasPhoto) {
+           window.location.href = '/onboarding';
+           return;
+        }
       }
     });
 

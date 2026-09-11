@@ -238,7 +238,15 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user && !isDemoMode) {
       getDoc(doc(db, 'users', user.uid)).then(d => {
-        if (d.exists()) setUserData(d.data());
+        if (d.exists()) {
+          const data = d.data();
+          const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
+          if (!data.onboarded || !hasPhoto) {
+             window.location.href = '/onboarding';
+             return;
+          }
+          setUserData(data);
+        }
       });
       
       const fetchPraises = async () => {
