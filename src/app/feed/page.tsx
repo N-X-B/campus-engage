@@ -497,8 +497,6 @@ export default function FeedPage() {
                      <div className="flex flex-wrap gap-2 mt-4">
                        {selectedProfileForBrief.answers.studyVibe && <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.studyVibe}</span>}
                        {selectedProfileForBrief.answers.weekendVibe && <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.weekendVibe}</span>}
-                       {selectedProfileForBrief.answers.groupProjectRole && <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.groupProjectRole}</span>}
-                       {selectedProfileForBrief.answers.dormEssential && <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{selectedProfileForBrief.answers.dormEssential}</span>}
                      </div>
                    </div>
                  )}

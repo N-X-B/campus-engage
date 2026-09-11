@@ -82,9 +82,6 @@ export default function OnboardingWizard() {
   const [skipClass, setSkipClass] = useState('');
   const [stressLevel, setStressLevel] = useState('');
   const [hotTake, setHotTake] = useState('');
-  const [groupProjectRole, setGroupProjectRole] = useState('');
-  const [dormEssential, setDormEssential] = useState('');
-
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   
@@ -239,12 +236,12 @@ export default function OnboardingWizard() {
          updateDoc(doc(db, 'users', user.uid), { course, year, branch, gender }).catch(console.error);
        }
     } else if (step === 3) {
-       if (!studyVibe || !weekendVibe || !skipClass || !groupProjectRole) {
+       if (!studyVibe || !weekendVibe || !skipClass) {
           setError("Please answer all vibe checks."); return;
        }
        
        if (user && !isDemoMode) {
-         updateDoc(doc(db, 'users', user.uid), { studyVibe, weekendVibe, skipClass, groupProjectRole }).catch(console.error);
+         updateDoc(doc(db, 'users', user.uid), { studyVibe, weekendVibe, skipClass }).catch(console.error);
        }
     }
     
@@ -278,7 +275,7 @@ export default function OnboardingWizard() {
        return;
     }
 
-    if (!course || !year || !branch || !gender || !bio || !hotTake || !stressLevel || !dormEssential) {
+    if (!course || !year || !branch || !gender || !bio || !hotTake || !stressLevel) {
        setError("⚠️ Please ensure all fields across all steps are fully filled out before completing your profile.");
        return;
     }
@@ -297,12 +294,10 @@ export default function OnboardingWizard() {
 
     try {
       const answers = { 
-        studyVibe: studyVibe || "Dead Silence (Library)", 
-        weekendVibe: weekendVibe || "Downtown Bar", 
-        skipClass: skipClass || "Cafe / Canteen",
-        stressLevel: stressLevel || "12 hours before", 
-        groupProjectRole: groupProjectRole || "The CEO",
-        dormEssential: dormEssential || "Noise-cancelling headphones",
+        studyVibe: studyVibe || "All-nighter in hostel", 
+        weekendVibe: weekendVibe || "Late night drive & Maggi", 
+        skipClass: skipClass || "Canteen / Maggi Point",
+        stressLevel: stressLevel || "Copying topper's PDF at 2 AM", 
         hotTake: hotTake 
       };
       
@@ -585,9 +580,9 @@ export default function OnboardingWizard() {
 
                     <div className="space-y-8">
                       <div>
-                        <label className="block text-base font-semibold text-white mb-4">Dead silence in the library, or low-fi beats in a busy coffee shop?</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {["Dead Silence (Library)", "Low-fi Beats (Coffee Shop)"].map(opt => (
+                        <label className="block text-base font-semibold text-white mb-4">Exam prep strategy?</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {["All-nighter in hostel", "Library (mainly for AC)", "Group study = gossip"].map(opt => (
                             <button key={opt} onClick={() => setStudyVibe(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${studyVibe === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
@@ -596,9 +591,9 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div>
-                        <label className="block text-base font-semibold text-white mb-4">Where are you most likely to skip class to?</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {["Cafe / Canteen", "Dorm Bed", "Gym", "Library (ironic)"].map(opt => (
+                        <label className="block text-base font-semibold text-white mb-4">Mass bunk! Where are you heading?</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {["Canteen / Maggi Point", "Back to bed", "Roaming around the city"].map(opt => (
                             <button key={opt} onClick={() => setSkipClass(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${skipClass === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
@@ -609,19 +604,8 @@ export default function OnboardingWizard() {
                       <div>
                         <label className="block text-base font-semibold text-white mb-4">Friday night vibe?</label>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {["Frat Basement", "Downtown Bar", "Movie in Dorm"].map(opt => (
+                          {["Late night drive & Maggi", "House party / Club", "Gaming / Movies in PG"].map(opt => (
                             <button key={opt} onClick={() => setWeekendVibe(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${weekendVibe === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-base font-semibold text-white mb-4">In a group project, you are...</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {["The CEO (Does Everything)", "The Ghost (MIA)", "The Hype Man"].map(opt => (
-                            <button key={opt} onClick={() => setGroupProjectRole(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${groupProjectRole === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
                           ))}
@@ -640,9 +624,9 @@ export default function OnboardingWizard() {
 
                     <div className="space-y-8">
                       <div>
-                        <label className="block text-base font-semibold text-white mb-4">Do you start essays a week early, or 12 hours before the deadline?</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {["A week early", "12 hours before"].map(opt => (
+                        <label className="block text-base font-semibold text-white mb-4">Assignment submission is tomorrow at 9 AM...</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {["Copying topper's PDF at 2 AM", "Writing it outside class", "Finished it a week ago"].map(opt => (
                             <button key={opt} onClick={() => setStressLevel(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${stressLevel === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
                               {opt}
                             </button>
@@ -651,18 +635,7 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div>
-                        <label className="block text-base font-semibold text-white mb-4">Dorm survival essential?</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {["Noise-canceling headphones", "Mini-fridge", "LED Strip Lights"].map(opt => (
-                            <button key={opt} onClick={() => setDormEssential(opt)} className={`p-4 rounded-xl border-2 text-left transition-all ${dormEssential === opt ? 'border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-500/20' : 'border-white/10 hover:border-white/30 bg-black'}`}>
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-base font-semibold text-white mb-2">What is the most overrated tradition at this university?</label>
+                        <label className="block text-base font-semibold text-white mb-2">What is the most overrated thing about this college?</label>
                         <textarea
                           rows={3}
                           value={hotTake}
