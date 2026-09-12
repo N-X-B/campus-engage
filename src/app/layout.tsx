@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 import { PushManager } from "@/components/PushManager";
+import { InstallPWA } from "@/components/InstallPWA";
 
 export default function RootLayout({
   children,
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans">
         <AuthProvider>
           <PushManager />
+          <InstallPWA />
           {children}
         </AuthProvider>
       </body>
