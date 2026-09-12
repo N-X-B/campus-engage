@@ -19,6 +19,7 @@ import { auth } from '@/lib/firebase';
 import { signOut, deleteUser } from 'firebase/auth';
 import { doc, deleteDoc, getDoc, updateDoc, setDoc, arrayUnion, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as nsfwjs from 'nsfwjs';
@@ -49,7 +50,17 @@ const compressAndUploadImage = async (file: File, uid: string, index: number): P
         ctx?.drawImage(img, 0, 0, width, height);
         
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(dataUrl);
+        try {
+          const storageRef = ref(storage, `users/${uid}/photo_${Date.now()}_${index}.jpg`);
+          await uploadString(storageRef, dataUrl, 'data_url');
+          const downloadUrl = await getDownloadURL(storageRef);
+          resolve(downloadUrl);
+        } catch (uploadErr) {
+          console.error("Firebase Storage Upload Error:", uploadErr);
+          // If storage fails (e.g. security rules), safely save the dataUrl directly to Firestore 
+          // (which is a global cloud database, NOT local storage, so everyone can still see it).
+          resolve(dataUrl);
+        }
       };
       img.onerror = error => reject(error);
     };
@@ -67,6 +78,7 @@ export default function ProfilePage() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isIncognito, setIsIncognito] = useState(false);
   const [showEditAnswersModal, setShowEditAnswersModal] = useState(false);
+  const [uploadingPhotoIndex, setUploadingPhotoIndex] = useState<number | null>(null);
   const [editAnswers, setEditAnswers] = useState({
     studyVibe: '',
     weekendVibe: '',
@@ -158,8 +170,7 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setPhotoError('');
-
-    // NSFW checker removed per request
+    setUploadingPhotoIndex(index);
 
     try {
       const uploadedUrl = await compressAndUploadImage(file, user.uid, index);
@@ -168,6 +179,8 @@ export default function ProfilePage() {
       setEditPhotos(newPhotos);
     } catch (err) {
       setPhotoError("Failed to process image.");
+    } finally {
+      setUploadingPhotoIndex(null);
     }
   };
 
@@ -175,14 +188,14 @@ export default function ProfilePage() {
     if (!user) return;
     
     // Validate they have at least one photo
-    if (!editPhotos.some(p => p !== null)) {
+    if (!editPhotos.some(p => Boolean(p))) {
       setPhotoError("You must have at least one profile photo.");
       return;
     }
 
     setSavingPhotos(true);
     try {
-      const cleanPhotos = editPhotos.filter(p => p !== null);
+      const cleanPhotos = editPhotos.filter(p => Boolean(p));
       await updateDoc(doc(db, 'users', user.uid), { photos: cleanPhotos });
       setUserData({ ...userData, photos: cleanPhotos });
       setShowEditPhotosModal(false);
@@ -726,11 +739,16 @@ export default function ProfilePage() {
                     ) : (
                       <span className="text-2xl text-white/20">+</span>
                     )}
+                    {uploadingPhotoIndex === index && (
+                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
                     <input 
                       type="file" 
                       accept="image/jpeg, image/png, image/webp" 
                       onChange={(e) => handlePhotoChange(index, e)}
-                      className="absolute inset-0 opacity-0 cursor-pointer" 
+                      className="absolute inset-0 opacity-0 cursor-pointer z-10" 
                     />
                   </div>
                 ))}

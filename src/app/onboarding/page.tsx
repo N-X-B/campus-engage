@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { doc, setDoc, getDoc, updateDoc, deleteField } from 'firebase/firestore';
 import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
 import { db } from '@/lib/firebase';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
@@ -38,7 +39,15 @@ const compressAndUploadImage = async (file: File, uid: string, index: number): P
         ctx?.drawImage(img, 0, 0, width, height);
         
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(dataUrl);
+        try {
+          const storageRef = ref(storage, `users/${uid}/photo_${Date.now()}_${index}.jpg`);
+          await uploadString(storageRef, dataUrl, 'data_url');
+          const downloadUrl = await getDownloadURL(storageRef);
+          resolve(downloadUrl);
+        } catch (uploadErr) {
+          console.error("Firebase Storage Upload Error:", uploadErr);
+          resolve(dataUrl);
+        }
       };
       img.onerror = error => reject(error);
     };
