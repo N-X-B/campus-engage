@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteField } from 'firebase/firestore';
 import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
@@ -241,7 +241,11 @@ export default function OnboardingWizard() {
        }
        
        if (user && !isDemoMode) {
-         updateDoc(doc(db, 'users', user.uid), { studyVibe, weekendVibe, skipClass }).catch(console.error);
+         updateDoc(doc(db, 'users', user.uid), { 
+           'answers.studyVibe': studyVibe, 
+           'answers.weekendVibe': weekendVibe, 
+           'answers.skipClass': skipClass 
+         }).catch(console.error);
        }
     }
     
@@ -349,7 +353,13 @@ export default function OnboardingWizard() {
           answers,
           photos: finalPhotos,
           auraScore: 20,
-          onboarded: true
+          onboarded: true,
+          // Clean up the draft root fields that were incorrectly placed
+          studyVibe: deleteField(),
+          weekendVibe: deleteField(),
+          skipClass: deleteField(),
+          stressLevel: deleteField(),
+          hotTake: deleteField()
         }, { merge: true });
         console.log("[ONBOARDING] Profile written successfully!");
       } catch (dbErr) {
