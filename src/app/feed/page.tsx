@@ -130,10 +130,8 @@ export default function FeedPage() {
           querySnapshot.forEach(doc => {
              const d = doc.data();
              const blockedByMe = currentUserData.blockedUsers || [];
-             // TEMPORARY OVERRIDE: Allowing accounts without photos so admin can check old test profiles
-             // const hasPhoto = d.photos && Array.isArray(d.photos) && d.photos.length > 0;
-             
-             if (d.onboarded && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
+             const hasPhoto = d.photos && Array.isArray(d.photos) && d.photos.length > 0;
+             if (d.onboarded && hasPhoto && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
                fetchedProfiles.push({ id: doc.id, ...d });
              }
           });
@@ -177,8 +175,6 @@ export default function FeedPage() {
           if (currentUserData.gender === 'female') {
              dailyLimit = Infinity;
           }
-          // TEMPORARY OVERRIDE: Set daily limit to Infinity so admin can see all profiles
-          dailyLimit = Infinity;
           
           const limitedProfiles = scoredProfiles.slice(0, dailyLimit);
           

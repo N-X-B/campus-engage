@@ -112,10 +112,18 @@ export default function OnboardingWizard() {
           if (docSnap.exists()) {
             const data = docSnap.data();
             
-            // If they are already fully onboarded, kick them to feed
-            if (data.onboarded || data.onboardingComplete) {
+            // If they are fully onboarded AND have a photo, kick to feed
+            // If they have onboarded: true but NO photos, keep them here to add a photo
+            const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
+            if ((data.onboarded || data.onboardingComplete) && hasPhoto) {
               router.push('/feed');
               return;
+            }
+            
+            // If they have onboarded: true but no photo, show them a warning and keep them on step 1
+            if ((data.onboarded || data.onboardingComplete) && !hasPhoto) {
+              setError("⚠️ Your account is missing a photo. Upload at least 1 photo to access the app — accounts without photos are permanently invisible to other users.");
+              // Don't redirect — let them add their photo now
             }
 
             // Restore text fields
@@ -677,7 +685,16 @@ export default function OnboardingWizard() {
                 ) : <div />}
                 
                 {step < totalSteps ? (
-                  <Button onClick={nextStep} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8">Continue</Button>
+                  <>
+                    {step === 1 && !previews.some(p => p !== null) ? (
+                      <div className="flex flex-col items-end gap-1">
+                        <Button disabled className="bg-white/20 text-white/40 rounded-lg px-8 cursor-not-allowed">Continue</Button>
+                        <p className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Upload at least 1 photo to continue</p>
+                      </div>
+                    ) : (
+                      <Button onClick={nextStep} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8">Continue</Button>
+                    )}
+                  </>
                 ) : (
                   <Button onClick={handleSubmit} disabled={saving} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8 shadow-md">
                     {saving ? (error ? error : 'Completing...') : 'Finish Profile'}
