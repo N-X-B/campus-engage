@@ -116,7 +116,7 @@ export default function LoginPage() {
             key="login-card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20, filter: "blur(5px)" }}
+            exit={{ opacity: 0, scale: 0.9, y: -20,  }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="w-full max-w-md bg-black/50 backdrop-blur-2xl rounded-[2rem] shadow-2xl border border-white/10 p-8 z-10"
           >
