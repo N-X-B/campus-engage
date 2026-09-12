@@ -144,7 +144,7 @@ export default function OnboardingWizard() {
 
             // Determine which step to put them on based on what's missing
             if (data.course && data.branch && data.year && data.gender) {
-              const requiredCount = data.gender === 'female' ? 1 : 3;
+              const requiredCount = 1;
               if (data.photos && data.photos.length >= requiredCount) {
                 if (data.studyVibe && data.weekendVibe) {
                   setStep(4);
@@ -207,9 +207,9 @@ export default function OnboardingWizard() {
              uploadedCount++;
           }
        }
-       const requiredCount = gender === 'female' ? 1 : 3;
+       const requiredCount = 1;
        if (uploadedCount < requiredCount) { 
-         setError(gender === 'female' ? "You must upload at least 1 photo to proceed." : "You must upload all 3 photos to proceed. High-effort profiles get the most matches."); 
+         setError("You must upload at least 1 photo to proceed."); 
          return; 
        }
        
@@ -275,7 +275,7 @@ export default function OnboardingWizard() {
     }
 
     const uploadedCount = files.filter(f => f !== null).length + previews.filter(p => p !== null && !p.startsWith('blob:')).length;
-    const requiredCount = gender === 'female' ? 1 : 3;
+    const requiredCount = 1;
     if (uploadedCount < requiredCount) {
        setError(`⚠️ You must upload at least ${requiredCount} photo${requiredCount > 1 ? 's' : ''} to complete your profile.`);
        setStep(2);
@@ -671,10 +671,10 @@ export default function OnboardingWizard() {
                 
                 {step < totalSteps ? (
                   <>
-                    {step === 2 && (files.filter(f => f !== null).length + previews.filter(p => p !== null && !p.startsWith('blob:')).length < (gender === 'female' ? 1 : 3)) ? (
+                    {step === 2 && (files.filter(f => f !== null).length + previews.filter(p => p !== null && !p.startsWith('blob:')).length < 1) ? (
                       <div className="flex flex-col items-end gap-1">
                         <Button disabled className="bg-white/20 text-white/40 rounded-lg px-8 cursor-not-allowed">Continue</Button>
-                        <p className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Upload required photos to continue</p>
+                        <p className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Upload at least 1 photo to continue</p>
                       </div>
                     ) : (
                       <Button onClick={nextStep} disabled={saving} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8">
