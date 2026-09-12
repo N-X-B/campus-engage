@@ -167,28 +167,7 @@ export default function ProfilePage() {
     if (!file) return;
     setPhotoError('');
 
-    if (nsfwModel) {
-      setIsScanningImage(true);
-      try {
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        await new Promise((resolve) => { img.onload = resolve; });
-        
-        const predictions = await nsfwModel.classify(img);
-        const isExplicit = predictions.some(p => 
-          (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.65
-        );
-        
-        if (isExplicit) {
-          setPhotoError("🚨 Explicit content detected. Please select a different photo.");
-          setIsScanningImage(false);
-          return;
-        }
-      } catch (err) {
-        console.error("Image scan failed", err);
-      }
-      setIsScanningImage(false);
-    }
+    // NSFW checker removed per request
 
     try {
       const uploadedUrl = await compressAndUploadImage(file, user.uid, index);

@@ -184,28 +184,7 @@ export default function OnboardingWizard() {
     if (file) {
       setError('');
       
-      if (nsfwModel) {
-        setIsScanningImage(true);
-        try {
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(file);
-          await new Promise((resolve) => { img.onload = resolve; });
-          
-          const predictions = await nsfwModel.classify(img);
-          const isExplicit = predictions.some(p => 
-            (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.65
-          );
-          
-          if (isExplicit) {
-            setError("🚨 Explicit content detected. Please upload an appropriate profile photo.");
-            setIsScanningImage(false);
-            return;
-          }
-        } catch (err) {
-          console.error("Image scan failed", err);
-        }
-        setIsScanningImage(false);
-      }
+      // NSFW checker removed per request
 
       const newFiles = [...files];
       newFiles[index] = file;
