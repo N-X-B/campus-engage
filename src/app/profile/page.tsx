@@ -19,12 +19,10 @@ import { auth } from '@/lib/firebase';
 import { signOut, deleteUser } from 'firebase/auth';
 import { doc, deleteDoc, getDoc, updateDoc, setDoc, arrayUnion, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as nsfwjs from 'nsfwjs';
 
-import { storage } from '@/lib/firebase';
 
 const compressAndUploadImage = async (file: File, uid: string, index: number): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -50,17 +48,7 @@ const compressAndUploadImage = async (file: File, uid: string, index: number): P
         ctx?.drawImage(img, 0, 0, width, height);
         
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        try {
-          const storageRef = ref(storage, `users/${uid}/photo_${Date.now()}_${index}.jpg`);
-          await uploadString(storageRef, dataUrl, 'data_url');
-          const downloadUrl = await getDownloadURL(storageRef);
-          resolve(downloadUrl);
-        } catch (uploadErr) {
-          console.error("Firebase Storage Upload Error:", uploadErr);
-          // If storage fails (e.g. security rules), safely save the dataUrl directly to Firestore 
-          // (which is a global cloud database, NOT local storage, so everyone can still see it).
-          resolve(dataUrl);
-        }
+        resolve(dataUrl);
       };
       img.onerror = error => reject(error);
     };
