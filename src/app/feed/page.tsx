@@ -4,7 +4,7 @@ import { SonarBackground } from '@/components/SonarBackground';
 import { useEffect, useState } from 'react';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, where, doc, setDoc, addDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, setDoc, addDoc, getDoc, updateDoc, arrayUnion, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/lib/AuthContext';
@@ -96,67 +96,73 @@ export default function FeedPage() {
         if (isDemoMode) {
           fetchedProfiles = await demoDb.getProfiles();
         } else {
-          // Parallelize network requests!
-          const userDocPromise = getDoc(doc(db, 'users', user.uid));
-          const querySnapshotPromise = getDocs(query(collection(db, 'users'), where('onboarded', '==', true)));
-          // Server action API call can also run in parallel
-          const aiMatchesPromise = getTopMatches(user.uid, 50).catch(e => {
-             console.error("AI Matchmaking skipped/failed:", e);
-             return { success: false, matches: [] };
-          });
-          
-          const [userDoc, querySnapshot, aiMatches] = await Promise.all([
-             userDocPromise, 
-             querySnapshotPromise,
-             aiMatchesPromise
+          // Step 1: Fetch user & AI Matches FIRST
+          const [userDoc, aiMatches] = await Promise.all([
+             getDoc(doc(db, 'users', user.uid)), 
+             getTopMatches(user.uid, 50).catch(e => {
+                console.error("AI Matchmaking skipped/failed:", e);
+                return { success: false, matches: [] };
+             })
           ]);
           
-          if (userDoc.exists()) {
-             currentUserData = userDoc.data();
-             if (currentUserData.incognito) {
-                window.location.href = '/confessions';
-                return;
-             }
-             const hasPhoto = currentUserData.photos && Array.isArray(currentUserData.photos) && currentUserData.photos.length > 0;
-             if (!currentUserData.onboarded && !currentUserData.onboardingComplete) {
-                window.location.href = '/onboarding';
-                return;
-             }
-             // Warn existing no-photo users but still let them in (grace period for existing accounts)
-             if (!hasPhoto) {
-                console.warn('[FEED] User has no photo — visible but encouraged to add one');
-                setShowPhotoReminder(true);
-             }
-             setUserData(currentUserData);
-          } else {
+          if (!userDoc.exists()) {
              window.location.href = '/onboarding';
              return;
           }
-          
-          querySnapshot.forEach(doc => {
-             const d = doc.data();
-             const blockedByMe = currentUserData.blockedUsers || [];
-             if (d.onboarded && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
-               fetchedProfiles.push({ id: doc.id, ...d });
-             }
-          });
-          
+          currentUserData = userDoc.data();
+          if (currentUserData.incognito) {
+             window.location.href = '/confessions';
+             return;
+          }
+          const hasPhoto = currentUserData.photos && Array.isArray(currentUserData.photos) && currentUserData.photos.length > 0;
+          if (!currentUserData.onboarded && !currentUserData.onboardingComplete) {
+             window.location.href = '/onboarding';
+             return;
+          }
+          if (!hasPhoto) {
+             console.warn('[FEED] User has no photo — visible but encouraged to add one');
+             setShowPhotoReminder(true);
+          }
+          setUserData(currentUserData);
+
+          // Step 2: Now fetch ONLY the needed profiles!
           let scoredProfiles = [];
           
           if (aiMatches && aiMatches.success && aiMatches.matches.length > 0) {
               const aiScoreMap = new Map();
               aiMatches.matches.forEach((m: any) => aiScoreMap.set(m.id, m.score));
               
+              // Instead of fetching all users, only fetch the AI matches! (Massive speedup)
+              const matchPromises = aiMatches.matches.map((m: any) => getDoc(doc(db, 'users', m.id)));
+              const matchDocs = await Promise.all(matchPromises);
+              
+              matchDocs.forEach(d => {
+                 if (d.exists()) {
+                    const data = d.data();
+                    const blockedByMe = currentUserData.blockedUsers || [];
+                    if (data.onboarded && d.id !== user.uid && data.status !== 'under_review' && !blockedByMe.includes(d.id)) {
+                       fetchedProfiles.push({ id: d.id, ...data });
+                    }
+                 }
+              });
+              
               scoredProfiles = fetchedProfiles
-                .filter(p => aiScoreMap.has(p.id))
                 .map(p => ({
                   ...p,
                   matchScore: Math.round(aiScoreMap.get(p.id) * 100)
                 }))
                 .sort((a, b) => b.matchScore - a.matchScore);
-          }
-          
-          if (scoredProfiles.length === 0) {
+          } else {
+              // Fallback if AI fails: fetch only 50 random users instead of entire database
+              const fallbackQuery = await getDocs(query(collection(db, 'users'), where('onboarded', '==', true), limit(50)));
+              fallbackQuery.forEach(d => {
+                 const data = d.data();
+                 const blockedByMe = currentUserData.blockedUsers || [];
+                 if (data.onboarded && d.id !== user.uid && data.status !== 'under_review' && !blockedByMe.includes(d.id)) {
+                    fetchedProfiles.push({ id: d.id, ...data });
+                 }
+              });
+              
               scoredProfiles = fetchedProfiles
                 .map(p => ({
                   ...p,

@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, doc, updateDoc, increment, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, increment, addDoc, serverTimestamp, limit } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { haptic } from '@/lib/haptics';
@@ -57,7 +57,7 @@ export default function SpeedBumpPage() {
     
     const fetchUsers = async () => {
       try {
-        const q = query(collection(db, 'users'), where('onboarded', '==', true));
+        const q = query(collection(db, 'users'), where('onboarded', '==', true), limit(50));
         const snap = await getDocs(q);
         let users: any[] = [];
         snap.forEach(d => {
