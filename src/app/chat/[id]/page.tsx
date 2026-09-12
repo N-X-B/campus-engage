@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { collection, query, orderBy, onSnapshot, addDoc, getDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { haptic } from '@/lib/haptics';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ChatRoom({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -20,6 +20,21 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const pressTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const handlePressStart = (msgId: string, text: string) => {
+    pressTimer.current = setTimeout(() => {
+       navigator.clipboard.writeText(text);
+       haptic.medium();
+       setCopiedId(msgId);
+       setTimeout(() => setCopiedId(null), 2000);
+    }, 500);
+  };
+
+  const handlePressEnd = () => {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -266,11 +281,28 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
                    className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                  >
                    <div 
-                     className={`max-w-[80%] px-5 py-3 rounded-2xl ${isMe 
+                     onPointerDown={() => handlePressStart(msg.id || idx.toString(), msg.text)}
+                     onPointerUp={handlePressEnd}
+                     onPointerLeave={handlePressEnd}
+                     onContextMenu={(e) => e.preventDefault()} // prevent default mobile context menu
+                     className={`relative max-w-[80%] px-5 py-3 rounded-2xl cursor-pointer select-none transition-transform active:scale-95 ${isMe 
                        ? 'bg-indigo-500 text-white rounded-br-sm shadow-[0_0_20px_rgba(99,102,241,0.2)]' 
                        : 'bg-zinc-900 border border-white/5 text-zinc-200 rounded-bl-sm'}`}
                    >
                      <p className="leading-relaxed break-words">{msg.text}</p>
+                     
+                     <AnimatePresence>
+                       {copiedId === (msg.id || idx.toString()) && (
+                         <motion.div 
+                           initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                           animate={{ opacity: 1, y: 0, scale: 1 }}
+                           exit={{ opacity: 0, scale: 0.9 }}
+                           className={`absolute -top-10 ${isMe ? 'right-0' : 'left-0'} bg-black/80 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-xl border border-white/10 z-50 pointer-events-none`}
+                         >
+                           Copied!
+                         </motion.div>
+                       )}
+                     </AnimatePresence>
                    </div>
                  </motion.div>
                );
