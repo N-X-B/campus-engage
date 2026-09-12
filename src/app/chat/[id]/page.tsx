@@ -22,6 +22,8 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [briefPhotoIndex, setBriefPhotoIndex] = useState(0);
 
   const handlePressStart = (msgId: string, text: string) => {
     pressTimer.current = setTimeout(() => {
@@ -233,13 +235,16 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
            <Link href="/inbox" className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center hover:bg-zinc-800 transition-colors border border-white/10">
              ←
            </Link>
-           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 overflow-hidden">
+           <div 
+             className="flex items-center gap-3 cursor-pointer group"
+             onClick={() => setShowProfileModal(true)}
+           >
+             <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 overflow-hidden group-hover:ring-2 ring-indigo-500/50 transition-all">
                 {otherUser?.photos?.[0] ? <img src={otherUser.photos[0]} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">👤</div>}
              </div>
              <div>
-               <h2 className="font-bold text-lg leading-tight">{otherUser?.name || 'Loading...'}</h2>
-               <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">{otherUser?.major || 'Student'}</p>
+               <h2 className="font-bold text-lg leading-tight group-hover:text-indigo-400 transition-colors">{otherUser?.name || 'Loading...'}</h2>
+               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{otherUser?.major || 'Student'}</p>
              </div>
            </div>
          </div>
@@ -337,6 +342,93 @@ export default function ChatRoom({ params }: { params: Promise<{ id: string }> }
           </button>
         </form>
       </div>
+
+      {/* Profile Brief Modal Overlay */}
+      <AnimatePresence>
+        {showProfileModal && otherUser && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            onClick={() => setShowProfileModal(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 40 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-zinc-900 rounded-[2rem] border border-zinc-800 overflow-hidden max-w-md w-full shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto"
+            >
+              <div className="relative aspect-[4/5] w-full shrink-0">
+                 {otherUser.photos && otherUser.photos.length > 0 ? (
+                   <>
+                     <img 
+                       src={otherUser.photos[briefPhotoIndex] || otherUser.photos[0]} 
+                       alt="profile" 
+                       className="object-cover w-full h-full" 
+                     />
+                     {/* Photo Progress Bars */}
+                     <div className="absolute top-4 left-4 right-16 flex gap-1 z-20">
+                       {otherUser.photos.map((_: any, i: number) => (
+                         <div key={i} className={`flex-1 h-1 rounded-full ${i === briefPhotoIndex ? 'bg-white' : 'bg-white/30'}`} />
+                       ))}
+                     </div>
+                     {/* Tap Zones */}
+                     <div 
+                       className="absolute inset-y-0 left-0 w-1/2 z-10 cursor-pointer"
+                       onClick={(e) => {
+                          e.stopPropagation();
+                          if (briefPhotoIndex > 0) setBriefPhotoIndex(prev => prev - 1);
+                       }}
+                     />
+                     <div 
+                       className="absolute inset-y-0 right-0 w-1/2 z-10 cursor-pointer"
+                       onClick={(e) => {
+                          e.stopPropagation();
+                          if (briefPhotoIndex < otherUser.photos.length - 1) setBriefPhotoIndex(prev => prev + 1);
+                       }}
+                     />
+                   </>
+                 ) : (
+                   <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-4xl">👤</div>
+                 )}
+                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent pointer-events-none" />
+                 
+                 <div className="absolute top-4 right-4 z-20 flex items-center">
+                   <button onClick={() => setShowProfileModal(false)} className="w-10 h-10 bg-black/40 backdrop-blur-none text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10 ml-2">
+                     ✕
+                   </button>
+                 </div>
+                 
+                 <div className="absolute bottom-6 left-6 right-6">
+                    <div className="flex items-center gap-3 mb-2">
+                       <h2 className="text-4xl font-bold text-white tracking-tight">{otherUser.name}</h2>
+                    </div>
+                    <p className="text-zinc-300 font-medium text-lg">{otherUser.branch || 'Student'} • Year {otherUser.year || '1'}</p>
+                 </div>
+              </div>
+              
+              <div className="p-6 pt-2 bg-zinc-900">
+                 <div className="bg-zinc-800/50 p-5 rounded-2xl border border-zinc-700/50 mb-6">
+                   <p className="text-zinc-300 italic text-lg leading-relaxed">"{otherUser.bio || 'No bio yet.'}"</p>
+                 </div>
+
+                 {otherUser.answers && (
+                   <div className="space-y-5 mb-8">
+                     {otherUser.answers.hotTake && (
+                       <div>
+                         <h3 className="text-xs font-bold uppercase text-indigo-400 mb-2 tracking-widest">Campus Hot Take</h3>
+                         <p className="text-white font-medium text-lg bg-zinc-800/50 p-4 rounded-xl border border-zinc-700/50">{otherUser.answers.hotTake}</p>
+                       </div>
+                     )}
+                     <div className="flex flex-wrap gap-2 mt-4">
+                       {otherUser.answers.studyVibe && <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{otherUser.answers.studyVibe}</span>}
+                       {otherUser.answers.weekendVibe && <span className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-xl">{otherUser.answers.weekendVibe}</span>}
+                     </div>
+                   </div>
+                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
