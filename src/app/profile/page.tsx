@@ -23,14 +23,17 @@ import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as nsfwjs from 'nsfwjs';
 
-const compressImageToBase64 = (file: File): Promise<string> => {
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { storage } from '@/lib/firebase';
+
+const compressAndUploadImage = async (file: File, uid: string, index: number): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
       const img = new Image();
       img.src = event.target?.result as string;
-      img.onload = () => {
+      img.onload = async () => {
         const canvas = document.createElement('canvas');
         const MAX_WIDTH = 600;
         const MAX_HEIGHT = 600;
@@ -45,11 +48,20 @@ const compressImageToBase64 = (file: File): Promise<string> => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.6));
+        
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        try {
+          const storageRef = ref(storage, `users/${uid}/photo_${Date.now()}_${index}.jpg`);
+          await uploadString(storageRef, dataUrl, 'data_url');
+          const downloadUrl = await getDownloadURL(storageRef);
+          resolve(downloadUrl);
+        } catch (uploadErr) {
+          reject(uploadErr);
+        }
       };
-      img.onerror = (error) => reject(error);
+      img.onerror = error => reject(error);
     };
-    reader.onerror = (error) => reject(error);
+    reader.onerror = error => reject(error);
   });
 };
 
@@ -178,9 +190,9 @@ export default function ProfilePage() {
     }
 
     try {
-      const base64 = await compressImageToBase64(file);
+      const uploadedUrl = await compressAndUploadImage(file, user.uid, index);
       const newPhotos = [...editPhotos];
-      newPhotos[index] = base64;
+      newPhotos[index] = uploadedUrl;
       setEditPhotos(newPhotos);
     } catch (err) {
       setPhotoError("Failed to process image.");

@@ -14,14 +14,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as nsfwjs from 'nsfwjs';
 
 
-const compressImageToBase64 = (file: File): Promise<string> => {
+import { uploadString } from 'firebase/storage';
+
+const compressAndUploadImage = async (file: File, uid: string, index: number): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
       const img = new Image();
       img.src = event.target?.result as string;
-      img.onload = () => {
+      img.onload = async () => {
         const canvas = document.createElement('canvas');
         const MAX_WIDTH = 600;
         const MAX_HEIGHT = 600;
@@ -36,7 +38,16 @@ const compressImageToBase64 = (file: File): Promise<string> => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
+        
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        try {
+          const storageRef = ref(storage, `users/${uid}/photo_${Date.now()}_${index}.jpg`);
+          await uploadString(storageRef, dataUrl, 'data_url');
+          const downloadUrl = await getDownloadURL(storageRef);
+          resolve(downloadUrl);
+        } catch (uploadErr) {
+          reject(uploadErr);
+        }
       };
       img.onerror = error => reject(error);
     };
@@ -218,7 +229,7 @@ export default function OnboardingWizard() {
            const finalPhotos: string[] = [];
            for (let i = 0; i < 3; i++) {
              if (files[i]) {
-               finalPhotos.push(await compressImageToBase64(files[i]!));
+               finalPhotos.push(await compressAndUploadImage(files[i]!, user.uid, i));
              } else if (previews[i] && !previews[i]?.startsWith('blob:')) {
                finalPhotos.push(previews[i]!);
              }
@@ -331,10 +342,10 @@ export default function OnboardingWizard() {
       for (let i = 0; i < 3; i++) {
         if (files[i]) {
           try {
-            const base64String = await compressImageToBase64(files[i]!);
-            finalPhotos.push(base64String);
+            const urlString = await compressAndUploadImage(files[i]!, user.uid, i);
+            finalPhotos.push(urlString);
           } catch (e) {
-            console.error("Failed to compress image", e);
+            console.error("Failed to compress/upload image", e);
           }
         } else if (previews[i] && !previews[i]?.startsWith('blob:')) {
           // Keep previously uploaded/restored photo

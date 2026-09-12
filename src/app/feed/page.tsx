@@ -49,6 +49,7 @@ export default function FeedPage() {
   // Keep all fetched profiles to filter locally
   const [allFetchedProfiles, setAllFetchedProfiles] = useState<any[]>([]);
   const [userData, setUserData] = useState<any>(null);
+  const [showPhotoReminder, setShowPhotoReminder] = useState(false);
 
   // Modals state
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
@@ -117,13 +118,14 @@ export default function FeedPage() {
                 return;
              }
              const hasPhoto = currentUserData.photos && Array.isArray(currentUserData.photos) && currentUserData.photos.length > 0;
-             if (!currentUserData.onboarded) {
+             if (!currentUserData.onboarded && !currentUserData.onboardingComplete) {
                 window.location.href = '/onboarding';
                 return;
              }
              // Warn existing no-photo users but still let them in (grace period for existing accounts)
              if (!hasPhoto) {
                 console.warn('[FEED] User has no photo — visible but encouraged to add one');
+                setShowPhotoReminder(true);
              }
              setUserData(currentUserData);
           } else {
@@ -392,7 +394,32 @@ export default function FeedPage() {
       <div className="min-h-screen relative z-10 pb-20 md:pb-0 font-sans selection:bg-indigo-500/30">
       <Navigation />
       
-      
+      <AnimatePresence>
+        {showPhotoReminder && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="px-4 pt-4 z-50 relative"
+          >
+            <div className="bg-gradient-to-r from-rose-500/10 to-orange-500/10 border border-rose-500/20 rounded-2xl p-4 flex items-start gap-4">
+              <div className="text-2xl mt-0.5">📸</div>
+              <div className="flex-1">
+                <h3 className="text-white font-bold text-sm mb-1">Add a photo to boost your Aura</h3>
+                <p className="text-zinc-400 text-xs mb-3">Your profile doesn't have any photos. Profiles with photos get 10x more engagement.</p>
+                <div className="flex gap-2">
+                  <button onClick={() => window.location.href = '/profile'} className="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">
+                    Upload Photo
+                  </button>
+                  <button onClick={() => setShowPhotoReminder(false)} className="bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-bold px-4 py-2 rounded-lg transition-colors">
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Vibe Filter Modal */}
       <AnimatePresence>
         {showFilterModal && (
