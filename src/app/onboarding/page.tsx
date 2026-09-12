@@ -191,9 +191,19 @@ export default function OnboardingWizard() {
     
     // Step validation
     if (step === 1) {
-       const hasPhoto = files.some(f => f !== null) || previews.some(p => p !== null);
-       if (!hasPhoto) { setError("Please upload at least one photo."); return; }
+       let uploadedCount = 0;
+       for (let i = 0; i < 3; i++) {
+          if (files[i] !== null || (previews[i] !== null && !previews[i]?.startsWith('blob:'))) {
+             uploadedCount++;
+          }
+       }
+       if (uploadedCount < 3) { 
+         setError("You must upload all 3 photos to proceed. High-effort profiles get the most matches."); 
+         return; 
+       }
        if (!bio.trim()) { setError("Please add a short bio."); return; }
+       
+       setSaving(true);
        if (user && !isDemoMode) {
          try {
            const finalPhotos: string[] = [];
@@ -209,6 +219,7 @@ export default function OnboardingWizard() {
            console.error("Failed to save draft", err);
          }
        }
+       setSaving(false);
     } else if (step === 2) {
        if (!course || !year || !branch.trim() || !gender) {
           setError("Please fill out all academic fields."); return;
@@ -299,7 +310,7 @@ export default function OnboardingWizard() {
         
         setOnboardingSuccess(true);
         setTimeout(() => {
-          window.location.href = '/feed';
+          router.push('/feed');
         }, 2000); // 2 second animation
         return;
       }
@@ -353,7 +364,7 @@ export default function OnboardingWizard() {
 
       setOnboardingSuccess(true);
       setTimeout(() => {
-        window.location.href = '/feed';
+        router.push('/feed');
       }, 2000); // 2 second animation
       
     } catch (err: any) {
@@ -449,7 +460,7 @@ export default function OnboardingWizard() {
             key="wizard"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20, filter: "blur(5px)" }}
+            exit={{ opacity: 0, scale: 0.95, y: -20,  }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="w-full max-w-2xl flex flex-col items-center z-10"
           >
@@ -656,13 +667,15 @@ export default function OnboardingWizard() {
                 
                 {step < totalSteps ? (
                   <>
-                    {step === 1 && !previews.some(p => p !== null) ? (
+                    {step === 1 && (files.filter(f => f !== null).length + previews.filter(p => p !== null && !p?.startsWith('blob:')).length < 3) ? (
                       <div className="flex flex-col items-end gap-1">
                         <Button disabled className="bg-white/20 text-white/40 rounded-lg px-8 cursor-not-allowed">Continue</Button>
-                        <p className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Upload at least 1 photo to continue</p>
+                        <p className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Upload all 3 photos to continue</p>
                       </div>
                     ) : (
-                      <Button onClick={nextStep} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8">Continue</Button>
+                      <Button onClick={nextStep} disabled={saving} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8">
+                         {saving ? 'Processing...' : 'Continue'}
+                      </Button>
                     )}
                   </>
                 ) : (
