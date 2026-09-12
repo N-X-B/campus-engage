@@ -162,6 +162,7 @@ export default function ProfilePage() {
     setIsVoting(false);
   };
   const handlePhotoChange = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) return;
     const file = e.target.files?.[0];
     if (!file) return;
     setPhotoError('');
@@ -253,8 +254,8 @@ export default function ProfilePage() {
       getDoc(doc(db, 'users', user.uid)).then(d => {
         if (d.exists()) {
           const data = d.data();
-          const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
-          if (!data.onboarded || !hasPhoto) {
+          const isFullyOnboarded = data.onboarded || data.onboardingComplete;
+          if (!isFullyOnboarded) {
              window.location.href = '/onboarding';
              return;
           }
