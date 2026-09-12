@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
+import Link from 'next/link';
 
 const INTEREST_GROUPS = {
   "Academics 📚": ["Study Group", "Library Grind", "Tech & Hackathons", "Startup Building"],
@@ -373,7 +374,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-2 gap-4 mb-4">
              <div className="bg-black/50 border border-white/5 p-5 rounded-3xl flex flex-col justify-between cursor-pointer" onClick={toggleIncognito}>
                 <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Incognito Mode</span>
                 <span className={`font-bold flex items-center gap-2 ${isIncognito ? 'text-indigo-400' : 'text-zinc-500'}`}>
@@ -406,6 +407,23 @@ export default function ProfilePage() {
                 </div>
              </div>
           </div>
+
+          {/* Growth Mode Card */}
+          <Link href="/guidance" className="block mb-8">
+            <div className="relative overflow-hidden bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/5 border border-amber-500/20 p-5 rounded-3xl group hover:border-amber-500/40 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 to-amber-500/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+              <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl">🕉</div>
+                  <div>
+                    <p className="text-xs font-bold text-amber-500/70 uppercase tracking-widest">Growth Mode</p>
+                    <p className="text-sm font-black text-white">The Path — Career & Life Guidance</p>
+                  </div>
+                </div>
+                <span className="text-amber-500/60 group-hover:text-amber-400 text-xl transition-colors">→</span>
+              </div>
+            </div>
+          </Link>
 
 
           <div className="mb-8">
