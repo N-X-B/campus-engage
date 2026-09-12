@@ -117,9 +117,13 @@ export default function FeedPage() {
                 return;
              }
              const hasPhoto = currentUserData.photos && Array.isArray(currentUserData.photos) && currentUserData.photos.length > 0;
-             if (!currentUserData.onboarded || !hasPhoto) {
+             if (!currentUserData.onboarded) {
                 window.location.href = '/onboarding';
                 return;
+             }
+             // Warn existing no-photo users but still let them in (grace period for existing accounts)
+             if (!hasPhoto) {
+                console.warn('[FEED] User has no photo — visible but encouraged to add one');
              }
              setUserData(currentUserData);
           } else {
@@ -130,8 +134,7 @@ export default function FeedPage() {
           querySnapshot.forEach(doc => {
              const d = doc.data();
              const blockedByMe = currentUserData.blockedUsers || [];
-             const hasPhoto = d.photos && Array.isArray(d.photos) && d.photos.length > 0;
-             if (d.onboarded && hasPhoto && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
+             if (d.onboarded && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
                fetchedProfiles.push({ id: doc.id, ...d });
              }
           });

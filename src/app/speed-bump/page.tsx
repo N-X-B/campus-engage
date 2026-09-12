@@ -62,8 +62,7 @@ export default function SpeedBumpPage() {
         let users: any[] = [];
         snap.forEach(d => {
           const data = d.data();
-          const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
-          if (d.id !== user.uid && data.status !== 'under_review' && hasPhoto) {
+          if (d.id !== user.uid && data.status !== 'under_review') {
             users.push({ id: d.id, ...data });
           }
         });

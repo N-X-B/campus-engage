@@ -112,18 +112,11 @@ export default function OnboardingWizard() {
           if (docSnap.exists()) {
             const data = docSnap.data();
             
-            // If they are fully onboarded AND have a photo, kick to feed
-            // If they have onboarded: true but NO photos, keep them here to add a photo
-            const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
-            if ((data.onboarded || data.onboardingComplete) && hasPhoto) {
+            // If they are already fully onboarded, let them into the feed
+            // (photo requirement is enforced at onboarding step 1 for NEW users only)
+            if (data.onboarded || data.onboardingComplete) {
               router.push('/feed');
               return;
-            }
-            
-            // If they have onboarded: true but no photo, show them a warning and keep them on step 1
-            if ((data.onboarded || data.onboardingComplete) && !hasPhoto) {
-              setError("⚠️ Your account is missing a photo. Upload at least 1 photo to access the app — accounts without photos are permanently invisible to other users.");
-              // Don't redirect — let them add their photo now
             }
 
             // Restore text fields
