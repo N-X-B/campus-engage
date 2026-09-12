@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { haptic } from '@/lib/haptics';
 import { collection, addDoc, onSnapshot, query, orderBy, getDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+
 import { toxicWords } from "@/lib/toxicWords";
 import { TokenBadge } from '@/components/TokenBadge';
 
@@ -104,20 +105,33 @@ export default function SpottedPage() {
     }
 
     
-    // Basic local filter
-    const lower = composeText.toLowerCase();
     
-    // We check if the text contains any of the exact substrings. 
-    // For a confession app, blocking substrings like "mc" might flag "hamburger mc", 
-    // so we pad with spaces for short acronyms, but for safety we'll use regex word boundaries.
+    // Advanced local filter for variations and combinations
+    // 1. Normalize text: remove repeating characters (e.g., "fuuuuck" -> "fuck", "chutiiyaaa" -> "chutiya")
+    // except for words where double letters are normal, but for toxicity checking, aggressive deduplication is safer.
+    const normalizedText = composeText.toLowerCase().replace(/(.)\1+/g, '$1');
+    const rawLower = composeText.toLowerCase();
     
+    // We check against both the raw text (for exact matches) and the aggressively deduplicated text (to catch "bheeenchoood")
     const containsToxic = toxicWords.some(w => {
-      // For short acronyms like 'bc' or 'mc', ensure they are standalone words
-      if (w.length <= 3) {
+      // For short acronyms like 'bc', 'mc', 'bsdk', ensure they are standalone words to prevent false positives in words like "bcool"
+      if (w.length <= 4) {
         const regex = new RegExp(`\\b${w}\\b`, 'i');
-        return regex.test(lower);
+        return regex.test(rawLower) || regex.test(normalizedText);
       }
-      return lower.includes(w);
+      
+      // For longer words, we do a substring match. 
+      // Example: 'chutiya' will match 'maha-chutiya'
+      // By checking both rawLower and normalizedText, we catch "chutiya" and "chuuuutiiyaaa" -> "chutiya"
+      
+      // We also remove spaces in the input to catch people bypassing with "c h u t i y a"
+      const noSpacesText = rawLower.replace(/\s+/g, '');
+      const noSpacesNormalized = normalizedText.replace(/\s+/g, '');
+      
+      return rawLower.includes(w) || 
+             normalizedText.includes(w) || 
+             noSpacesText.includes(w) || 
+             noSpacesNormalized.includes(w);
     });
 
     if (containsToxic) {
