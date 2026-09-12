@@ -130,7 +130,8 @@ export default function FeedPage() {
           querySnapshot.forEach(doc => {
              const d = doc.data();
              const blockedByMe = currentUserData.blockedUsers || [];
-             if (d.onboarded && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
+             const hasPhoto = d.photos && Array.isArray(d.photos) && d.photos.length > 0;
+             if (d.onboarded && hasPhoto && doc.id !== user.uid && d.status !== 'under_review' && !blockedByMe.includes(doc.id)) {
                fetchedProfiles.push({ id: doc.id, ...d });
              }
           });
