@@ -78,6 +78,7 @@ export default function FeedPage() {
   const [breakingIceId, setBreakingIceId] = useState<string | null>(null);
   const [shatterPos, setShatterPos] = useState<{x: number, y: number, width: number} | null>(null);
   const [selectedProfileForBrief, setSelectedProfileForBrief] = useState<any | null>(null);
+  const [briefPhotoIndex, setBriefPhotoIndex] = useState(0);
 
   // Dopamine Loop State
   const [tokens, setTokens] = useState(0);
@@ -541,11 +542,38 @@ export default function FeedPage() {
             >
               <div className="relative aspect-[4/5] w-full shrink-0">
                  {selectedProfileForBrief.photos && selectedProfileForBrief.photos.length > 0 ? (
-                   <img src={selectedProfileForBrief.photos[0]} alt="profile" className="object-cover w-full h-full" />
+                   <>
+                     <img 
+                       src={selectedProfileForBrief.photos[briefPhotoIndex] || selectedProfileForBrief.photos[0]} 
+                       alt="profile" 
+                       className="object-cover w-full h-full" 
+                     />
+                     {/* Photo Progress Bars */}
+                     <div className="absolute top-4 left-4 right-16 flex gap-1 z-20">
+                       {selectedProfileForBrief.photos.map((_: any, i: number) => (
+                         <div key={i} className={`flex-1 h-1 rounded-full ${i === briefPhotoIndex ? 'bg-white' : 'bg-white/30'}`} />
+                       ))}
+                     </div>
+                     {/* Tap Zones */}
+                     <div 
+                       className="absolute inset-y-0 left-0 w-1/2 z-10 cursor-pointer"
+                       onClick={(e) => {
+                          e.stopPropagation();
+                          if (briefPhotoIndex > 0) setBriefPhotoIndex(prev => prev - 1);
+                       }}
+                     />
+                     <div 
+                       className="absolute inset-y-0 right-0 w-1/2 z-10 cursor-pointer"
+                       onClick={(e) => {
+                          e.stopPropagation();
+                          if (briefPhotoIndex < selectedProfileForBrief.photos.length - 1) setBriefPhotoIndex(prev => prev + 1);
+                       }}
+                     />
+                   </>
                  ) : (
                    <div className="w-full h-full bg-zinc-800" />
                  )}
-                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
+                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent pointer-events-none" />
                  
                  <div className="absolute top-4 right-4 z-20 flex items-center">
                    <button onClick={() => setSelectedProfileForBrief(null)} className="w-10 h-10 bg-black/40 backdrop-blur-none text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10 ml-2">
@@ -771,7 +799,7 @@ export default function FeedPage() {
                   </div>
                 )}
                 {/* Background Image */}
-                <div className="absolute inset-0 cursor-pointer" onClick={() => setSelectedProfileForBrief(p)}>
+                <div className="absolute inset-0 cursor-pointer" onClick={() => { setSelectedProfileForBrief(p); setBriefPhotoIndex(0); }}>
                   {p.photos && p.photos.length > 0 ? (
                     <img src={p.photos[0]} alt={p.name} className="object-cover w-full h-full" />
                   ) : (
