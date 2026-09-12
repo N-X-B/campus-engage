@@ -17,15 +17,24 @@ export function Navigation() {
   useEffect(() => {
     if (!user) return;
     
-    // Listen for new pending invitations
+    // Listen for new pending invitations and unread messages
     const q = query(
       collection(db, 'conversations'),
-      where('receiverId', '==', user.uid),
-      where('status', '==', 'pending')
+      where('participants', 'array-contains', user.uid)
     );
 
     const unsubscribeConvs = onSnapshot(q, (snapshot) => {
-      setHasNotification(!snapshot.empty);
+      let hasUnread = false;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.status === 'pending' && data.receiverId === user.uid) {
+           hasUnread = true;
+        }
+        if (data[`unread_${user.uid}`] > 0) {
+           hasUnread = true;
+        }
+      });
+      setHasNotification(hasUnread);
     }, (error) => {
       console.warn("Notification listener error:", error);
     });
@@ -88,7 +97,7 @@ export function Navigation() {
             >
               {item.name}
               {item.name === 'Inbox' && hasNotification && (
-                 <span className="absolute -top-1 -right-3 w-2 h-2 bg-rose-500 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.8)] animate-pulse" />
+                 <span className="absolute -top-1 -right-3 w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />
               )}
             </Link>
           ))}
@@ -112,7 +121,7 @@ export function Navigation() {
             <div className="relative">
               {item.name}
               {item.name === 'Inbox' && hasNotification && (
-                 <span className="absolute -top-1 -right-3 w-1.5 h-1.5 bg-rose-500 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.8)] animate-pulse" />
+                 <span className="absolute -top-1 -right-3 w-1.5 h-1.5 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />
               )}
             </div>
           </Link>
