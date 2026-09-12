@@ -56,7 +56,8 @@ const compressAndUploadImage = async (file: File, uid: string, index: number): P
           const downloadUrl = await getDownloadURL(storageRef);
           resolve(downloadUrl);
         } catch (uploadErr) {
-          reject(uploadErr);
+          console.warn("Storage upload failed, falling back to Base64", uploadErr);
+          resolve(dataUrl);
         }
       };
       img.onerror = error => reject(error);
