@@ -111,8 +111,15 @@ function RegisterForm() {
       window.location.href = '/onboarding';
     } catch (err: any) {
       console.error("[REGISTER] Caught Error:", err);
-      setError(err.message || 'Failed to create account');
-      setLoading(false);
+      if (err.code === 'auth/email-already-in-use') {
+        setError('Account already exists! Redirecting to login so you can resume your profile...');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      } else {
+        setError(err.message || 'Failed to create account');
+        setLoading(false);
+      }
     }
   };
 
