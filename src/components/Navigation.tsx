@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LiveMarquee } from './LiveMarquee';
 import { useAuth } from '@/lib/AuthContext';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -66,6 +67,7 @@ export function Navigation() {
 
   return (
     <>
+      <LiveMarquee />
       {/* Desktop Header */}
       <header className="w-full px-6 py-5 bg-black/50 backdrop-blur-xl border-b border-white/5 flex justify-between items-center sticky top-0 z-50">
         <Link href="/feed" className="text-xl font-bold tracking-tight text-white hover:scale-105 transition-transform">

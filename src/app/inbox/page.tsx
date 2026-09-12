@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { collection, query, where, onSnapshot, getDocs, getDoc, updateDoc, doc, addDoc, deleteDoc, arrayUnion } from 'firebase/firestore';
 import { db, messaging } from '@/lib/firebase';
 import { getToken } from 'firebase/messaging';
+import { TimeBombTimer } from "@/components/TimeBombTimer";
 import { ScrambleText } from '@/components/ScrambleText';
 import { TokenBadge } from '@/components/TokenBadge';
 
@@ -315,11 +316,14 @@ export default function InboxPage() {
                              {otherUser?.photos?.[0] ? <img src={otherUser.photos[0]} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">👤</div>}
                            </div>
                            <div>
-                             <h4 className="text-white font-bold">{otherUser?.name || 'Someone'}</h4>
+                             <h4 className="text-white font-bold flex items-center gap-2">
+                               {otherUser?.name || 'Someone'}
+                               <TimeBombTimer timestamp={chat.lastUpdated} />
+                             </h4>
                              <p className="text-xs text-indigo-300 mt-1">Wants to break the ice!</p>
                            </div>
                          </div>
-                         <div className="flex gap-2">
+                         <div className="flex gap-2 mt-2 sm:mt-0">
                            <button 
                              onClick={() => handleReject(chat.id, chat.senderId)}
                              className="text-xs font-medium text-zinc-500 hover:text-rose-500 transition-colors uppercase tracking-wider px-2 flex items-center"
@@ -349,9 +353,12 @@ export default function InboxPage() {
                          <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800">
                            {otherUser?.photos?.[0] ? <img src={otherUser.photos[0]} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">👤</div>}
                          </div>
-                         <div>
-                           <h4 className="text-zinc-300 font-bold text-sm">{otherUser?.name || 'Someone'}</h4>
-                           <p className="text-xs text-zinc-500">Waiting for them to accept...</p>
+                         <div className="flex-1 flex justify-between items-center">
+                           <div>
+                             <h4 className="text-zinc-300 font-bold text-sm">{otherUser?.name || 'Someone'}</h4>
+                             <p className="text-xs text-zinc-500">Waiting for them to accept...</p>
+                           </div>
+                           <TimeBombTimer timestamp={chat.lastUpdated} />
                          </div>
                       </div>
                     )
