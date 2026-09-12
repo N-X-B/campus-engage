@@ -62,8 +62,9 @@ export default function SpeedBumpPage() {
         let users: any[] = [];
         snap.forEach(d => {
           const data = d.data();
-          const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
-          if (d.id !== user.uid && data.status !== 'under_review' && hasPhoto) {
+          // TEMPORARY OVERRIDE: Allowing accounts without photos so admin can check old test profiles
+          // const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
+          if (d.id !== user.uid && data.status !== 'under_review') {
             users.push({ id: d.id, ...data });
           }
         });
