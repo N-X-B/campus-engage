@@ -143,8 +143,9 @@ export default function OnboardingWizard() {
             }
 
             // Determine which step to put them on based on what's missing
-            if (data.bio && data.photos?.length > 0) {
-              if (data.course && data.branch && data.year && data.gender) {
+            if (data.course && data.branch && data.year && data.gender) {
+              const requiredCount = data.gender === 'female' ? 1 : 3;
+              if (data.photos && data.photos.length >= requiredCount) {
                 if (data.studyVibe && data.weekendVibe) {
                   setStep(4);
                   setShowRulesModal(false);
@@ -156,6 +157,8 @@ export default function OnboardingWizard() {
                 setStep(2);
                 setShowRulesModal(false);
               }
+            } else {
+              setStep(1);
             }
           }
         } catch (err) {
@@ -190,23 +193,30 @@ export default function OnboardingWizard() {
     setError('');
     
     // Step validation
-    if (step === 1) {
+    if (step === 1) { // Academics & Gender
+       if (!course || !year || !branch.trim() || !gender) {
+          setError("Please fill out all academic fields and gender to continue."); return;
+       }
+       if (user && !isDemoMode) {
+         updateDoc(doc(db, 'users', user.uid), { course, year, branch, gender }).catch(console.error);
+       }
+    } else if (step === 2) { // Photos
        let uploadedCount = 0;
        for (let i = 0; i < 3; i++) {
           if (files[i] !== null || (previews[i] !== null && !previews[i]?.startsWith('blob:'))) {
              uploadedCount++;
           }
        }
-       if (uploadedCount < 3) { 
-         setError("You must upload all 3 photos to proceed. High-effort profiles get the most matches."); 
+       const requiredCount = gender === 'female' ? 1 : 3;
+       if (uploadedCount < requiredCount) { 
+         setError(gender === 'female' ? "You must upload at least 1 photo to proceed." : "You must upload all 3 photos to proceed. High-effort profiles get the most matches."); 
          return; 
        }
-       if (!bio.trim()) { setError("Please add a short bio."); return; }
        
        setSaving(true);
        if (user && !isDemoMode) {
          try {
-           const finalPhotos: string[] = [];
+           const finalPhotos = [];
            for (let i = 0; i < 3; i++) {
              if (files[i]) {
                finalPhotos.push(await compressAndUploadImage(files[i]!, user.uid, i));
@@ -214,21 +224,13 @@ export default function OnboardingWizard() {
                finalPhotos.push(previews[i]!);
              }
            }
-           await updateDoc(doc(db, 'users', user.uid), { bio, photos: finalPhotos });
+           await updateDoc(doc(db, 'users', user.uid), { photos: finalPhotos });
          } catch(err) {
-           console.error("Failed to save draft", err);
+           console.error("Failed to save photos", err);
          }
        }
        setSaving(false);
-    } else if (step === 2) {
-       if (!course || !year || !branch.trim() || !gender) {
-          setError("Please fill out all academic fields."); return;
-       }
-       
-       if (user && !isDemoMode) {
-         updateDoc(doc(db, 'users', user.uid), { course, year, branch, gender }).catch(console.error);
-       }
-    } else if (step === 3) {
+    } else if (step === 3) { // Vibes
        if (!studyVibe || !weekendVibe || !skipClass) {
           setError("Please answer all vibe checks."); return;
        }
@@ -272,10 +274,11 @@ export default function OnboardingWizard() {
        return;
     }
 
-    const hasPhoto = files.some(f => f !== null) || previews.some(p => p !== null);
-    if (!hasPhoto) {
-       setError("⚠️ You must upload at least 1 photo to complete your profile.");
-       setStep(1);
+    const uploadedCount = files.filter(f => f !== null).length + previews.filter(p => p !== null && !p.startsWith('blob:')).length;
+    const requiredCount = gender === 'female' ? 1 : 3;
+    if (uploadedCount < requiredCount) {
+       setError(`⚠️ You must upload at least ${requiredCount} photo${requiredCount > 1 ? 's' : ''} to complete your profile.`);
+       setStep(2);
        return;
     }
 
@@ -482,39 +485,6 @@ export default function OnboardingWizard() {
                 {step === 1 && (
                   <motion.div key="step1" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
-                      <Typewriter text="Let's build your profile." />
-                      <p className="text-zinc-400 mt-2">First impressions matter. Add your best photos and a bio.</p>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                      {[0, 1, 2].map((index) => (
-                        <label key={index} className="aspect-[3/4] bg-white/5 rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:bg-black text-white transition-colors relative overflow-hidden group">
-                          <input type="file" accept="image/jpeg, image/png, image/webp" className="text-white hidden" onChange={(e) => handleFileChange(index, e)} />
-                          {previews[index] ? (
-                            <img src={previews[index]!} alt="preview" className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
-                          ) : (
-                            <span className="text-3xl text-zinc-500 group-hover:scale-125 transition-transform">+</span>
-                          )}
-                        </label>
-                      ))}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-white mb-2">Your Bio</label>
-                      <textarea
-                        rows={4}
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
-                        placeholder="Keep it brief, authentic, and engaging..."
-                        className="w-full px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none bg-black text-white transition-colors"
-                      />
-                    </div>
-                  </motion.div>
-                )}
-
-                {step === 2 && (
-                  <motion.div key="step2" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
-                    <div>
                       <Typewriter text="The Academics" />
                       <p className="text-zinc-400 mt-2">Who are you on campus?</p>
                     </div>
@@ -581,6 +551,30 @@ export default function OnboardingWizard() {
                   </motion.div>
                 )}
 
+                {step === 2 && (
+                  <motion.div key="step2" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
+                    <div>
+                      <Typewriter text="Let's build your profile." />
+                      <p className="text-zinc-400 mt-2">First impressions matter. Add your best photos and a bio.</p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      {[0, 1, 2].map((index) => (
+                        <label key={index} className="aspect-[3/4] bg-white/5 rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:bg-black text-white transition-colors relative overflow-hidden group">
+                          <input type="file" accept="image/jpeg, image/png, image/webp" className="text-white hidden" onChange={(e) => handleFileChange(index, e)} />
+                          {previews[index] ? (
+                            <img src={previews[index]!} alt="preview" className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
+                          ) : (
+                            <span className="text-3xl text-zinc-500 group-hover:scale-125 transition-transform">+</span>
+                          )}
+                        </label>
+                      ))}
+                    </div>
+
+                    
+                  </motion.div>
+                )}
+
                 {step === 3 && (
                   <motion.div key="step3" variants={slideVariants} initial="initial" animate="in" exit="out" className="space-y-8 pb-20">
                     <div>
@@ -634,6 +628,16 @@ export default function OnboardingWizard() {
 
                     <div className="space-y-8">
                       <div>
+                      <label className="block text-sm font-semibold text-white mb-2">Your Bio</label>
+                      <textarea
+                        rows={4}
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        placeholder="Keep it brief, authentic, and engaging..."
+                        className="w-full px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none bg-black text-white transition-colors"
+                      />
+                    </div>
+                      <div>
                         <label className="block text-base font-semibold text-white mb-4">Assignment submission is tomorrow at 9 AM...</label>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           {["Copying topper's PDF at 2 AM", "Writing it outside class", "Finished it a week ago"].map(opt => (
@@ -667,10 +671,10 @@ export default function OnboardingWizard() {
                 
                 {step < totalSteps ? (
                   <>
-                    {step === 1 && (files.filter(f => f !== null).length + previews.filter(p => p !== null && !p?.startsWith('blob:')).length < 3) ? (
+                    {step === 2 && (files.filter(f => f !== null).length + previews.filter(p => p !== null && !p.startsWith('blob:')).length < (gender === 'female' ? 1 : 3)) ? (
                       <div className="flex flex-col items-end gap-1">
                         <Button disabled className="bg-white/20 text-white/40 rounded-lg px-8 cursor-not-allowed">Continue</Button>
-                        <p className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Upload all 3 photos to continue</p>
+                        <p className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Upload required photos to continue</p>
                       </div>
                     ) : (
                       <Button onClick={nextStep} disabled={saving} className="bg-white text-black hover:bg-zinc-200 rounded-lg px-8">
