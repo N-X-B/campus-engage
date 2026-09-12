@@ -71,7 +71,7 @@ export default function LoginPage() {
         await demoAuth.signIn(email);
         setLoginState('success');
         setTimeout(() => {
-          window.location.href = '/feed'; // using router.push instead of window.location for smoother SPA transition
+          router.push('/feed'); // using router.push instead of window.location for smoother SPA transition
         }, 1200);
         return;
       }
@@ -96,9 +96,9 @@ export default function LoginPage() {
         // If DB fails, assume they are returning user to avoid forcing onboarding loop
         const isFullyOnboarded = userData && ((userData as any).onboarded || (userData as any).onboardingComplete);
         if (dbFailed || isFullyOnboarded) {
-          window.location.href = '/feed';
+          router.push('/feed');
         } else {
-          window.location.href = '/onboarding';
+          router.push('/onboarding');
         }
       }, 500);
     } catch (err: any) {

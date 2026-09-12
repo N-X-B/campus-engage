@@ -40,7 +40,7 @@ function RegisterForm() {
       if (isDemoMode) {
         console.log("[REGISTER] Using demo mode");
         await demoAuth.register(email, name);
-        window.location.href = '/onboarding';
+        router.push('/onboarding');
         return;
       }
 
@@ -108,13 +108,13 @@ function RegisterForm() {
       }
 
       console.log("[REGISTER] Routing to /onboarding...");
-      window.location.href = '/onboarding';
+      router.push('/onboarding');
     } catch (err: any) {
       console.error("[REGISTER] Caught Error:", err);
       if (err.code === 'auth/email-already-in-use') {
         setError('Account already exists! Redirecting to login so you can resume your profile...');
         setTimeout(() => {
-          window.location.href = '/login';
+          router.push('/login');
         }, 2000);
       } else {
         setError(err.message || 'Failed to create account');
