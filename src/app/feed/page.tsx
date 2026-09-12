@@ -229,7 +229,7 @@ export default function FeedPage() {
         if (targetDoc.exists()) {
            const currentAura = targetDoc.data().auraScore || 20;
            await updateDoc(doc(db, 'users', p.id), {
-             auraScore: Math.max(0, currentAura - 50)
+             auraScore: Math.max(15, currentAura - 50)
            });
         }
       } catch (err) {
@@ -306,15 +306,7 @@ export default function FeedPage() {
       }
     }
     
-    // Aura Filter Check
-    const myAura = userData?.auraScore ?? 20;
-    const reqAura = p.minAuraRequired || 0;
-    
-    if (myAura < reqAura) {
-       alert(`🛡️ Aura Shield Active!\n\n${p.name} requires a minimum Aura Score of ${reqAura} to receive messages.\nYour current Aura is ${myAura}.\n\nRaise your Aura by getting praises from others!`);
-       return;
-    }
-
+    // Aura Filter Check removed per user request
     haptic.medium();
     const rect = e.currentTarget.getBoundingClientRect();
     setShatterPos({ x: rect.left, y: rect.top, width: rect.width });

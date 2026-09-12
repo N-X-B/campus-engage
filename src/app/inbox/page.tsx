@@ -67,7 +67,7 @@ export default function InboxPage() {
         if (targetDoc.exists()) {
            const currentAura = targetDoc.data().auraScore || 20;
            await updateDoc(doc(db, 'users', senderId), {
-             auraScore: Math.max(0, currentAura - 50)
+             auraScore: Math.max(15, currentAura - 50)
            });
         }
         
