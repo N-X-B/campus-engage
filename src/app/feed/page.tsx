@@ -16,8 +16,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SpeedBumpModal from '@/components/SpeedBumpModal';
 import VibeMatchScreen from '@/components/VibeMatchScreen';
 import { TokenBadge } from '@/components/TokenBadge';
-
-
+function base64ToBlobUrl(base64Str: string): string {
+  if (!base64Str.startsWith('data:image')) return base64Str;
+  try {
+    const arr = base64Str.split(',');
+    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const blob = new Blob([u8arr], { type: mime });
+    return URL.createObjectURL(blob);
+  } catch (e) {
+    console.error("Failed to convert base64 to blob", e);
+    return base64Str;
+  }
+}
 const INTEREST_GROUPS = {
   "Academics 📚": ["Study Group", "Library Grind", "Tech & Hackathons", "Startup Building"],
   "Social & Nightlife 🪩": ["Greek Life", "Bar Crawls", "House Parties", "Cafe Hopping"],
@@ -141,7 +157,11 @@ export default function FeedPage() {
                     const data = d.data();
                     const blockedByMe = currentUserData.blockedUsers || [];
                     if (data.onboarded && d.id !== user.uid && data.status !== 'under_review' && !blockedByMe.includes(d.id)) {
-                       fetchedProfiles.push({ id: d.id, ...data });
+                       fetchedProfiles.push({ 
+                         id: d.id, 
+                         ...data,
+                         photos: Array.isArray(data.photos) ? data.photos.map(base64ToBlobUrl) : []
+                       });
                     }
                  }
               });
@@ -159,7 +179,11 @@ export default function FeedPage() {
                  const data = d.data();
                  const blockedByMe = currentUserData.blockedUsers || [];
                  if (data.onboarded && d.id !== user.uid && data.status !== 'under_review' && !blockedByMe.includes(d.id)) {
-                    fetchedProfiles.push({ id: d.id, ...data });
+                    fetchedProfiles.push({ 
+                      id: d.id, 
+                      ...data,
+                      photos: Array.isArray(data.photos) ? data.photos.map(base64ToBlobUrl) : []
+                    });
                  }
               });
               
@@ -387,7 +411,7 @@ export default function FeedPage() {
   const getMatchColor = (score: number) => {
     if (score >= 85) return 'bg-rose-500 text-white border-rose-400';
     if (score >= 70) return 'bg-emerald-500 text-white border-emerald-400';
-    return 'bg-white/20 text-white border-white/30 backdrop-blur-md';
+    return 'bg-white/20 text-white border-white/30 backdrop-blur-none';
   };
 
   if (loading || fetching) {
@@ -396,7 +420,6 @@ export default function FeedPage() {
 
   return (
     <>
-      <SonarBackground />
       <div className="min-h-screen relative z-10 pb-20 md:pb-0 font-sans selection:bg-indigo-500/30">
       <Navigation />
       
@@ -525,7 +548,7 @@ export default function FeedPage() {
                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
                  
                  <div className="absolute top-4 right-4 z-20 flex items-center">
-                   <button onClick={() => setSelectedProfileForBrief(null)} className="w-10 h-10 bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10 ml-2">
+                   <button onClick={() => setSelectedProfileForBrief(null)} className="w-10 h-10 bg-black/40 backdrop-blur-none text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-colors border border-white/10 ml-2">
                      ✕
                    </button>
                  </div>
@@ -736,10 +759,10 @@ export default function FeedPage() {
                   )}
                   <motion.div 
                 key={p.id}
-                initial={{ opacity: 0, y: 100, filter: "blur(40px) brightness(2)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px) brightness(1)" }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "50px" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 className={`relative bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden aspect-[3/4] flex flex-col group hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 cursor-pointer z-10 ${index % 5 === 2 ? 'ring-2 ring-rose-500 shadow-[0_0_30px_rgba(244,63,94,0.3)]' : ''}`}
               >
                 {index % 5 === 2 && (
@@ -774,10 +797,10 @@ export default function FeedPage() {
                   <div className="flex flex-wrap gap-2 mb-4">
                     {p.answers && (
                       <>
-                        <span className="bg-black/30 backdrop-blur-md border border-white/10 text-white text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-full shadow-sm">
+                        <span className="bg-black/30 backdrop-blur-none border border-white/10 text-white text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-full shadow-sm">
                           {p.answers.weekendVibe}
                         </span>
-                        <span className="bg-black/30 backdrop-blur-md border border-white/10 text-white text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-full shadow-sm">
+                        <span className="bg-black/30 backdrop-blur-none border border-white/10 text-white text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-full shadow-sm">
                           {p.answers.studyVibe.includes('Beats') ? 'Coffee Shop' : 'Library'}
                         </span>
                       </>
@@ -794,7 +817,7 @@ export default function FeedPage() {
                             key="btn-ice"
                             exit={{ opacity: 0, scale: 1.1 }}
                             onClick={(e) => handleBreakIceClick(e, p)} 
-                            className="flex-1 bg-white/10 hover:bg-white/20 bg-zinc-800/80 backdrop-blur-md border border-white/20 text-white rounded-xl py-3 font-bold text-sm transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
+                            className="flex-1 bg-white/10 hover:bg-white/20 bg-zinc-800/80 backdrop-blur-none border border-white/20 text-white rounded-xl py-3 font-bold text-sm transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2"
                           >
                             Break the Ice 🧊
                           </motion.button>
@@ -803,7 +826,7 @@ export default function FeedPage() {
                             key="btn-pulse"
                             exit={{ opacity: 0, scale: 1.1 }}
                             onClick={handlePulseClick} 
-                            className="w-14 bg-rose-500/20 text-rose-500 border border-rose-500/40 rounded-xl flex flex-col items-center justify-center hover:bg-rose-500 hover:text-white transition group relative overflow-hidden backdrop-blur-md"
+                            className="w-14 bg-rose-500/20 text-rose-500 border border-rose-500/40 rounded-xl flex flex-col items-center justify-center hover:bg-rose-500 hover:text-white transition group relative overflow-hidden backdrop-blur-none"
                           >
                             <div className="absolute inset-0 bg-gradient-to-t from-rose-500/20 to-transparent opacity-0 group-hover:opacity-100 transition" />
                             <span className="text-xl group-hover:scale-125 transition">🫀</span>
