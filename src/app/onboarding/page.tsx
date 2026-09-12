@@ -5,8 +5,7 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc, getDoc, updateDoc, deleteField } from 'firebase/firestore';
 import { generateAndSaveEmbedding } from '@/app/actions/matchmaking';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { isDemoMode, demoDb } from '@/lib/demo-backend';
@@ -14,7 +13,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as nsfwjs from 'nsfwjs';
 
 
-import { uploadString } from 'firebase/storage';
 
 const compressAndUploadImage = async (file: File, uid: string, index: number): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -40,15 +38,7 @@ const compressAndUploadImage = async (file: File, uid: string, index: number): P
         ctx?.drawImage(img, 0, 0, width, height);
         
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        try {
-          const storageRef = ref(storage, `users/${uid}/photo_${Date.now()}_${index}.jpg`);
-          await uploadString(storageRef, dataUrl, 'data_url');
-          const downloadUrl = await getDownloadURL(storageRef);
-          resolve(downloadUrl);
-        } catch (uploadErr) {
-          console.warn("Storage upload failed, falling back to Base64", uploadErr);
-          resolve(dataUrl);
-        }
+        resolve(dataUrl);
       };
       img.onerror = error => reject(error);
     };
@@ -488,7 +478,7 @@ export default function OnboardingWizard() {
                     <div className="grid grid-cols-3 gap-4">
                       {[0, 1, 2].map((index) => (
                         <label key={index} className="aspect-[3/4] bg-white/5 rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:bg-black text-white transition-colors relative overflow-hidden group">
-                          <input type="file" accept="image/*" className="text-white hidden" onChange={(e) => handleFileChange(index, e)} />
+                          <input type="file" accept="image/jpeg, image/png, image/webp" className="text-white hidden" onChange={(e) => handleFileChange(index, e)} />
                           {previews[index] ? (
                             <img src={previews[index]!} alt="preview" className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
                           ) : (

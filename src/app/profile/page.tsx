@@ -23,7 +23,6 @@ import { deleteUserEmbedding } from '@/app/actions/matchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as nsfwjs from 'nsfwjs';
 
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
 
 const compressAndUploadImage = async (file: File, uid: string, index: number): Promise<string> => {
@@ -50,15 +49,7 @@ const compressAndUploadImage = async (file: File, uid: string, index: number): P
         ctx?.drawImage(img, 0, 0, width, height);
         
         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        try {
-          const storageRef = ref(storage, `users/${uid}/photo_${Date.now()}_${index}.jpg`);
-          await uploadString(storageRef, dataUrl, 'data_url');
-          const downloadUrl = await getDownloadURL(storageRef);
-          resolve(downloadUrl);
-        } catch (uploadErr) {
-          console.warn("Storage upload failed, falling back to Base64", uploadErr);
-          resolve(dataUrl);
-        }
+        resolve(dataUrl);
       };
       img.onerror = error => reject(error);
     };
@@ -737,7 +728,7 @@ export default function ProfilePage() {
                     )}
                     <input 
                       type="file" 
-                      accept="image/*" 
+                      accept="image/jpeg, image/png, image/webp" 
                       onChange={(e) => handlePhotoChange(index, e)}
                       className="absolute inset-0 opacity-0 cursor-pointer" 
                     />
