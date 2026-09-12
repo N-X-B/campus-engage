@@ -503,10 +503,6 @@ export default function OnboardingWizard() {
                     <div>
                       <Typewriter text="Let's build your profile." />
                       <p className="text-zinc-400 mt-2">First impressions matter. Add your best photos and a bio.</p>
-                      <p className="text-[10px] text-rose-400/80 font-medium mt-3 uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse" />
-                        Accounts without photos uploaded within 24 hours will be permanently deleted.
-                      </p>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">

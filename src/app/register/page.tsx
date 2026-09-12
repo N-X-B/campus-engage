@@ -200,10 +200,6 @@ function RegisterForm() {
         >
           {loading ? 'Creating Account...' : 'Continue to Vibe Check →'}
         </Button>
-
-        <p className="text-[10px] text-rose-400/80 text-center font-medium mt-4 uppercase tracking-wider">
-          ⚠️ Note: Accounts without photos uploaded within 24 hours will be automatically permanently deleted.
-        </p>
       </form>
 
       <div className="mt-8 text-center">

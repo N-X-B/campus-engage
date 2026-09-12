@@ -194,12 +194,6 @@ export default function LoginPage() {
                 ) : isResetMode ? 'Send Reset Link' : 'Sign In'}
               </Button>
               
-              {!isResetMode && (
-                <p className="text-[10px] text-rose-400/80 text-center font-medium mt-4 uppercase tracking-wider">
-                  ⚠️ Note: Accounts without photos uploaded within 24 hours will be automatically permanently deleted.
-                </p>
-              )}
-              
               {isResetMode && (
                  <div className="text-center mt-4">
                    <button 
