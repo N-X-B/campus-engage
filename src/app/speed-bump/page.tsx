@@ -11,19 +11,27 @@ import { LoadingScreen } from '@/components/LoadingScreen';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 
-const SUPERLATIVES = [
-  "Definitely has a secret admirer right now 💌",
-  "Who are you double-taking in the hallway? 👀",
-  "Has the most unspoken rizz on campus 🤫",
-  "Most likely to break a heart this semester 💔",
-  "Main Character Energy ✨",
-  "Who makes your heart skip a beat? 💓",
-  "Intimidatingly good looking 🧿",
-  "Best dressed on campus 👗",
-  "Most likely to steal your hoodie and never return it 🧥",
-  "Who would you secretly want to match with? 🎯",
-  "Has the best smile on campus 😊",
-  "Most likely to leave you on delivered for 3 days 📱"
+type Question = { type: 'profile', text: string } | { type: 'text', text: string, answers: string[] };
+
+const QUESTIONS: Question[] = [
+  // Spicy Profile Questions (Thrilling)
+  { type: 'profile', text: "Most likely to break a heart this semester 💔" },
+  { type: 'profile', text: "Who is definitely hiding a crazy side? 😈" },
+  { type: 'profile', text: "Who would you trust with your deepest secret? 🤫" },
+  { type: 'profile', text: "Who has the most unspoken rizz on campus? 🫦" },
+  { type: 'profile', text: "Intimidatingly good looking 🧿" },
+  { type: 'profile', text: "Who are you double-taking in the hallway? 👀" },
+  { type: 'profile', text: "Most likely to steal your hoodie and never return it 🧥" },
+  { type: 'profile', text: "Who would you secretly want to match with? 🎯" },
+  { type: 'profile', text: "Most likely to leave you on delivered for 3 days 📱" },
+  { type: 'profile', text: "Main Character Energy ✨" },
+  
+  // Non-Profile "Hot Take" Questions
+  { type: 'text', text: "Biggest ick on a first date? 🚩", answers: ["Being rude to waiters", "Talking about their ex", "Being on their phone", "No ambition"] },
+  { type: 'text', text: "What's the most attractive major? 📚", answers: ["Engineering/CS", "Business/Finance", "Arts/Humanities", "Pre-Med"] },
+  { type: 'text', text: "What's your toxic trait? 💅", answers: ["Ghosting people", "Overthinking everything", "Falling in love too fast", "Never texting back"] },
+  { type: 'text', text: "Best late-night campus food? 🍕", answers: ["Pizza", "Taco Bell", "Diner/Waffle House", "Instant Noodles"] },
+  { type: 'text', text: "Ideal Friday night? 🌙", answers: ["Massive Frat Party", "Small group of friends", "Bingeing Netflix alone", "Late night drive"] }
 ];
 
 export default function SpeedBumpPage() {
@@ -32,6 +40,7 @@ export default function SpeedBumpPage() {
   
   const [candidates, setCandidates] = useState<any[]>([]);
   const [currentPrompt, setCurrentPrompt] = useState("");
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [options, setOptions] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
   
@@ -81,11 +90,22 @@ export default function SpeedBumpPage() {
       return;
     }
     
-    const shuffledPrompt = SUPERLATIVES[Math.floor(Math.random() * SUPERLATIVES.length)];
-    setCurrentPrompt(shuffledPrompt);
+    const q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+    setCurrentQuestion(q);
+    setCurrentPrompt(q.text);
     
-    const selected = [...pool].sort(() => 0.5 - Math.random()).slice(0, 4);
-    setOptions(selected);
+    if (q.type === 'profile') {
+      const selected = [...pool].sort(() => 0.5 - Math.random()).slice(0, 4);
+      setOptions(selected);
+    } else {
+      // It's a text poll, map answers to options format
+      const selected = q.answers.map((ans, i) => ({
+        id: `text_${i}`,
+        isText: true,
+        text: ans,
+      }));
+      setOptions(selected);
+    }
     setSelectedId(null);
   };
 
@@ -104,18 +124,23 @@ export default function SpeedBumpPage() {
     } catch(e) {}
 
     try {
-      await updateDoc(doc(db, 'users', winnerId), {
-         auraScore: increment(2),
-         superlativeWins: increment(1)
-      });
-      
-      await addDoc(collection(db, 'superlative_votes'), {
-         voterId: user!.uid,
-         receiverId: winnerId,
-         prompt: currentPrompt,
-         timestamp: serverTimestamp(),
-         status: 'unread'
-      });
+      if (currentQuestion?.type === 'profile') {
+        await updateDoc(doc(db, 'users', winnerId), {
+           auraScore: increment(2),
+           superlativeWins: increment(1)
+        });
+        
+        await addDoc(collection(db, 'superlative_votes'), {
+           voterId: user!.uid,
+           receiverId: winnerId,
+           prompt: currentPrompt,
+           timestamp: serverTimestamp(),
+           status: 'unread'
+        });
+      } else {
+        // Just record the global hot take answer if needed, or do nothing.
+        // For now, we just give them the token.
+      }
     } catch (err) {
       console.error("Failed to save vote", err);
     }
@@ -180,19 +205,25 @@ export default function SpeedBumpPage() {
                         : selectedId !== null 
                           ? 'border-white/5 opacity-40 scale-95 grayscale' 
                           : 'border-white/10 hover:border-white/30'
-                    }`}
+                    } ${opt.isText ? 'bg-zinc-900 flex items-center justify-center p-4' : ''}`}
                   >
-                    <img 
-                      src={opt.photos?.[0] || 'https://via.placeholder.com/300'} 
-                      alt={opt.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    
-                    <div className="absolute bottom-4 left-4 text-left">
-                      <p className="font-bold text-white text-lg tracking-tight">{opt.name}</p>
-                      <p className="text-zinc-300 text-xs font-medium">{opt.year ? `Year ${opt.year}` : 'Student'}</p>
-                    </div>
+                    {!opt.isText ? (
+                      <>
+                        <img 
+                          src={opt.photos?.[0] || 'https://via.placeholder.com/300'} 
+                          alt={opt.name}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        
+                        <div className="absolute bottom-4 left-4 text-left">
+                          <p className="font-bold text-white text-lg tracking-tight">{opt.name}</p>
+                          <p className="text-zinc-300 text-xs font-medium">{opt.year ? `Year ${opt.year}` : 'Student'}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="font-bold text-white text-xl text-center leading-tight tracking-tight">{opt.text}</p>
+                    )}
 
                     {/* Floating Reward Animation */}
                     <AnimatePresence>
