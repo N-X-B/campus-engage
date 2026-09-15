@@ -95,8 +95,8 @@ export default function SpottedPage() {
   };
 
   const handleSubmitConfession = async () => {
-    if (tokens < 20) {
-      alert("You need 20 Reveal Tokens to post a confession!");
+    if (tokens < 5) {
+      alert("You need 5 Reveal Tokens to post a confession!");
       return;
     }
     if (composeText.trim().length < 10) {
@@ -150,7 +150,7 @@ export default function SpottedPage() {
       });
 
       // Deduct Tokens
-      const newTokens = tokens - 20;
+      const newTokens = tokens - 5;
       localStorage.setItem('revealTokens', newTokens.toString());
       window.dispatchEvent(new Event('tokensUpdated'));
       
@@ -300,7 +300,7 @@ export default function SpottedPage() {
                 
                 <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 p-4 rounded-xl text-sm font-bold flex items-center gap-3 mb-6">
                    <span className="text-2xl">🪙</span>
-                   This action costs exactly 20 Reveal Tokens.
+                   This action costs exactly 5 Reveal Tokens.
                 </div>
 
                 <textarea
@@ -312,7 +312,7 @@ export default function SpottedPage() {
                 
                 <button 
                    onClick={handleSubmitConfession}
-                   disabled={isSubmitting || tokens < 20}
+                   disabled={isSubmitting || tokens < 5}
                    className="w-full bg-rose-600 hover:bg-rose-500 disabled:opacity-50 disabled:hover:bg-rose-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors uppercase tracking-widest text-sm"
                 >
                    {isSubmitting ? "Posting..." : "Post Instantly (20 🪙)"}
