@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
 import { Navigation } from '@/components/Navigation';
@@ -19,6 +19,7 @@ export default function AdminEmailsPage() {
   const [activeUsers, setActiveUsers] = useState<UserExport[]>([]);
   const [incompleteUsers, setIncompleteUsers] = useState<UserExport[]>([]);
   const [error, setError] = useState("");
+  const [boosting, setBoosting] = useState(false);
 
   useEffect(() => {
     if (!user) return; // Wait for login
@@ -61,6 +62,36 @@ export default function AdminEmailsPage() {
     fetchEmails();
   }, [user]);
 
+  const boostAuraScores = async () => {
+    if (!confirm("Are you sure you want to increase all active users' scores by 10-15 points?")) return;
+    setBoosting(true);
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      const updatePromises: Promise<void>[] = [];
+      
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        const hasPhoto = data.photos && Array.isArray(data.photos) && data.photos.length > 0;
+        
+        if (data.onboarded && hasPhoto) {
+          const currentScore = typeof data.auraScore === 'number' ? data.auraScore : 20;
+          const boost = Math.floor(Math.random() * 6) + 10; 
+          let newScore = currentScore + boost;
+          if (newScore > 100) newScore = 100;
+          
+          updatePromises.push(updateDoc(docSnap.ref, { auraScore: newScore }));
+        }
+      });
+      
+      await Promise.all(updatePromises);
+      alert(`Successfully boosted aura scores for ${updatePromises.length} active users!`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to boost scores.");
+    }
+    setBoosting(false);
+  };
+
   const copyToClipboard = (users: UserExport[]) => {
     navigator.clipboard.writeText(users.map(u => u.email).join(', '));
     alert("Copied to clipboard! You can paste this directly into Gmail's BCC field.");
@@ -71,7 +102,18 @@ export default function AdminEmailsPage() {
       <Navigation />
       
       <div className="max-w-6xl mx-auto pt-10">
-        <h1 className="text-3xl font-black mb-2 text-rose-500">Admin Dashboard</h1>
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-3xl font-black text-rose-500">Admin Dashboard</h1>
+          {user && (
+            <button 
+              onClick={boostAuraScores}
+              disabled={boosting}
+              className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
+            >
+              {boosting ? "Boosting Scores..." : "🚀 Boost Aura Scores"}
+            </button>
+          )}
+        </div>
         <p className="text-zinc-400 mb-8">
           View all registered users and extract their emails for marketing campaigns.
         </p>
