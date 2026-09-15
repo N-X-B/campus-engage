@@ -84,6 +84,7 @@ export default function FeedPage() {
   const [tokens, setTokens] = useState(0);
   const [speedBumpOpen, setSpeedBumpOpen] = useState(false);
   const [speedBumpProfiles, setSpeedBumpProfiles] = useState<any[]>([]);
+  const [speedBumpPrompt, setSpeedBumpPrompt] = useState("Who is more likely to sprint to class at 8:59 AM in pyjamas?");
   const [vibeMatchOpen, setVibeMatchOpen] = useState(false);
   const [vibeMatchData, setVibeMatchData] = useState<any>(null);
 
@@ -752,6 +753,16 @@ export default function FeedPage() {
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true, margin: "-100px" }}
                       onClick={() => {
+                         const prompts = [
+                            "Who is more likely to sprint to class at 8:59 AM in pyjamas?",
+                            "Who survives entirely on Maggi and campus coffee?",
+                            "Who is definitely getting caught giving a proxy?",
+                            "Who is more likely to start a random club just for the resume?",
+                            "Who is more likely to cancel a Goa trip at the last minute?",
+                            "Who is more likely to accidentally reply-all to a professor?",
+                            "Who is more likely to know all the campus gossip?"
+                         ];
+                         setSpeedBumpPrompt(prompts[Math.floor(Math.random() * prompts.length)]);
                          setSpeedBumpProfiles([profiles[index-1], p]);
                          setSpeedBumpOpen(true);
                       }}
@@ -907,7 +918,7 @@ export default function FeedPage() {
         onComplete={() => setSpeedBumpOpen(false)} 
         profileA={speedBumpProfiles[0]} 
         profileB={speedBumpProfiles[1]} 
-        prompt="Who's more likely to start a billion-dollar startup?" 
+        prompt={speedBumpPrompt} 
       />
 
       <VibeMatchScreen 
