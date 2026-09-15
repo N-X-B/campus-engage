@@ -116,7 +116,7 @@ export default function FeedPage() {
           // Step 1: Fetch user & AI Matches FIRST
           const [userDoc, aiMatches] = await Promise.all([
              getDoc(doc(db, 'users', user.uid)), 
-             getTopMatches(user.uid, 50).catch(e => {
+             getTopMatches(user.uid, 1000).catch(e => {
                 console.error("AI Matchmaking skipped/failed:", e);
                 return { success: false, matches: [] };
              })
@@ -175,7 +175,7 @@ export default function FeedPage() {
                 .sort((a, b) => b.matchScore - a.matchScore);
           } else {
               // Fallback if AI fails: fetch only 50 random users instead of entire database
-              const fallbackQuery = await getDocs(query(collection(db, 'users'), where('onboarded', '==', true), limit(50)));
+              const fallbackQuery = await getDocs(query(collection(db, 'users'), where('onboarded', '==', true)));
               fallbackQuery.forEach(d => {
                  const data = d.data();
                  const blockedByMe = currentUserData.blockedUsers || [];
@@ -198,24 +198,8 @@ export default function FeedPage() {
           // Dynamically shuffle the feed every time the site loads so anyone can appear
           scoredProfiles = scoredProfiles.sort(() => 0.5 - Math.random());
           
-          // Seed logic
-          const today = new Date().toISOString().split('T')[0];
-          const seedStr = user.uid + today;
-          let seed = 0;
-          for (let i = 0; i < seedStr.length; i++) {
-            seed = ((seed << 5) - seed) + seedStr.charCodeAt(i);
-            seed = seed & seed;
-          }
-          let dailyLimit = 15 + (Math.abs(seed) % 11);
-          
-          if (currentUserData.gender === 'female') {
-             dailyLimit = Infinity;
-          }
-          
-          const limitedProfiles = scoredProfiles.slice(0, dailyLimit);
-          
-          setAllFetchedProfiles(limitedProfiles);
-          setProfiles(limitedProfiles);
+          setAllFetchedProfiles(scoredProfiles);
+          setProfiles(scoredProfiles);
         }
         
       } catch (err) {
